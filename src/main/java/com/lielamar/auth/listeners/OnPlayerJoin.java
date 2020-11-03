@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class OnPlayerJoin implements Listener {
 
-    private Main main;
+    private final Main main;
     public OnPlayerJoin(Main main) {
         this.main = main;
     }
@@ -26,8 +26,15 @@ public class OnPlayerJoin implements Listener {
                 this.main.getAuthDatabaseManager().generateKey(player);
             }
         } else {
-            this.main.getAuthManager().lockPlayer(player);
-            this.main.getAuthDatabaseManager().demandCode(player);
+            boolean required = this.main.getAuthVars().isRequiredOnIPChange()
+                    && this.main.getAuthDatabaseManager().getDatabase().hasLastIP(player.getUniqueId())
+                    && !this.main.getAuthDatabaseManager().getDatabase().getLastIP(player.getUniqueId()).equalsIgnoreCase(player.getAddress().getHostString())
+                    || this.main.getAuthVars().isRequiredOnEveryLogin();
+
+            if(required) {
+                this.main.getAuthManager().lockPlayer(player);
+                this.main.getAuthDatabaseManager().demandCode(player);
+            }
         }
     }
 }

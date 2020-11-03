@@ -1,8 +1,52 @@
+# ===========================================================================================
+# Thank you for using the Two Factor Authentication plugin by Liel Amar & xItsRaz.
+# For support, you can contact us through our discord server: https://discord.gg/NzgBrqR.
+#
+# If you have any problems connecting to the database, whether it be MySQL or Mongo,
+# please delete this file, start up your server once again and re-set the information.
+#
+# Github: https://github.com/LielAmar/2FA
+# ===========================================================================================
+
+# When to require the players to use 2FA
+require:
+  # Whether or not to require 2FA when an ip of a player is changes
+  ipchanges: true
+  # Whether or not to require 2FA on every login
+  # For bungeecord servers: this will require your players to /2FA every time they switch
+  # to a different server
+  everylogin: false
+
+# If you wish to use a MySQL database for your 2FA, you need to set the 'enabled' field to
+# true, and set up the host, database, port, username and password fields.
+# If the enabled field is set to false, the plugin would try to use MongoDB or JSON!
 MySQL:
   enabled: false
   credentials:
     host: "localhost"
     database: "auth"
-    username: "changeme"
-    password: "changeme"
     port: 3306
+
+    auth:
+      username: "changeme"
+      password: "changeme"
+
+# If you wish to use a MongoDB database for your 2FA, you need to set the 'enabled' field to
+# true, and set up the host, database and port.
+# If you want to use a URI connection, change the uri field to your URI.
+# If the enabled field is set to false, the plugin would try to use MySQL or JSON!
+MongoDB:
+  enabled: false
+  credentials:
+    uri: null
+
+    host: "localhost"
+    database: "auth"
+    port: 3306
+
+    # If you have authentication enabled, please set the 'auth.required'
+    # field to true and set your username & password.
+    auth:
+      required: true
+      username: "changeme"
+      password: "changeme"
