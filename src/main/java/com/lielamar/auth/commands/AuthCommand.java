@@ -1,5 +1,6 @@
 package com.lielamar.auth.commands;
 
+import com.lielamar.auth.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -7,6 +8,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class AuthCommand implements CommandExecutor {
+
+    private Main main;
+
+    public AuthCommand(Main main) {
+        this.main = main;
+    }
 
     public boolean onCommand(CommandSender cs, Command cmd, String cmdLabel, String[] args) {
         if(cmd.getName().equalsIgnoreCase("2fa")) {
@@ -18,7 +25,7 @@ public class AuthCommand implements CommandExecutor {
             Player player = (Player)cs;
 
             if(args.length == 0) {
-                if(!AuthenticationManager.hasAuthentication(player)) {
+                if(!main.getAuthManager().hasAuthentication(player)) {
                     if(!player.hasPermission("2fa.setup")) {
                         player.sendMessage(ChatColor.RED + "You don't have permissions to set up 2 Factor Authentication!");
                         return false;
@@ -29,7 +36,7 @@ public class AuthCommand implements CommandExecutor {
                     // TODO: Send help message of the command
                 }
             } else {
-                if(!AuthenticationManager.hasAuthentication(player)) {
+                if(!main.getAuthManager().hasAuthentication(player)) {
                     player.sendMessage(ChatColor.RED + "You don't have 2 Factor Authentication set up! Use /2fa to set it up first!");
                     return false;
                 }
@@ -39,7 +46,7 @@ public class AuthCommand implements CommandExecutor {
                     codeBuilder.append(s);
 
                 String code = codeBuilder.toString();
-                boolean auth = AuthenticationManager.authenticate(player.getUniqueId(), code);
+                boolean auth = main.getAuthManager().authenticate(player, code);
 
                 if(!auth) {
                     player.kickPlayer("Wrong code");
@@ -47,10 +54,6 @@ public class AuthCommand implements CommandExecutor {
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "Authenticated!");
                 }
-
-                // /2fa 123 456
-
-                // Authenticate
             }
         }
         return false;
