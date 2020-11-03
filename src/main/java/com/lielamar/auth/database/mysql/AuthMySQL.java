@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class AuthMySQL implements AuthenticationDatabase {
 
-    private Main main;
+    private final Main main;
 
     private Connection connection;
     private String host, database, username, password;
@@ -25,7 +25,7 @@ public class AuthMySQL implements AuthenticationDatabase {
      *
      * @return   Whether or not connection was successful
      */
-    public boolean setupDatabase() {
+    public boolean setup() {
         if(this.main.getConfig() == null)
             this.main.saveConfig();
 
@@ -105,6 +105,9 @@ public class AuthMySQL implements AuthenticationDatabase {
                 statement.setString(2, uuid.toString());
             }
             statement.executeUpdate();
+
+            AuthenticationDatabase.cachedKeys.put(uuid, secretKey);
+
             return secretKey;
         } catch(SQLException e) {
             e.printStackTrace();
@@ -114,6 +117,9 @@ public class AuthMySQL implements AuthenticationDatabase {
 
     @Override
     public String getSecretKey(UUID uuid) {
+        if(AuthenticationDatabase.cachedKeys.containsKey(uuid))
+            return AuthenticationDatabase.cachedKeys.get(uuid);
+
         try {
             if(!isValidConnection()) return null;
 
@@ -121,8 +127,11 @@ public class AuthMySQL implements AuthenticationDatabase {
             statement.setString(1, uuid.toString());
             ResultSet result = statement.executeQuery();
 
-            if(result.next())
-                return result.getString("secret_key");
+            if(result.next()) {
+                String secretKey = result.getString("secret_key");
+                AuthenticationDatabase.cachedKeys.put(uuid, secretKey);
+                return secretKey;
+            }
         } catch(SQLException e) {
             e.printStackTrace();
         }

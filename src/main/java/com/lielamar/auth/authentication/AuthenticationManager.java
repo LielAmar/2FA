@@ -1,9 +1,7 @@
 package com.lielamar.auth.authentication;
 
 import com.lielamar.auth.Main;
-import com.lielamar.auth.database.AuthenticationDatabase;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
-import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -28,20 +26,6 @@ public class AuthenticationManager {
     }
     public void lockPlayer(Player player) { this.lockedPlayers.add(player.getUniqueId()); }
     public void unlockPlayer(Player player) { this.lockedPlayers.remove(player.getUniqueId()); }
-
-    public void generateKey(Player player) {
-        GoogleAuthenticator gAuth = new GoogleAuthenticator();
-        GoogleAuthenticatorKey key = gAuth.createCredentials();
-
-        AuthenticationDatabase.cachedKeys.put(player.getUniqueId(), key.getKey());
-
-        player.sendMessage(ChatColor.GRAY + "Your 2FA key is: " + ChatColor.YELLOW + key.getKey() + ChatColor.GRAY + "!");
-        player.sendMessage(ChatColor.GRAY + "Use it in your authentication app and verify with " + ChatColor.YELLOW + "/2FA <Code>" + ChatColor.GRAY + "!");
-    }
-
-    public void demandCode(Player player) {
-        player.sendMessage(ChatColor.GRAY + "Please verify your identity with " + ChatColor.YELLOW + "/2FA <Code>" + ChatColor.GRAY + "!");
-    }
 
     public boolean hasAuthentication(Player player) {
         return this.main.getAuthDatabaseManager().getDatabase().hasSecretKey(player.getUniqueId());

@@ -23,11 +23,11 @@ public class OnPlayerJoin implements Listener {
         if(secretKey == null) {
             if(player.hasPermission("2fa.demand")) {
                 this.main.getAuthManager().lockPlayer(player);
-                this.main.getAuthManager().generateKey(player);
+                this.main.getAuthDatabaseManager().generateKey(player);
             }
         } else {
             this.main.getAuthManager().lockPlayer(player);
-            this.main.getAuthManager().demandCode(player);
+            this.main.getAuthDatabaseManager().demandCode(player);
         }
     }
 }

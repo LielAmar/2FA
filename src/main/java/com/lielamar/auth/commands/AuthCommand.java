@@ -1,15 +1,27 @@
 package com.lielamar.auth.commands;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.lielamar.auth.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.UUID;
 
 public class AuthCommand implements CommandExecutor {
 
-    private Main main;
+    private final Main main;
 
     public AuthCommand(Main main) {
         this.main = main;
@@ -24,44 +36,64 @@ public class AuthCommand implements CommandExecutor {
 
             Player player = (Player)cs;
 
+            // If the amount of arguments is 0 we want to either set up 2fa/send the message to authenticate
+            // If the amount of arguments is greater than 0, we want to authenticate player/remove their key
             if(args.length == 0) {
-                if(!main.getAuthManager().hasAuthentication(player)) {
-                    if(!player.hasPermission("2fa.setup")) {
-                        player.sendMessage(ChatColor.RED + "You don't have permissions to set up 2 Factor Authentication!");
-                        return false;
-                    }
-
-                    this.main.getAuthManager().generateKey(player);
-                } else
-                    this.main.getAuthManager().demandCode(player);
-                return true;
+                return this.main.getAuthDatabaseManager().setup2FA(player);
             } else {
-                if(!main.getAuthManager().hasAuthentication(player)) {
-                    player.sendMessage(ChatColor.RED + "You don't have 2 Factor Authentication set up! Use /2fa to set it up first!");
-                    return false;
-                }
-
-                StringBuilder codeBuilder = new StringBuilder();
-                for(String s : args)
-                    codeBuilder.append(s);
+                String codeRaw = Arrays.toString(args);
 
                 try {
-                    int code = Integer.parseInt(codeBuilder.toString());
-
-                    // If authentication failed
-                    if(!main.getAuthManager().authenticate(player, code)) {
-                        player.kickPlayer("Wrong code");
-                        return false;
-                    }
-
-                    player.sendMessage(ChatColor.YELLOW + "Authenticated!");
-
+                    int code = Integer.parseInt(codeRaw);
+                    return this.main.getAuthDatabaseManager().authenticatePlayer(player, code);
                 } catch(IllegalArgumentException e) {
-                    player.sendMessage(ChatColor.RED + "Your authentication code must be an Integer!");
-                    return false;
+                    if(codeRaw.equalsIgnoreCase("remove") || codeRaw.equalsIgnoreCase("reset")) {
+                        if(args.length == 1) {
+                            return this.main.getAuthDatabaseManager().removePlayerSecretKey(player, player.getUniqueId());
+                        } else {
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    UUID targetUUID = fetchUUID(args[1]);
+                                    main.getAuthDatabaseManager().removePlayerSecretKey(player, targetUUID);
+                                }
+                            }.runTaskAsynchronously(this.main);
+                            return true;
+                        }
+                    }
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * Communicates with Mojang's API to get a player's uuid through their IGN
+     *
+     * @param name   Name to get the UUID of
+     * @return       UUID of the player
+     */
+    public UUID fetchUUID(String name) {
+        try {
+            String MOJANG_API = "https://api.mojang.com/users/profiles/minecraft/%s";
+            HttpURLConnection connection = (HttpURLConnection) new URL(String.format(MOJANG_API, name)).openConnection();
+            connection.setReadTimeout(5000);
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+
+            while((inputLine = in.readLine()) != null)
+                response.append(inputLine);
+            in.close();
+
+            JsonElement json = new JsonParser().parse(response.toString());
+            String uuid = json.getAsJsonObject().get("id").getAsString();
+
+            return UUID.fromString(uuid);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
