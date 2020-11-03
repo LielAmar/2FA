@@ -1,0 +1,8 @@
+MySQL:
+  enabled: false
+  credentials:
+    host: "localhost"
+    database: "auth"
+    username: "changeme"
+    password: "changeme"
+    port: 3306

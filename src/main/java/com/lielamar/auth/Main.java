@@ -1,13 +1,13 @@
 package com.lielamar.auth;
 
 import com.lielamar.auth.authentication.AuthenticationManager;
-import com.lielamar.auth.database.DatabaseModule;
+import com.lielamar.auth.database.AuthenticationDatabase;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
 
     private AuthenticationManager authManager;
-    private DatabaseModule database;
+    private AuthenticationDatabase database;
 
     @Override
     public void onEnable() {
@@ -15,5 +15,5 @@ public class Main extends JavaPlugin {
     }
 
     public AuthenticationManager getAuthManager() { return this.authManager; }
-    public DatabaseModule getAuthDatabase() { return this.database; }
+    public AuthenticationDatabase getAuthDatabase() { return this.database; }
 }

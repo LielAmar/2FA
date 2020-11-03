@@ -45,14 +45,20 @@ public class AuthCommand implements CommandExecutor {
                 for(String s : args)
                     codeBuilder.append(s);
 
-                String code = codeBuilder.toString();
-                boolean auth = main.getAuthManager().authenticate(player, code);
+                try {
+                    int code = Integer.parseInt(codeBuilder.toString());
 
-                if(!auth) {
-                    player.kickPlayer("Wrong code");
-                    return false;
-                } else {
+                    // If authentication failed
+                    if(!main.getAuthManager().authenticate(player, code)) {
+                        player.kickPlayer("Wrong code");
+                        return false;
+                    }
+
                     player.sendMessage(ChatColor.YELLOW + "Authenticated!");
+
+                } catch(IllegalArgumentException e) {
+                    player.sendMessage(ChatColor.RED + "Your authentication code must be an Integer!");
+                    return false;
                 }
             }
         }

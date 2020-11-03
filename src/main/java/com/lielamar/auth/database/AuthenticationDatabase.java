@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public interface DatabaseModule {
+public interface AuthenticationDatabase {
 
     Map<UUID, String> cachedKeys = new HashMap<UUID, String>();
+
+    boolean setupDatabase();
 
     String setSecretKey(UUID uuid, String secretKey);
     String getSecretKey(UUID uuid);
