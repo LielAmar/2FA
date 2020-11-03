@@ -15,7 +15,7 @@ public class AuthMySQL implements AuthenticationDatabase {
     private String host, database, username, password;
     private int port;
 
-    public void AuthMySQL(Main main) {
+    public AuthMySQL(Main main) {
         this.main = main;
     }
 

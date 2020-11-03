@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface AuthenticationDatabase {
 
-    Map<UUID, String> cachedKeys = new HashMap<UUID, String>();
+    Map<UUID, String> cachedKeys = new HashMap<>();
 
     boolean setupDatabase();
 
@@ -14,5 +14,4 @@ public interface AuthenticationDatabase {
     String getSecretKey(UUID uuid);
     boolean hasSecretKey(UUID uuid);
     void removeSecretKey(UUID uuid);
-
 }

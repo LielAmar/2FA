@@ -31,10 +31,10 @@ public class AuthCommand implements CommandExecutor {
                         return false;
                     }
 
-                    // TODO: setup
-                } else {
-                    // TODO: Send help message of the command
-                }
+                    this.main.getAuthManager().generateKey(player);
+                } else
+                    this.main.getAuthManager().demandCode(player);
+                return true;
             } else {
                 if(!main.getAuthManager().hasAuthentication(player)) {
                     player.sendMessage(ChatColor.RED + "You don't have 2 Factor Authentication set up! Use /2fa to set it up first!");

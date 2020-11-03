@@ -30,6 +30,9 @@ permissions:
   2fa.admin:
     description: Admin permissions to remove other players' 2FA
     default: op
-  2fa.exampt:
-    description: Exampt from using 2FA
+  2fa.demand:
+    description: A player with this permission must have 2FA linked to thier account
+    default: false
+  2fa.exempt:
+    description: A player with this permission does not have to authenticate
     default: false
