@@ -55,14 +55,23 @@ public class AuthJSON implements AuthenticationDatabase {
                 if(file.createNewFile()) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("secret_key", JSONObject.NULL);
+                    jsonObject.put("last_ip", JSONObject.NULL);
                     JSONUtils.write(jsonObject, new FileOutputStream(file));
                 }
             } else {
                 JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
+                boolean changed = false;
                 if(!jsonObject.has("secret_key")) {
                     jsonObject.put("secret_key", JSONObject.NULL);
-                    JSONUtils.write(jsonObject, new FileOutputStream(file));
+                    changed = true;
                 }
+                if(!jsonObject.has("last_ip")) {
+                    jsonObject.put("last_ip", JSONObject.NULL);
+                    changed = true;
+                }
+
+                if(changed)
+                    JSONUtils.write(jsonObject, new FileOutputStream(file));
             }
         } catch(IOException e) {
             e.printStackTrace();
@@ -88,7 +97,7 @@ public class AuthJSON implements AuthenticationDatabase {
         } catch(IOException e) {
             e.printStackTrace();
         }
-        return secretKey;
+        return null;
     }
 
     @Override
@@ -121,5 +130,51 @@ public class AuthJSON implements AuthenticationDatabase {
     @Override
     public void removeSecretKey(UUID uuid) {
         setSecretKey(uuid, null);
+    }
+
+
+    @Override
+    public String setLastIP(UUID uuid, String lastIP) {
+        try {
+            File file = getFile(uuid);
+            JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
+
+            if(lastIP == null) jsonObject.put("last_ip", JSONObject.NULL);
+            else jsonObject.put("last_ip", lastIP);
+
+            JSONUtils.write(jsonObject, new FileOutputStream(file));
+
+            return lastIP;
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String getLastIP(UUID uuid) {
+        try {
+            File file = getFile(uuid);
+            JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
+
+            if(!jsonObject.has("last_ip")) return null;
+            Object ip = jsonObject.get("last_ip");
+            if(ip == JSONObject.NULL) return null;
+
+            return ip.toString();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean hasLastIP(UUID uuid) {
+        return getLastIP(uuid) != null;
+    }
+
+    @Override
+    public void removeLastIP(UUID uuid) {
+        setLastIP(uuid, null);
     }
 }

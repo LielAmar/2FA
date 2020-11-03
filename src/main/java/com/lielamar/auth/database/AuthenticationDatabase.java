@@ -16,6 +16,7 @@ public interface AuthenticationDatabase {
      */
     boolean setup();
 
+
     /**
      * Sets the Secret Key of the player who's UUID is uuid
      *
@@ -47,4 +48,13 @@ public interface AuthenticationDatabase {
      * @param uuid   UUID of the player to remove the Secret Key of
      */
     void removeSecretKey(UUID uuid);
+
+
+    String setLastIP(UUID uuid, String lastIP);
+
+    String getLastIP(UUID uuid);
+
+    boolean hasLastIP(UUID uuid);
+
+    void removeLastIP(UUID uuid);
 }

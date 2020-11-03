@@ -2,22 +2,24 @@ package com.lielamar.auth.database;
 
 import com.lielamar.auth.Main;
 import com.lielamar.auth.database.json.AuthJSON;
+import com.lielamar.auth.database.mongodb.AuthMongoDB;
 import com.lielamar.auth.database.mysql.AuthMySQL;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class DatabaseManager {
+public class AuthenticationDBManager {
 
     private final Main main;
 
     private AuthenticationDatabase database;
 
-    public DatabaseManager(Main main) {
+    public AuthenticationDBManager(Main main) {
         this.main = main;
 
         this.loadDatabase().setup();
@@ -36,8 +38,8 @@ public class DatabaseManager {
     private AuthenticationDatabase loadDatabase() {
         if(main.getConfig().contains("MySQL.enabled") && main.getConfig().getBoolean("MySQL.enabled"))
             this.database = new AuthMySQL(this.main);
-//        else if(main.getConfig().contains("MongoDB.enabled") && main.getConfig().getBoolean("MongoDB.enabled"))
-//            this.database = new AuthMongoDB(this.main);
+        else if(main.getConfig().contains("MongoDB.enabled") && main.getConfig().getBoolean("MongoDB.enabled"))
+            this.database = new AuthMongoDB(this.main);
         else
             this.database = new AuthJSON(this.main);
 
@@ -120,8 +122,8 @@ public class DatabaseManager {
      * @param secretKeyOwner   Player to reset the secret key of
      * @return                 Whether or not removing the secret key was successful
      */
-    public boolean removePlayerSecretKey(Player commandSender, UUID secretKeyOwner) {
-        if(commandSender.getUniqueId() == secretKeyOwner) {
+    public boolean removePlayerSecretKey(CommandSender commandSender, UUID secretKeyOwner) {
+        if(commandSender instanceof Player && ((Player)commandSender).getUniqueId() == secretKeyOwner) {
             if(!commandSender.hasPermission("2fa.remove")) {
                 commandSender.sendMessage(ChatColor.RED + "You don't have permissions to remove your own 2FA!");
                 return false;
