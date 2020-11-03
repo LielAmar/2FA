@@ -18,13 +18,13 @@ permissions:
       2fa.setup: true
       2fa.remove: true
       2fa.admin: true
-  2fa.use:
+  2fa.use: # Done
     description: Permissions to use the /2FA command
     default: op
-  2fa.setup:
+  2fa.setup: # Done
     description: Permissions to set up 2FA
     default: op
-  2fa.remove:
+  2fa.remove: # Done
     description: Permissions to remove your own 2FA
     default: op
   2fa.admin:

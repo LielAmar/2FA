@@ -20,8 +20,8 @@ public class Main extends JavaPlugin {
         this.authManager = new AuthenticationManager(this);
         this.database = new DatabaseManager(this);
 
-        registerListeners();
-        registerCommands();
+        this.registerListeners();
+        this.registerCommands();
     }
 
     public void registerListeners() {
