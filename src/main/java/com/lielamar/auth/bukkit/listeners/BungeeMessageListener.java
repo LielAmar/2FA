@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
+import javax.annotation.Nonnull;
 import java.io.*;
 import java.util.UUID;
 
@@ -85,7 +86,7 @@ public class BungeeMessageListener implements PluginMessageListener {
      * @param message   Content of the response
      */
     @Override
-    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+    public void onPluginMessageReceived(String channel, @Nonnull Player player, @Nonnull byte[] message) {
         if(!channel.equals(BungeeMessagingUtils.channelName)) return;
 
         ByteArrayDataInput in = ByteStreams.newDataInput(message);

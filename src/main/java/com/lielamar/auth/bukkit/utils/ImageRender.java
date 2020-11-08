@@ -30,13 +30,14 @@ public class ImageRender extends MapRenderer {
     public void render(MapView view, MapCanvas canvas, Player player) {
         if(this.hasRendered) return;
 
-        if(this.cacheImage.get() != null) {
+        view.setScale(MapView.Scale.CLOSEST);
+
+        if(this.cacheImage != null && this.cacheImage.get() != null) {
             canvas.drawImage(0, 0, this.cacheImage.get());
-            this.hasRendered = true;
         } else {
             player.sendMessage(ChatColor.RED + "Attempted to render the image, but the cached image was null!");
-            this.hasRendered = true;
         }
+        this.hasRendered = true;
     }
 
     private BufferedImage getImage(String url) throws IOException {

@@ -15,11 +15,13 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
@@ -233,20 +235,36 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         String url = getQRCodeURL(main.getConfigHandler().getQrCodeURL(), player.getUniqueId());
 
         new BukkitRunnable() {
+            final MapView view = Bukkit.createMap(player.getWorld());
+
             @Override
             public void run() {
-                MapView view = Bukkit.createMap(player.getWorld());
                 view.getRenderers().forEach(view::removeRenderer);
                 try {
                     ImageRender renderer = new ImageRender(url);
                     view.addRenderer(renderer);
 
-                    @SuppressWarnings("deprecation")
-                    ItemStack mapItem = new ItemStack(Material.MAP, 1, view.getId());
-                    ItemMeta mapMeta = mapItem.getItemMeta();
-                    mapMeta.setDisplayName(ChatColor.GRAY + "QR Code");
-                    mapItem.setItemMeta(mapMeta);
+                    String versionRaw = Bukkit.getVersion().split("MC: 1.")[1];
+                    if(versionRaw.contains(".")) versionRaw = versionRaw.split("\\.")[0];
+                    if(versionRaw.contains(")")) versionRaw = versionRaw.split("\\)")[0];
+                    int version = Integer.parseInt(versionRaw);
 
+                    ItemStack mapItem = new ItemStack(Material.MAP);
+                    if(version >= 13) {
+                        MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
+                        if(mapMeta != null) {
+                            mapMeta.setMapId(view.getId());
+                            mapItem.setItemMeta(mapMeta);
+                        }
+                    } else {
+                        mapItem = new ItemStack(Material.MAP, 1, getMapID(view));
+                    }
+
+                    ItemMeta meta = mapItem.getItemMeta();
+                    if(meta != null) {
+                        meta.setDisplayName(ChatColor.GRAY + "QR Code");
+                        mapItem.setItemMeta(meta);
+                    }
 
                     // If inventory is not full
                     if(player.getInventory().firstEmpty() != -1) {
@@ -264,7 +282,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     sendClickableMessage(player, main.getMessageHandler().getMessage("&aPlease click here to open the QR code"), url.replaceAll("128x128", "256x256"));
                     main.getMessageHandler().sendMessage(player, "&aPlease use the QR code given to setup two-factor authentication");
                     main.getMessageHandler().sendMessage(player, "&aPlease validate by entering your code: /2fa <code>");
-                } catch (IOException e) {
+                } catch (IOException | NumberFormatException e) {
                     e.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
                 }
@@ -332,6 +350,20 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         } else {
             main.getMessageHandler().sendMessage(player, "&cTwo-factor authentication is enabled on this account");
             main.getMessageHandler().sendMessage(player, "&cPlease authenticate using /2fa <code>");
+        }
+    }
+
+    public static short getMapID(MapView view) {
+        try {
+            return (short) view.getId();
+        } catch (NoSuchMethodError e) {
+            try {
+                Class<?> MapView = Class.forName("org.bukkit.map.MapView");
+                Object mapID = MapView.getMethod("getId").invoke(view);
+                return (short) mapID;
+            } catch (Exception e1) {
+                return 1;
+            }
         }
     }
 }
