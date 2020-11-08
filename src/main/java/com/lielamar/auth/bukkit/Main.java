@@ -2,9 +2,9 @@ package com.lielamar.auth.bukkit;
 
 import com.lielamar.auth.bukkit.commands.CommandHandler;
 import com.lielamar.auth.bukkit.handlers.AuthHandler;
-import com.lielamar.auth.bukkit.handlers.BungeeMessageHandler;
 import com.lielamar.auth.bukkit.handlers.ConfigHandler;
 import com.lielamar.auth.bukkit.handlers.MessageHandler;
+import com.lielamar.auth.bukkit.listeners.BungeeMessageListener;
 import com.lielamar.auth.bukkit.listeners.DisabledEvents;
 import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
 import com.lielamar.auth.bungee.BungeeMessagingUtils;
@@ -14,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
 
-    private BungeeMessageHandler pluginMessageListener;
+    private BungeeMessageListener pluginMessageListener;
     private MessageHandler messageHandler;
     private ConfigHandler configHandler;
     private AuthHandler authHandler;
@@ -43,12 +43,12 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new OnPlayerConnection(this), this);
         pm.registerEvents(new DisabledEvents(this), this);
 
-        this.pluginMessageListener = new BungeeMessageHandler(this);
+        this.pluginMessageListener = new BungeeMessageListener(this);
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMessagingUtils.channelName);
         this.getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMessagingUtils.channelName, pluginMessageListener);
     }
 
-    public BungeeMessageHandler getPluginMessageListener() { return this.pluginMessageListener; }
+    public BungeeMessageListener getPluginMessageListener() { return this.pluginMessageListener; }
     public MessageHandler getMessageHandler() { return this.messageHandler; }
     public ConfigHandler getConfigHandler() { return this.configHandler; }
     public AuthHandler getAuthHandler() { return this.authHandler; }
