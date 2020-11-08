@@ -3,10 +3,12 @@ package com.lielamar.auth.bukkit.commands;
 import com.lielamar.auth.bukkit.Main;
 import com.lielamar.auth.bukkit.commands.subcommands.*;
 import com.lielamar.auth.shared.handlers.AuthHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -66,7 +68,7 @@ public class CommandHandler implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender cs, org.bukkit.command.Command cmd, String cmdLabel, String[] args) {
+    public boolean onCommand(@Nonnull CommandSender cs, @Nonnull org.bukkit.command.Command cmd, @Nonnull String cmdLabel, @Nonnull String[] args) {
         if(!(cs instanceof Player)) {
             cs.sendMessage(main.getMessageHandler().getMessage("&cThis command must be ran as a player"));
             return false;

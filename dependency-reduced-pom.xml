@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.lielamar</groupId>
   <artifactId>2fa</artifactId>
-  <version>1.0</version>
+  <version>1.0.1</version>
   <build>
     <plugins>
       <plugin>
@@ -28,6 +28,7 @@
                 <includes>
                   <include>org.json:json**</include>
                   <include>com.warrenstrange:googleauth**</include>
+                  <include>commons-codec:commons-codec**</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -56,7 +57,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
-      <version>1.8.8-R0.1-SNAPSHOT</version>
+      <version>1.13.2-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
