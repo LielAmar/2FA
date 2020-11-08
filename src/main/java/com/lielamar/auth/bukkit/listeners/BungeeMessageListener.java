@@ -1,4 +1,4 @@
-package com.lielamar.auth.bukkit.handlers;
+package com.lielamar.auth.bukkit.listeners;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
@@ -14,10 +14,10 @@ import java.io.*;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class BungeeMessageHandler implements PluginMessageListener {
+public class BungeeMessageListener implements PluginMessageListener {
 
     private final Main main;
-    public BungeeMessageHandler(Main main) {
+    public BungeeMessageListener(Main main) {
         this.main = main;
     }
 
