@@ -18,7 +18,6 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
     private AuthHandler.AuthState authState;
 
     public PlayerStateChangeEvent(Player player, AuthHandler.AuthState authState) {
-        super();
         this.player = player;
         this.authState = authState;
     }
