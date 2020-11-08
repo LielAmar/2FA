@@ -1,8 +1,8 @@
 name: 2FA
-description: A plugin that adds another layer of protection for your players
+version: "1.0"
 authors: [LielAmar, xItsRaz]
-version: 1.0
-main: com.lielamar.auth.Main
+main: com.lielamar.auth.bukkit.Main
+description: Add another layer of protection to your server
 
 commands:
   2fa:
@@ -17,7 +17,8 @@ permissions:
       2fa.use: true
       2fa.setup: true
       2fa.remove: true
-      2fa.admin: true
+      2fa.remove.others: true
+      2fa.reload: true
   2fa.use:
     description: Permissions to use the /2FA command
     default: op
@@ -27,9 +28,12 @@ permissions:
   2fa.remove:
     description: Permissions to remove your own 2FA
     default: op
-  2fa.admin:
+  2fa.remove.others:
     description: Admin permissions to remove other players' 2FA
     default: op
-  2fa.exampt:
-    description: Exampt from using 2FA
+  2fa.reload:
+    description: Admin permissions to reload the 2FA plugin
+    default: op
+  2fa.demand:
+    description: A player with this permission must have 2FA linked to thier account
     default: false

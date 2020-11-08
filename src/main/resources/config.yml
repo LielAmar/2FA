@@ -1,0 +1,69 @@
+# ===========================================================================================
+# Thank you for using the Two Factor Authentication plugin by Liel Amar.
+# Special thanks to Connor Linfoot for developing the original MC2FA plugin.
+# For support, you can contact me through our discord server: https://discord.gg/NzgBrqR.
+#
+# If you have any problems connecting to the database, whether it be MySQL or Mongo,
+# please delete this file, start up your server once again and re-set the values.
+#
+# Github: https://github.com/LielAmar/2FA
+# ===========================================================================================
+
+# Your server name. This will be the default name of the 2fa in the authenticator app
+Server Name: "MyServer"
+
+# Disable all commands if not yet authenticated (other than 2fa ones)
+Disable Commands: true
+
+# If the above is true you can whitelist commands with the below
+Whitelisted Commands:
+  - "help"
+
+# If commands are not disabled you can use the below to blacklist specific commands instead
+Blacklisted Commands:
+  - "op"
+  - "spawn"
+
+# Whether to send a message advising to use 2FA if the player has permissions to use it
+Advise: true
+
+# When to require the use of 2FA
+# If you run the plugin for a BungeeCord server, please include this plugin in your BungeeCord/plugins/ folder
+# so it can handles the authentication on the BungeeCord level
+Require When:
+  # When the player's IP Address changes
+  IP Changes: true
+  # On every login
+  Every Login: false
+
+# Storage Type. Can be either JSON, MYSQL or MONGODB
+Storage Type: JSON
+
+# If the Storage Type is MYSQL please enter MySQL connection details
+MySQL:
+  credentials:
+    host: "localhost"
+    database: "auth"
+    port: 3306
+
+    auth:
+      username: "changeme"
+      password: "changeme"
+
+# If the Storage Type is MONGODB please enter MongoDB connection details
+# If you want to use a URI connection, change the uri field to your URI.
+# If the enabled field is set to false, the plugin would try to use MySQL or JSON!
+MongoDB:
+  credentials:
+    uri: null
+
+    host: "localhost"
+    database: "auth"
+    port: 3306
+
+    # If you have authentication enabled, please set the 'auth.required'
+    # field to true and set your username & password.
+    auth:
+      required: true
+      username: "changeme"
+      password: "changeme"
