@@ -1,16 +1,13 @@
 name: 2FA
-description: A plugin that adds another layer of protection for your players
+version: "1.0"
 authors: [LielAmar, xItsRaz]
-version: 1.0
-main: com.lielamar.auth.Main
+main: com.lielamar.auth.bukkit.Main
+description: Add another layer of protection to your server
 
 commands:
   2fa:
-    description: Two Factor Authentication
+    description: Setup your 2FA app/Enter your 2FA code
     aliases: [auth]
-  2faadmin:
-    description: Two Factor Authentication Admin Command
-    aliases: [authadmin]
 
 permissions:
   2fa.*:
@@ -39,7 +36,4 @@ permissions:
     default: op
   2fa.demand:
     description: A player with this permission must have 2FA linked to thier account
-    default: false
-  2fa.exempt:
-    description: A player with this permission does not have to authenticate
     default: false
