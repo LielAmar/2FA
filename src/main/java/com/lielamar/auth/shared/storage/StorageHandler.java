@@ -68,5 +68,4 @@ public abstract class StorageHandler {
      * @return       Whether or not the player has a Last IP
      */
     public abstract boolean hasIP(UUID uuid);
-
 }

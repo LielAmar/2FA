@@ -1,6 +1,3 @@
-/**
- * This class was originally written by Connor Linfoot (https://github.com/ConnorLinfoot/MC2FA).
- */
 package com.lielamar.auth.bukkit.utils;
 
 import org.bukkit.ChatColor;
@@ -9,6 +6,7 @@ import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
+import javax.annotation.Nonnull;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,6 +17,10 @@ import java.net.URL;
 
 public class ImageRender extends MapRenderer {
 
+    /**
+     * This class was originally written by Connor Linfoot (https://github.com/ConnorLinfoot/MC2FA).
+     */
+
     private final SoftReference<BufferedImage> cacheImage;
     private boolean hasRendered = false;
 
@@ -27,7 +29,7 @@ public class ImageRender extends MapRenderer {
     }
 
     @Override
-    public void render(MapView view, MapCanvas canvas, Player player) {
+    public void render(@Nonnull MapView view, @Nonnull MapCanvas canvas, @Nonnull Player player) {
         if(this.hasRendered) return;
 
         view.setScale(MapView.Scale.CLOSEST);

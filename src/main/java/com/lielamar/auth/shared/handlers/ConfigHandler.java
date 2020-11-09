@@ -10,7 +10,6 @@ public abstract class ConfigHandler {
     private final String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/%%label%%?secret=%%key%%";
     protected String serverName;
     protected StorageType storageType;
-    protected boolean debug = false;
     protected boolean requireOnIPChange = true;
     protected boolean requireOnEveryLogin = false;
     protected boolean advice2FA = true;
@@ -21,7 +20,6 @@ public abstract class ConfigHandler {
     public String getQrCodeURL() { return this.qrCodeURL; }
     public String getServerName() { return this.serverName; }
     public StorageType getStorageType() { return this.storageType; }
-    public boolean isDebug() { return this.debug; }
     public boolean isRequiredOnIPChange() {
         return this.requireOnIPChange;
     }
