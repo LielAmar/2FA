@@ -4,7 +4,8 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.lielamar.auth.bungee.Main;
-import com.lielamar.auth.bungee.BungeeMessagingUtils;
+import com.lielamar.auth.shared.handlers.AuthHandler;
+import com.lielamar.auth.shared.utils.Constants;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -24,12 +25,12 @@ public class OnPluginMessage implements Listener {
 
     @EventHandler
     public void onQueryReceive(PluginMessageEvent event) {
-        if(!event.getTag().equals(BungeeMessagingUtils.channelName)) return;
+        if(!event.getTag().equals(Constants.channelName)) return;
 
         ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
         String subChannel = in.readUTF();                                    // Getting the SubChannel name
 
-        if(subChannel.equals(BungeeMessagingUtils.subChannelName)) {
+        if(subChannel.equals(Constants.subChannelName)) {
             UUID playerUUID = UUID.fromString(in.readUTF());                 // UUID of the player to run the check on
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
 
@@ -41,19 +42,18 @@ public class OnPluginMessage implements Listener {
             try {
                 String action = msgIn.readUTF();                             // The message action (isAuthenticated/setAuthenticated)
 
-                // If the action is a 2FA's action, specifically isAuthenticated, return whether the player is BungeeCord authenticated
-                if(action.equals(BungeeMessagingUtils.isAuthenticated)) {
-                    sendResponse(player, action, main.getAuthHandler().containsPlayer(player));
+                if(action.equals(Constants.getState)) {
+                    AuthHandler.AuthState defaultState = AuthHandler.AuthState.valueOf(msgIn.readUTF());
+                    if(main.getAuthHandler().getAuthState(player.getUniqueId()) == null)
+                        main.getAuthHandler().changeState(player.getUniqueId(), defaultState);
 
-                // If the action is a 2FA's action, specifically setAuthenticated, set the BungeeCord authentication of the player to the given value
-                } else if(action.equals(BungeeMessagingUtils.setAuthenticated)) {
-                    boolean authenticated = msgIn.readBoolean();
-                    if(authenticated)
-                        main.getAuthHandler().setPlayer(player);
-                    else
-                        main.getAuthHandler().removePlayer(player);
+                    sendResponse(player, action);
+                } else if(action.equals(Constants.setState)) {
+                    AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
+                    if(state != main.getAuthHandler().getAuthState(player.getUniqueId()))
+                        main.getAuthHandler().changeState(player.getUniqueId(), state);
 
-                    sendResponse(player, action, main.getAuthHandler().containsPlayer(player));
+                    sendResponse(player, action);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -64,19 +64,23 @@ public class OnPluginMessage implements Listener {
     /**
      * Sends back a response from BungeeCord to spigot
      *
-     * @param player          Player to send the response of
-     * @param action          The action of the message (isAuthenticated/setAuthenticated)
-     * @param authenticated   Whether the player is authenticated on BungeeCord
+     * @param player   Player to send the response of
+     * @param action   The action of the message (isAuthenticated/setAuthenticated)
      */
-    public void sendResponse(ProxiedPlayer player, String action, boolean authenticated) {
+    public void sendResponse(ProxiedPlayer player, String action) {
+        AuthHandler.AuthState state = main.getAuthHandler().getAuthState(player.getUniqueId());
+
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF(BungeeMessagingUtils.subChannelName);             // Setting the SubChannel of the response
+        out.writeUTF(Constants.subChannelName);                        // Setting the SubChannel of the response
 
         ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
         DataOutputStream msgOut = new DataOutputStream(msgBytes);
         try {
             msgOut.writeUTF(action);                                   // Setting the action of the response
-            msgOut.writeBoolean(authenticated);                        // Setting the value of the response
+            if(state != null)
+                msgOut.writeUTF(state.name());                         // Setting the value of the response
+            else
+                msgOut.writeUTF("null");
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -84,6 +88,6 @@ public class OnPluginMessage implements Listener {
         out.writeShort(msgBytes.toByteArray().length);                 // Setting the message length
         out.write(msgBytes.toByteArray());                             // Setting the message data as ByteArray
 
-        player.getServer().getInfo().sendData(BungeeMessagingUtils.channelName, out.toByteArray());
+        player.getServer().getInfo().sendData(Constants.channelName, out.toByteArray());
     }
 }

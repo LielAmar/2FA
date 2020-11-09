@@ -6,7 +6,6 @@ import com.lielamar.auth.shared.utils.AuthUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
@@ -37,7 +36,7 @@ public class DisableCommand extends Command {
                 main.getMessageHandler().sendMessage(player, "&cYou do not have permission to run this command");
             } else {
                 if(main.getAuthHandler().is2FAEnabled(player.getUniqueId())) {
-                    main.getAuthHandler().reset(player.getUniqueId());
+                    main.getAuthHandler().resetKey(player.getUniqueId());
                     main.getMessageHandler().sendMessage(player, "&aYour 2FA has been reset");
                 } else {
                     main.getMessageHandler().sendMessage(player, "&cYou are not setup with 2FA");
@@ -61,7 +60,7 @@ public class DisableCommand extends Command {
                             main.getMessageHandler().sendMessage(player, "&cPlayer %name% could not be found".replaceAll("%name%", target));
                         } else {
                             if(main.getAuthHandler().is2FAEnabled(targetUUID)) {
-                                main.getAuthHandler().reset(targetUUID);
+                                main.getAuthHandler().resetKey(targetUUID);
                                 main.getMessageHandler().sendMessage(player, "&a%name%'s 2FA has been reset".replaceAll("%name%", target));
                             } else {
                                 main.getMessageHandler().sendMessage(player, "&c%name% is not setup with 2FA".replaceAll("%name%", target));

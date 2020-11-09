@@ -1,0 +1,29 @@
+# ===========================================================================================
+# Thank you for using the Two Factor Authentication plugin by Liel Amar.
+# Special thanks to Connor Linfoot for developing the original MC2FA plugin.
+# For support, you can contact me through our discord server: https://discord.gg/NzgBrqR.
+#
+# If you have any problems connecting to the database, whether it be MySQL or Mongo,
+# please delete this file, start up your server once again and re-set the values.
+#
+# Github: https://github.com/LielAmar/2FA
+# ===========================================================================================
+
+# ==================================================
+#        THIS IS THE BUNGEECORD CONFIGURATION
+# ==================================================
+
+# Disable all bungeecord commands if not yet authenticated (other than 2fa ones)
+Disable Commands: true
+
+# Disable the ability to switch servers if not yet authenticated
+Disable Server Switch: true
+
+# If the above is true you can whitelist commands with the below
+Whitelisted Commands:
+  - "help"
+
+# If commands are not disabled you can use the below to blacklist specific commands instead
+Blacklisted Commands:
+  - "op"
+  - "spawn"

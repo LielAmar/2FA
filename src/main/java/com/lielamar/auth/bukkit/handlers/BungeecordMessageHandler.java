@@ -1,11 +1,11 @@
-package com.lielamar.auth.bukkit.listeners;
+package com.lielamar.auth.bukkit.handlers;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.lielamar.auth.bukkit.Main;
 import com.lielamar.auth.shared.handlers.AuthHandler;
-import com.lielamar.auth.bungee.BungeeMessagingUtils;
+import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -15,30 +15,30 @@ import java.io.*;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class BungeeMessageListener implements PluginMessageListener {
+public class BungeecordMessageHandler implements PluginMessageListener {
 
     private final Main main;
-    public BungeeMessageListener(Main main) {
+    public BungeecordMessageHandler(Main main) {
         this.main = main;
     }
 
     /**
      * Communicates with BungeeCord and sets the player authentication state to {authenticated}
      *
-     * @param uuid            UUID of the player to set (un)authenticated
-     * @param authenticated   Whether to set to authenticated or unauthenticated
+     * @param uuid    UUID of the player to set (un)authenticated
+     * @param state   AuthState to set for the player on BungeeCord
      */
-    public void setBungeeCordAuthenticated(UUID uuid, boolean authenticated) {
+    public void setBungeeCordAuthState(UUID uuid, AuthHandler.AuthState state) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
-        out.writeUTF(BungeeMessagingUtils.subChannelName);            // Setting the SubChannel of the message
+        out.writeUTF(Constants.subChannelName);            // Setting the SubChannel of the message
         out.writeUTF(uuid.toString());                                // Setting the UUID of the player
 
         ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
         DataOutputStream msgOut = new DataOutputStream(msgBytes);
         try {
-            msgOut.writeUTF(BungeeMessagingUtils.setAuthenticated);   // Setting the action of the message
-            msgOut.writeBoolean(authenticated);                       // Setting whether to authenticate the player on BungeeCord
+            msgOut.writeUTF(Constants.setState);           // Setting the action of the message
+            msgOut.writeUTF(state.name());                            // Setting the state of the player
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -48,7 +48,7 @@ public class BungeeMessageListener implements PluginMessageListener {
 
         Player player = Bukkit.getPlayer(uuid);
         if(player != null && player.isOnline())
-            player.sendPluginMessage(main, BungeeMessagingUtils.channelName, out.toByteArray());
+            player.sendPluginMessage(main, Constants.channelName, out.toByteArray());
     }
 
     /**
@@ -56,16 +56,17 @@ public class BungeeMessageListener implements PluginMessageListener {
      *
      * @param uuid            UUID of the player to get check if authenticated
      */
-    public void isBungeeCordAuthenticated(UUID uuid) {
+    public void getBungeeCordAUthState(UUID uuid) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
-        out.writeUTF(BungeeMessagingUtils.subChannelName);            // Setting the SubChannel of the message
+        out.writeUTF(Constants.subChannelName);            // Setting the SubChannel of the message
         out.writeUTF(uuid.toString());                                // Setting the UUID of the player
 
         ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
         DataOutputStream msgOut = new DataOutputStream(msgBytes);
         try {
-            msgOut.writeUTF(BungeeMessagingUtils.isAuthenticated);    // Setting the action of the message
+            msgOut.writeUTF(Constants.getState);           // Setting the action of the message
+            msgOut.writeUTF(main.getAuthHandler().getAuthState(uuid).name()); // Default auth state
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -75,7 +76,7 @@ public class BungeeMessageListener implements PluginMessageListener {
 
         Player player = Bukkit.getPlayer(uuid);
         if(player != null && player.isOnline())
-            player.sendPluginMessage(main, BungeeMessagingUtils.channelName, out.toByteArray());
+            player.sendPluginMessage(main, Constants.channelName, out.toByteArray());
     }
 
     /**
@@ -87,13 +88,13 @@ public class BungeeMessageListener implements PluginMessageListener {
      */
     @Override
     public void onPluginMessageReceived(String channel, @Nonnull Player player, @Nonnull byte[] message) {
-        if(!channel.equals(BungeeMessagingUtils.channelName)) return;
+        if(!channel.equals(Constants.channelName)) return;
 
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subChannel = in.readUTF();                           // Getting the SubChannel name
 
         // If the SubChannel name is the 2FA's SubChannel name
-        if(subChannel.equals(BungeeMessagingUtils.subChannelName)) {
+        if(subChannel.equals(Constants.subChannelName)) {
             short length = in.readShort();                          // Length of the message
             byte[] msgBytes = new byte[length];                     // Message itself
             in.readFully(msgBytes);
@@ -101,15 +102,16 @@ public class BungeeMessageListener implements PluginMessageListener {
             DataInputStream msgIn = new DataInputStream(new ByteArrayInputStream(msgBytes));
             try {
                 String action = msgIn.readUTF();                    // The message action (isAuthenticated/setAuthenticated)
-                boolean authenticated = false;                      // Default response value
+                AuthHandler.AuthState state;                        // Default response value
 
-                // If the action is a 2FA's action (isAuthenticated/setAuthenticated), set the authenticated variable to the value received.
-                if(action.equals(BungeeMessagingUtils.isAuthenticated) || action.equalsIgnoreCase(BungeeMessagingUtils.setAuthenticated))
-                    authenticated = msgIn.readBoolean();
-
-                // If we received a `true` value, meaning the player is authenticated on BungeeCord, set the player to be authenticated on spigot as well
-                if(authenticated)
-                    main.getAuthHandler().changeState(player.getUniqueId(), AuthHandler.AuthState.AUTHENTICATED);
+                if(action.equals(Constants.getState)) {
+                    state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
+                    main.getAuthHandler().changeState(player.getUniqueId(), state);
+                } else if(action.equals(Constants.setState)) {
+                    state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
+                    if(state != main.getAuthHandler().getAuthState(player.getUniqueId()))
+                        main.getAuthHandler().changeState(player.getUniqueId(), state);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

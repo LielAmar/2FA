@@ -21,7 +21,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
@@ -32,11 +31,11 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
 
     protected final Main main;
-    private final boolean isBungeecord;
+    protected final AutoAuthHandler autoAuthHandler;
 
     public AuthHandler(Main main) {
         this.main = main;
-        this.isBungeecord = SpigotConfig.bungee && !Bukkit.getServer().getOnlineMode();
+        this.autoAuthHandler = new AutoAuthHandler();
 
         loadStorageHandler();
     }
@@ -57,24 +56,21 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public boolean validateKey(UUID uuid, Integer code) {
         boolean valid = super.validateKey(uuid, code);
 
-        if(!valid) {
-            int failedAttempts = getFailedAttempts(uuid) + 1;
-            setFailedAttempts(uuid, failedAttempts);
-
-            if(failedAttempts > MAX_ATTEMPTS) {
-                Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission("2fa.alert") && !needsToAuthenticate(pl.getUniqueId())).forEach(pl ->
-                        main.getMessageHandler().sendMessage(pl, "&c%name% failed to authenticate %times% times"
-                                .replaceAll("%name%", Bukkit.getPlayer(uuid).getName()).replaceAll("%times%", failedAttempts + "")));
-            }
-        } else {
-            Player player = Bukkit.getPlayer(uuid);
-            if(player != null && player.isOnline()) {
+        Player player = Bukkit.getPlayer(uuid);
+        if(player != null && player.isOnline()) {
+            if(valid) {
                 removeQRItem(player);
-                String ip = player.getAddress().getAddress().getHostAddress();
-                getStorageHandler().setIP(uuid, ip);
+                updatePlayerIP(player);
+            } else {
+                int failedAttempts = increaseFailedAttempts(uuid, 1);
+
+                if(failedAttempts > MAX_ATTEMPTS) {
+                    Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission("2fa.alert") && !needsToAuthenticate(pl.getUniqueId())).forEach(pl ->
+                            main.getMessageHandler().sendMessage(pl, "&c%name% failed to authenticate %times% times"
+                                    .replaceAll("%name%", player.getName()).replaceAll("%times%", failedAttempts + "")));
+                }
             }
         }
-
         return valid;
     }
 
@@ -82,11 +78,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public boolean approveKey(UUID uuid, Integer code) {
         boolean approved = super.approveKey(uuid, code);
 
-        Player player = Bukkit.getPlayer(uuid);
-        if(player != null && player.isOnline()) {
-            removeQRItem(player);
-            String ip = player.getAddress().getAddress().getHostAddress();
-            getStorageHandler().setIP(uuid, ip);
+        if(approved) {
+            Player player = Bukkit.getPlayer(uuid);
+            if(player != null) {
+                removeQRItem(player);
+                updatePlayerIP(player);
+            }
         }
 
         return approved;
@@ -114,19 +111,20 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             changeState(uuid, AuthState.DISABLED);
         }
 
-        // If the player has a key and they are waiting to authenticate, attempt to auto-authenticate them through BungeeCord/IP
-        if(needsToAuthenticate(uuid)) {
-            attemptAutoAuthentication(player);
-        } else {
+        // If the player doesn't need to authenticate (they don't have a key)
+        if(!needsToAuthenticate(player.getUniqueId())) {
             if(player.hasPermission("2fa.demand")) {
                 main.getMessageHandler().sendMessage(player, "&6You are required to enable 2FA!");
-                createKey(uuid);
+                createKey(player.getUniqueId());
             } else {
                 if(main.getConfigHandler().is2FAAdvised()) {
                     main.getMessageHandler().sendMessage(player, "&6This server supports two-factor authentication and is highly recommended");
                     main.getMessageHandler().sendMessage(player, "&6Get started by running \"/2fa enable\"");
                 }
             }
+        } else {
+            // try to auto authenticate the player
+            autoAuthHandler.autoAuthenticate(player);
         }
     }
 
@@ -146,12 +144,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
 
         authStates.put(uuid, authState);
-
-        if(isBungeecord) {
-            if(getAuthState(uuid) == AuthHandler.AuthState.AUTHENTICATED) {
-                main.getPluginMessageListener().setBungeeCordAuthenticated(uuid, true);
-            }
-        }
+        autoAuthHandler.setBungeecordAuthState(player, authState);
     }
 
     @Override
@@ -177,40 +170,47 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         if(storageType == StorageType.MYSQL) {
             ConfigurationSection mysql = main.getConfig().getConfigurationSection("MySQL");
-            String host = mysql.getString("credentials.host");
-            String database = mysql.getString("credentials.database");
-            String username = mysql.getString("credentials.auth.username");
-            String password = mysql.getString("credentials.auth.password");
-            int port = mysql.getInt("credentials.port");
 
-            this.storageHandler = new MySQLStorage(host, database, username, password, port);
+            if(mysql != null) {
+                String host = mysql.getString("credentials.host");
+                String database = mysql.getString("credentials.database");
+                String username = mysql.getString("credentials.auth.username");
+                String password = mysql.getString("credentials.auth.password");
+                int port = mysql.getInt("credentials.port");
+
+                this.storageHandler = new MySQLStorage(host, database, username, password, port);
+            }
         } else if(storageType == StorageType.MONGODB) {
-            ConfigurationSection mysql = main.getConfig().getConfigurationSection("MongoDB");
-            String uri = mysql.getString("credentials.uri");
-            String host = mysql.getString("credentials.host");
-            String database = mysql.getString("credentials.database");
-            String username = mysql.getString("credentials.auth.username");
-            String password = mysql.getString("credentials.auth.password");
-            int port = mysql.getInt("credentials.port");
-            boolean requiredAuth = mysql.getBoolean("credentials.auth.required");
+            ConfigurationSection mongodb = main.getConfig().getConfigurationSection("MongoDB");
 
-            this.storageHandler = new MongoDBStorage(uri, host, database, username, password, port, requiredAuth);
-        } else {
+            if(mongodb != null) {
+                String uri = mongodb.getString("credentials.uri");
+                String host = mongodb.getString("credentials.host");
+                String database = mongodb.getString("credentials.database");
+                String username = mongodb.getString("credentials.auth.username");
+                String password = mongodb.getString("credentials.auth.password");
+                int port = mongodb.getInt("credentials.port");
+                boolean requiredAuth = mongodb.getBoolean("credentials.auth.required");
+
+                this.storageHandler = new MongoDBStorage(uri, host, database, username, password, port, requiredAuth);
+            }
+        }
+
+        if(this.storageHandler == null) {
             this.storageHandler = new JSONStorage(this.main.getDataFolder().getAbsolutePath());
         }
     }
 
     /**
-     * Attempts to auto authenticate the player on Spigot (using their IP address).
-     * If fails, it locks the player
+     * Updates a player's ip in the database
      *
-     * @param player   Player to auto authentication
+     * @param player   Player to update the ip of
      */
-    public void attemptAutoAuthentication(Player player) {
-        if(isBungeecord)
-            bungeeAutoAuthentication(player);
-        else
-            spigotAutoAuthentication(player);
+    public void updatePlayerIP(Player player) {
+        if(player.getAddress() != null && player.getAddress().getAddress() != null) {
+            String ip = player.getAddress().getAddress().getHostAddress();
+            getStorageHandler().setIP(player.getUniqueId(), ip);
+        }
     }
 
     /**
@@ -231,6 +231,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      *
      * @param player   Player to give item to
      */
+    @SuppressWarnings("deprecation")
     public void giveQRCodeItem(Player player) {
         String url = getQRCodeURL(main.getConfigHandler().getQrCodeURL(), player.getUniqueId());
 
@@ -309,50 +310,16 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      * @return       Whether it's a QR item
      */
     public boolean isQRCodeItem(ItemStack item) {
-        return item != null && item.getType() != Material.AIR && item.hasItemMeta() && item.getItemMeta().hasDisplayName()
+        return item != null && item.getType() != Material.AIR && item.hasItemMeta() && item.getItemMeta() != null && item.getItemMeta().hasDisplayName()
                 && item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GRAY + "QR Code");
     }
 
-
-    public void bungeeAutoAuthentication(Player player) {
-        if(!needsToAuthenticate(player.getUniqueId())) return;
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                main.getPluginMessageListener().isBungeeCordAuthenticated(player.getUniqueId());
-            }
-        }.runTaskLater(main, 1L);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                spigotAutoAuthentication(player);
-            }
-        }.runTaskLater(main, 2L);
-    }
-
-    public void spigotAutoAuthentication(Player player) {
-        if(!needsToAuthenticate(player.getUniqueId())) return;
-
-        player.setWalkSpeed(0);
-        player.setFlySpeed(0);
-
-        boolean hasIPChanged = main.getAuthHandler().getStorageHandler().getIP(player.getUniqueId()) == null
-                || !main.getAuthHandler().getStorageHandler().getIP(player.getUniqueId()).equalsIgnoreCase(player.getAddress().getHostString());
-
-        boolean isRequiredDueToIPChange = main.getConfigHandler().isRequiredOnIPChange() && hasIPChanged;
-        boolean isRequiredOnEveryJoin = main.getConfigHandler().isRequiredOnEveryLogin();
-
-        if(!isRequiredDueToIPChange && !isRequiredOnEveryJoin) {
-            main.getAuthHandler().changeState(player.getUniqueId(), AuthState.AUTHENTICATED);
-            main.getMessageHandler().sendMessage(player, "&aYou were authenticated automatically");
-        } else {
-            main.getMessageHandler().sendMessage(player, "&cTwo-factor authentication is enabled on this account");
-            main.getMessageHandler().sendMessage(player, "&cPlease authenticate using /2fa <code>");
-        }
-    }
-
+    /**
+     * Returns the ID of a MapView
+     *
+     * @param view   MapView to get the ID of
+     * @return       ID of view
+     */
     public static short getMapID(MapView view) {
         try {
             return (short) view.getId();
@@ -364,6 +331,72 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             } catch (Exception e1) {
                 return 1;
             }
+        }
+    }
+
+
+    /**
+     * Inner class to handle BungeeCord communication
+     */
+    public class AutoAuthHandler {
+
+        private final boolean isBungeecord;
+
+        public AutoAuthHandler() {
+            this.isBungeecord = SpigotConfig.bungee && !Bukkit.getServer().getOnlineMode();
+        }
+
+        /**
+         * Handles BungeeCord authentication
+         *
+         * @param player   Player to update BungeeCord authentication
+         * @param state    State to set the player's BungeeCord authentication to
+         */
+        public void setBungeecordAuthState(Player player, AuthState state) {
+            if(isBungeecord) {
+                main.getPluginMessageListener().setBungeeCordAuthState(player.getUniqueId(), state);
+            }
+        }
+
+        public void autoAuthenticate(Player player) {
+            if(isBungeecord) {
+                bungeecordAutoAuthenticate(player);
+            } else {
+                spigotAutoAuthenticate(player);
+            }
+        }
+
+        private void bungeecordAutoAuthenticate(Player player) {
+            if(!needsToAuthenticate(player.getUniqueId())) return;
+
+            Bukkit.getScheduler().runTaskLater(main, () -> main.getPluginMessageListener().getBungeeCordAUthState(player.getUniqueId()), 1L);
+            Bukkit.getScheduler().runTaskLater(main, () -> spigotAutoAuthenticate(player), 2L);
+        }
+
+        private void spigotAutoAuthenticate(Player player) {
+            if(!needsToAuthenticate(player.getUniqueId())) return;
+
+            if(player.getAddress() != null && player.getAddress().getAddress() != null) {
+                String ip = player.getAddress().getAddress().getHostAddress();
+
+                boolean hasIPChanged = getStorageHandler().getIP(player.getUniqueId()) == null
+                        || !getStorageHandler().getIP(player.getUniqueId()).equalsIgnoreCase(ip);
+
+                boolean isRequiredDueToIPChange = main.getConfigHandler().isRequiredOnIPChange() && hasIPChanged;
+                boolean isRequiredOnEveryJoin = main.getConfigHandler().isRequiredOnEveryLogin();
+
+                if(!isRequiredDueToIPChange && !isRequiredOnEveryJoin) {
+                    changeState(player.getUniqueId(), AuthState.AUTHENTICATED);
+                    main.getMessageHandler().sendMessage(player, "&aYou were authenticated automatically");
+                    return;
+                }
+            }
+
+            player.setWalkSpeed(0);
+            player.setFlySpeed(0);
+
+            main.getMessageHandler().sendMessage(player, "&cTwo-factor authentication is enabled on this account");
+            main.getMessageHandler().sendMessage(player, "&cPlease authenticate using /2fa <code>");
         }
     }
 }

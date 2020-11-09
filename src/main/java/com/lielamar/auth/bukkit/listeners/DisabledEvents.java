@@ -1,9 +1,7 @@
 package com.lielamar.auth.bukkit.listeners;
 
 import com.lielamar.auth.bukkit.Main;
-import com.lielamar.auth.bukkit.commands.CommandHandler;
-import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
-import com.lielamar.auth.shared.handlers.AuthHandler;
+import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -23,17 +21,17 @@ public class DisabledEvents implements Listener {
         this.main = main;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
-            if(event.getTo().getBlockZ() != event.getFrom().getBlockZ() || event.getTo().getBlockX() != event.getFrom().getBlockX()) {
+            if(event.getTo() != null && (event.getTo().getBlockZ() != event.getFrom().getBlockZ() || event.getTo().getBlockX() != event.getFrom().getBlockX())) {
                 event.setTo(event.getFrom());
                 main.getMessageHandler().sendMessage(event.getPlayer(), "&cPlease validate your account with two-factor authentication");
             }
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
@@ -41,7 +39,7 @@ public class DisabledEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
@@ -49,7 +47,7 @@ public class DisabledEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
@@ -57,25 +55,25 @@ public class DisabledEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onItemDrop(PlayerDropItemEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
-        } else if(event.getItemDrop() != null && this.main.getAuthHandler().isQRCodeItem(event.getItemDrop().getItemStack())) {
+        } else if(this.main.getAuthHandler().isQRCodeItem(event.getItemDrop().getItemStack())) {
             event.getItemDrop().remove();
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onItemPickup(PlayerPickupItemEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
-        } else if(event.getItem() != null && this.main.getAuthHandler().isQRCodeItem(event.getItem().getItemStack())) {
+        } else if(this.main.getAuthHandler().isQRCodeItem(event.getItem().getItemStack())) {
             event.getItem().remove();
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageEvent event) {
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
@@ -85,7 +83,7 @@ public class DisabledEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(event.getDamager() instanceof Player) {
             Player player = (Player) event.getDamager();
@@ -95,7 +93,7 @@ public class DisabledEvents implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getWhoClicked().getUniqueId())) {
             event.setCancelled(true);
@@ -108,21 +106,14 @@ public class DisabledEvents implements Listener {
         }
     }
 
-    @EventHandler
-    public void onItemMove(InventoryMoveItemEvent event) {
-        if(event.getItem() != null && this.main.getAuthHandler().isQRCodeItem(event.getItem()) && event.getDestination().getType() != InventoryType.PLAYER) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onCommand(PlayerCommandPreprocessEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             String[] args = event.getMessage().substring(1).split("\\s+");
             if(this.main.getConfigHandler().isCommandsDisabled()) {
                 if(args.length > 0) {
                     String command = args[0];
-                    if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !CommandHandler.mainCommand.equalsIgnoreCase(command)) {
+                    if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.equalsIgnoreCase(command)) {
                         event.setCancelled(true);
                         main.getMessageHandler().sendMessage(event.getPlayer(), "&cPlease validate your account with two-factor authentication");
                     }
@@ -139,20 +130,20 @@ public class DisabledEvents implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onItemMove(InventoryMoveItemEvent event) {
+        if(this.main.getAuthHandler().isQRCodeItem(event.getItem()) && event.getDestination().getType() != InventoryType.PLAYER) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    @SuppressWarnings("deprecation")
     public void onItemFrameInteract(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof ItemFrame) {
             if(this.main.getAuthHandler().isQRCodeItem(event.getPlayer().getItemInHand())) {
                 event.setCancelled(true);
             }
-        }
-    }
-
-    @EventHandler
-    public void onAuthState(PlayerStateChangeEvent event) {
-        if (event.getAuthState().equals(AuthHandler.AuthState.AUTHENTICATED)) {
-            event.getPlayer().setFlySpeed((float) 0.1);
-            event.getPlayer().setWalkSpeed((float) 0.2);
         }
     }
 }

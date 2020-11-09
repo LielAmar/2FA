@@ -3,7 +3,7 @@ package com.lielamar.auth.bukkit.commands;
 import com.lielamar.auth.bukkit.Main;
 import com.lielamar.auth.bukkit.commands.subcommands.*;
 import com.lielamar.auth.shared.handlers.AuthHandler;
-import org.bukkit.Bukkit;
+import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,15 +18,9 @@ public class CommandHandler implements CommandExecutor {
     private final Set<Command> commands;
     private Command loginCommand, setupCommand;
 
-    public static final String mainCommand = "2fa";
-    private static final String enableCommand = "enable";
-    private static final String disableCommand = "disable";
-    private static final String reloadCommand = "reload";
-    private static final String helpCommand = "help";
-
     public CommandHandler(Main main) {
         this.main = main;
-        this.main.getCommand(mainCommand).setExecutor(this);
+        this.main.getCommand(Constants.mainCommand).setExecutor(this);
 
         this.commands = new HashSet<>();
         this.setupCommands();
@@ -38,10 +32,10 @@ public class CommandHandler implements CommandExecutor {
     private void setupCommands() {
         loginCommand = new LoginCommand("", main);
         setupCommand = new SetupCommand("", main);
-        commands.add(new EnableCommand(enableCommand, main));
-        commands.add(new DisableCommand(disableCommand, main));
-        commands.add(new ReloadCommand(reloadCommand, main));
-        commands.add(new HelpCommand(helpCommand));
+        commands.add(new EnableCommand(Constants.enableCommand, main));
+        commands.add(new DisableCommand(Constants.disableCommand, main));
+        commands.add(new ReloadCommand(Constants.reloadCommand, main));
+        commands.add(new HelpCommand(Constants.helpCommand));
     }
 
     /**
@@ -82,11 +76,11 @@ public class CommandHandler implements CommandExecutor {
             setupCommand.execute(player, args);
         } else {
             if(args.length == 0) {
-                Command subCommand = getCommand(helpCommand);
+                Command subCommand = getCommand(Constants.helpCommand);
                 if(subCommand != null) subCommand.execute(player, args);
             } else {
                 Command subCommand = getCommand(args[0]);
-                if(subCommand == null) subCommand = getCommand(helpCommand);
+                if(subCommand == null) subCommand = getCommand(Constants.helpCommand);
 
                 String[] arguments = new String[args.length-1];
                 System.arraycopy(args, 1, arguments, 0, arguments.length);

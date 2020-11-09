@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.0.1"
+version: "1.0.2"
 authors: [LielAmar, xItsRaz]
 main: com.lielamar.auth.bukkit.Main
 description: Add another layer of protection to your server

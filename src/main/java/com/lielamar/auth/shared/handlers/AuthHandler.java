@@ -110,6 +110,17 @@ public abstract class AuthHandler {
     }
 
     /**
+     * Resets a player's key
+     *
+     * @param uuid   UUID of the player to reset the key of
+     */
+    public void resetKey(UUID uuid) {
+        pendingKeys.remove(uuid);
+        changeState(uuid, AuthState.DISABLED);
+        getStorageHandler().removeKey(uuid);
+    }
+
+    /**
      * Returns a player's key
      *
      * @param uuid   UUID of the player to get the key of
@@ -134,19 +145,6 @@ public abstract class AuthHandler {
     }
 
     /**
-     * Returns a QR Code URL based on a player's key
-     *
-     * @param urlTemplate   Base URL of the QR Code
-     * @param uuid          UUID of the player to get the key of
-     * @return              URL of the QR Code
-     */
-    public String getQRCodeURL(String urlTemplate, UUID uuid) {
-        String key = getPendingKey(uuid);
-        if(key == null) return null;
-        return urlTemplate.replaceAll("%%key%%", key);
-    }
-
-    /**
      * Checks if a player needs to authenticate
      *
      * @param uuid   UUID of the player to check
@@ -162,31 +160,28 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to check
      * @return       Amount of fails
      */
-    public int getFailedAttempts(UUID uuid) {
-        if(!failedAttempts.containsKey(uuid))
-            return 0;
-        return failedAttempts.get(uuid);
+    public int increaseFailedAttempts(UUID uuid, int amount) {
+        if(!failedAttempts.containsKey(uuid)) {
+            failedAttempts.put(uuid, amount);
+            return amount;
+        } else {
+            int playerFailedAttempts = failedAttempts.get(uuid) + amount;
+            failedAttempts.put(uuid, playerFailedAttempts);
+            return playerFailedAttempts;
+        }
     }
 
     /**
-     * Sets the amount of times a player has failed authentication
+     * Returns a QR Code URL based on a player's key
      *
-     * @param uuid       UUID of the player to set
-     * @param attempts   Amount of attempts
+     * @param urlTemplate   Base URL of the QR Code
+     * @param uuid          UUID of the player to get the key of
+     * @return              URL of the QR Code
      */
-    public void setFailedAttempts(UUID uuid, int attempts) {
-        failedAttempts.put(uuid, attempts);
-    }
-
-    /**
-     * Resets a player's key
-     *
-     * @param uuid   UUID of the player to reset the key of
-     */
-    public void reset(UUID uuid) {
-        pendingKeys.remove(uuid);
-        changeState(uuid, AuthState.DISABLED);
-        getStorageHandler().removeKey(uuid);
+    public String getQRCodeURL(String urlTemplate, UUID uuid) {
+        String key = getPendingKey(uuid);
+        if(key == null) return null;
+        return urlTemplate.replaceAll("%%key%%", key);
     }
 
     public void playerJoin(UUID uuid) {
