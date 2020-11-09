@@ -16,8 +16,6 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
     @Override
     public void reload() {
         FileConfiguration config = main.getConfig();
-        if(main.getConfig() == null)
-            main.saveDefaultConfig();
 
         this.serverName = config.getString("Server Name");
         this.storageType = StorageType.valueOf(config.getString("Storage Type"));

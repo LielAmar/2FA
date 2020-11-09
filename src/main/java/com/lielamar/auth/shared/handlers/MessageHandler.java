@@ -10,7 +10,7 @@ public abstract class MessageHandler {
      * This class was edited by Liel Amar to add Bungeecord, JSON, MySQL, and MongoDB support.
      */
 
-    private String prefix = "&7[&b2FA&7]&r ";
+    private final String prefix = "&7[&b2FA&7]&r ";
     private final List<String> defaults = Arrays.asList(
             "&cPlease validate your account with two-factor authentication", 
             "&cThe code you entered was not valid, please try again", 
@@ -40,10 +40,6 @@ public abstract class MessageHandler {
 
     public String getPrefix() {
         return this.prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
     }
 
     public abstract String getMessage(String message);

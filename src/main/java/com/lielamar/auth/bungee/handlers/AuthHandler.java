@@ -1,29 +1,28 @@
 package com.lielamar.auth.bungee.handlers;
 
+import com.lielamar.auth.bungee.events.PlayerStateChangeEvent;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
-public class AuthHandler {
+public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
-    private final Set<UUID> authenticatedPlayers;
+    @Override
+    public void changeState(UUID uuid, AuthState authState) {
+        if(authState == getAuthState(uuid))
+            return;
 
-    public AuthHandler() {
-        this.authenticatedPlayers = new HashSet<>();
-    }
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+        if(player != null) {
+            PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authState);
+            ProxyServer.getInstance().getPluginManager().callEvent(event);
+            if(event.isCancelled())
+                return;
 
-    public boolean containsPlayer(ProxiedPlayer player) {
-        if(player == null) return false;
-        return authenticatedPlayers.contains(player.getUniqueId());
-    }
+            authState = event.getAuthState();
+        }
 
-    public void setPlayer(ProxiedPlayer player) {
-        authenticatedPlayers.add(player.getUniqueId());
-    }
-
-    public void removePlayer(ProxiedPlayer player) {
-        authenticatedPlayers.remove(player.getUniqueId());
+        authStates.put(uuid, authState);
     }
 }

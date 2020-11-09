@@ -37,6 +37,7 @@ Require When:
   Every Login: false
 
 # Storage Type. Can be either JSON, MYSQL or MONGODB
+# If you use this plugin in your bungeecord /plugins/ folder as well, make sure Storage Type IS NOT JSON!
 Storage Type: JSON
 
 # If the Storage Type is MYSQL please enter MySQL connection details

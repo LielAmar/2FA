@@ -17,15 +17,15 @@ public class OnBungeePlayerConnections implements Listener {
 
     @EventHandler
     public void onJoin(LoginEvent event) {
-        ProxiedPlayer p = ProxyServer.getInstance().getPlayer(event.getConnection().getUniqueId());
-        if(main.getAuthHandler().containsPlayer(p))
-            main.getAuthHandler().removePlayer(p);
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(event.getConnection().getUniqueId());
+
+        if(player != null)
+            main.getAuthHandler().playerJoin(player.getUniqueId());
     }
 
     @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
-        ProxiedPlayer p = event.getPlayer();
-        if(main.getAuthHandler().containsPlayer(p))
-            main.getAuthHandler().removePlayer(p);
+        ProxiedPlayer player = event.getPlayer();
+        main.getAuthHandler().playerQuit(player.getUniqueId());
     }
 }
