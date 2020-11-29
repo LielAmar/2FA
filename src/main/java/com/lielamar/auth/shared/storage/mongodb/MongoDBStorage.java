@@ -11,8 +11,6 @@ import java.util.UUID;
 
 public class MongoDBStorage extends StorageHandler {
 
-    private final StorageType storageType = StorageType.MONGODB;
-
     private MongoClient mongoClient;
     private MongoCollection<Document> mongoCollection;
 
@@ -57,12 +55,6 @@ public class MongoDBStorage extends StorageHandler {
 
         MongoDatabase mongoDatabase = mongoClient.getDatabase(this.database);
         this.mongoCollection = mongoDatabase.getCollection("players");
-    }
-
-
-    @Override
-    public StorageType getStorageType() {
-        return storageType;
     }
 
 

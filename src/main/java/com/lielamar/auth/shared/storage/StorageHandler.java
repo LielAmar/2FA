@@ -5,13 +5,6 @@ import java.util.UUID;
 public abstract class StorageHandler {
 
     /**
-     * Returns the type of the storage
-     *
-     * @return   Type of the storage
-     */
-    public abstract StorageType getStorageType();
-
-    /**
      * Sets the Key of the player who's UUID is uuid
      *
      * @param uuid        UUID of the player to set the Key of
