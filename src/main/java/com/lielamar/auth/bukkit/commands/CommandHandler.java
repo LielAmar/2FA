@@ -70,6 +70,13 @@ public class CommandHandler implements CommandExecutor {
 
         Player player = (Player)cs;
 
+        if(main.getAuthHandler() == null) {
+            main.getMessageHandler().sendMessage(player, "&cSomething went wrong. Please contact a Staff Member!");
+            return false;
+        } else if(main.getAuthHandler().getAuthState(player.getUniqueId()) == null) {
+            main.getAuthHandler().playerJoin(player.getUniqueId());
+        }
+
         if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.PENDING_LOGIN)) {
             loginCommand.execute(player, args);
         } else if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.PENDING_SETUP)) {

@@ -9,8 +9,6 @@ import java.util.UUID;
 
 public class JSONStorage extends StorageHandler {
 
-    private final StorageType storageType = StorageType.JSON;
-
     private final File dir;
 
     public JSONStorage(String path) {
@@ -65,12 +63,6 @@ public class JSONStorage extends StorageHandler {
             e.printStackTrace();
         }
         return file;
-    }
-
-
-    @Override
-    public StorageType getStorageType() {
-        return storageType;
     }
 
 

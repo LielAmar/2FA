@@ -6,13 +6,14 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.5</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <craftbukkit.path>D:/Build Tool/spigot-1.13.2.jar</craftbukkit.path>
     </properties>
 
     <build>
@@ -43,8 +44,8 @@
                                     <include>org.json:json**</include>
                                     <include>com.warrenstrange:googleauth**</include>
                                     <!-- For Spigot 1.13 and above -->
-<!--                                    <include>commons-codec:commons-codec**</include>-->
-                                </includes>
+                                    <include>commons-codec:commons-codec**</include>
+                                </includes>w
                             </artifactSet>
                         </configuration>
                     </execution>
@@ -55,11 +56,6 @@
 
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-
-        <repository>
             <id>bungeecord-repo</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
@@ -67,9 +63,31 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${craftbukkit.path}</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.16-R0.4-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.warrenstrange</groupId>
             <artifactId>googleauth</artifactId>
             <version>1.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.6</version>
         </dependency>
 
         <dependency>
@@ -83,35 +101,6 @@
             <artifactId>json</artifactId>
             <version>20200518</version>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.6</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.13.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>1.16-R0.4-SNAPSHOT</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>1.16-R0.4-SNAPSHOT</version>
-            <type>javadoc</type>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

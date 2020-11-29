@@ -8,8 +8,6 @@ import java.util.UUID;
 
 public class MySQLStorage extends StorageHandler {
 
-    private final StorageType storageType = StorageType.MYSQL;
-
     private Connection connection;
     private final String host;
     private final String database;
@@ -67,12 +65,6 @@ public class MySQLStorage extends StorageHandler {
      */
     public boolean isValidConnection() throws SQLException {
         return this.connection != null && !this.connection.isClosed();
-    }
-
-
-    @Override
-    public StorageType getStorageType() {
-        return storageType;
     }
 
 
