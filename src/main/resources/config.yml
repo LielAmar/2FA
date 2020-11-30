@@ -30,6 +30,10 @@ Blacklisted Commands:
 # Whether to send a message advising to use 2FA if the player has permissions to use it
 Advise: true
 
+# Whether to hash IPs or not
+# Can be either SHA256, SHA512 or NONE
+IP Hash: SHA256
+
 # When to require the use of 2FA
 # If you run the plugin for a BungeeCord server, please include this plugin in your BungeeCord/plugins/ folder
 # so it can handles the authentication on the BungeeCord level

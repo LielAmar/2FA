@@ -7,6 +7,10 @@ import com.lielamar.auth.shared.storage.StorageType;
 import com.lielamar.auth.shared.storage.json.JSONStorage;
 import com.lielamar.auth.shared.storage.mongodb.MongoDBStorage;
 import com.lielamar.auth.shared.storage.mysql.MySQLStorage;
+import com.lielamar.auth.shared.utils.hash.Hash;
+import com.lielamar.auth.shared.utils.hash.NoHash;
+import com.lielamar.auth.shared.utils.hash.SHA256;
+import com.lielamar.auth.shared.utils.hash.SHA512;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -35,11 +39,13 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     protected final Main main;
     protected final AutoAuthHandler autoAuthHandler;
+    protected Hash hash;
 
     public AuthHandler(Main main) {
         this.main = main;
         this.autoAuthHandler = new AutoAuthHandler();
 
+        loadHashType();
         loadStorageHandler();
     }
 
@@ -160,10 +166,27 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
     }
 
+    /**
+     * Loads the hash type (SHA-256, SHA-512, No Hash)
+     */
+    private void loadHashType() {
+        String hashType = main.getConfigHandler().getHashType();
+
+        switch (hashType.toUpperCase()) {
+            case "SHA256":
+                this.hash = new SHA256();
+                break;
+            case "SHA512":
+                this.hash = new SHA512();
+                break;
+            default:
+                this.hash = new NoHash();
+                break;
+        }
+    }
 
     /**
      * Loads the storage handler (JSON, MySQL, MongoDB)
-     *
      */
     private void loadStorageHandler() {
         StorageType storageType = main.getConfigHandler().getStorageType();
@@ -208,7 +231,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
     public void updatePlayerIP(Player player) {
         if(player.getAddress() != null && player.getAddress().getAddress() != null) {
-            String ip = player.getAddress().getAddress().getHostAddress();
+            String ip = this.hash.hash(player.getAddress().getAddress().getHostAddress());
             getStorageHandler().setIP(player.getUniqueId(), ip);
         }
     }
@@ -380,7 +403,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             if(!needsToAuthenticate(player.getUniqueId())) return;
 
             if(player.getAddress() != null && player.getAddress().getAddress() != null) {
-                String ip = player.getAddress().getAddress().getHostAddress();
+                String ip = hash.hash(player.getAddress().getAddress().getHostAddress());
 
                 boolean hasIPChanged = getStorageHandler().getIP(player.getUniqueId()) == null
                         || !getStorageHandler().getIP(player.getUniqueId()).equalsIgnoreCase(ip);

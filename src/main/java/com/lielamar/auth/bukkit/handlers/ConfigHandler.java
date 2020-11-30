@@ -18,6 +18,7 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
         FileConfiguration config = main.getConfig();
 
         this.serverName = config.getString("Server Name");
+        this.hashType = config.getString("IP Hash");
         this.storageType = StorageType.valueOf(config.getString("Storage Type", "JSON").toUpperCase());
         this.requireOnIPChange = config.getBoolean("Require When.IP Changes");
         this.requireOnEveryLogin = config.getBoolean("Require When.Every Login");
