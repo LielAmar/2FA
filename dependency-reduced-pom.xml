@@ -3,15 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.lielamar</groupId>
   <artifactId>2fa</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.7</version>
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.5.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>8</source>
+          <target>8</target>
         </configuration>
       </plugin>
       <plugin>
@@ -26,6 +26,7 @@
             <configuration>
               <artifactSet>
                 <includes>
+                  <include>com.lielamar:LielsUtils**</include>
                   <include>org.json:json**</include>
                   <include>com.warrenstrange:googleauth**</include>
                   <include>commons-codec:commons-codec**</include>
@@ -38,6 +39,10 @@
     </plugins>
   </build>
   <repositories>
+    <repository>
+      <id>lielamar-api</id>
+      <url>https://api.lielamar.com/repository/maven-public/</url>
+    </repository>
     <repository>
       <id>bungeecord-repo</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>

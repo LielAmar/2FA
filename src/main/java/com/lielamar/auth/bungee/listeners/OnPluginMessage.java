@@ -72,6 +72,7 @@ public class OnPluginMessage implements Listener {
 
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF(Constants.subChannelName);                        // Setting the SubChannel of the response
+        out.writeUTF(player.getUniqueId().toString());                 // Setting the playerUUID of the response
 
         ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
         DataOutputStream msgOut = new DataOutputStream(msgBytes);

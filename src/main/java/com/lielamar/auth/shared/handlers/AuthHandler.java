@@ -3,6 +3,7 @@ package com.lielamar.auth.shared.handlers;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,8 +15,6 @@ public abstract class AuthHandler {
      * This class was originally written by Connor Linfoot (https://github.com/ConnorLinfoot/MC2FA).
      * This class was edited by Liel Amar to add Bungeecord, JSON, MySQL, and MongoDB support.
      */
-
-    protected final int MAX_ATTEMPTS = 3;
 
     protected StorageHandler storageHandler;
     protected HashMap<UUID, AuthState> authStates = new HashMap<>();
@@ -46,7 +45,8 @@ public abstract class AuthHandler {
      * @return       Whether or not the player has a Secret Key
      */
     public boolean is2FAEnabled(UUID uuid) {
-        if(!authStates.containsKey(uuid)) return false;
+        if(!authStates.containsKey(uuid))
+            return false;
         return authStates.get(uuid).equals(AuthState.PENDING_LOGIN) || authStates.get(uuid).equals(AuthState.AUTHENTICATED);
     }
 
@@ -138,7 +138,7 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to get the pending key of
      * @return       Player's pending key
      */
-    private String getPendingKey(UUID uuid) {
+    protected String getPendingKey(UUID uuid) {
         if(!isPendingSetup(uuid))
             return null;
         return pendingKeys.get(uuid);
@@ -179,9 +179,7 @@ public abstract class AuthHandler {
      * @return              URL of the QR Code
      */
     public String getQRCodeURL(String urlTemplate, UUID uuid) {
-        String key = getPendingKey(uuid);
-        if(key == null) return null;
-        return urlTemplate.replaceAll("%%key%%", key);
+        return null;
     }
 
     public void playerJoin(UUID uuid) {

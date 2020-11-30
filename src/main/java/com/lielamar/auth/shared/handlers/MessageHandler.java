@@ -12,7 +12,7 @@ public abstract class MessageHandler {
 
     private String prefix = "&7[&b2FA&7]&r ";
     private final List<String> defaults = Arrays.asList(
-            "&cPlease validate your account with two-factor authentication", 
+            "&cPlease validate your account with two-factor authentication",
             "&cThe code you entered was not valid, please try again", 
             "&aYou have successfully setup two-factor authentication", 
             "&cThis command must be ran as a player", 
@@ -34,8 +34,7 @@ public abstract class MessageHandler {
             "&a%name%'s 2FA has been reset",
             "&c%name% could not be found", 
             "&c%name% is not setup with 2FA", 
-            "&aConfig was reloaded", 
-            "&c%name% failed to authenticate %times% times",
+            "&aConfig was reloaded",
             "&cSomething went wrong. Please contact a Staff Member!"
     );
 

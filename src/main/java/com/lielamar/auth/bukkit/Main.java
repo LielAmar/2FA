@@ -1,5 +1,6 @@
 package com.lielamar.auth.bukkit;
 
+import com.lielamar.lielsutils.bstats.MetricsSpigot;
 import com.lielamar.auth.bukkit.commands.CommandHandler;
 import com.lielamar.auth.bukkit.handlers.AuthHandler;
 import com.lielamar.auth.bukkit.handlers.BungeecordMessageHandler;
@@ -8,9 +9,10 @@ import com.lielamar.auth.bukkit.handlers.MessageHandler;
 import com.lielamar.auth.bukkit.listeners.DisabledEvents;
 import com.lielamar.auth.bukkit.listeners.OnAuthStateChange;
 import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
-import com.lielamar.auth.shared.Metrics;
 import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.lielsutils.update.UpdateChecker;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,11 +28,15 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
+        if(getConfig().getBoolean("Check For Updates"))
+            new UpdateChecker(this, 85594).checkForUpdates();
+
         this.setupAuth();
         this.setupBStats();
         this.registerListeners();
 
-        Bukkit.getOnlinePlayers().forEach(pl -> this.authHandler.playerJoin(pl.getUniqueId()));
+        for(Player pl : Bukkit.getOnlinePlayers())
+            this.authHandler.playerJoin(pl.getUniqueId());
     }
 
     public void setupAuth() {
@@ -44,7 +50,7 @@ public class Main extends JavaPlugin {
 
     public void setupBStats() {
         int pluginId = 9355;
-        new Metrics(this, pluginId);
+        new MetricsSpigot(this, pluginId);
     }
 
     public void registerListeners() {

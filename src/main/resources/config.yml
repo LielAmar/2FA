@@ -9,6 +9,9 @@
 # Github: https://github.com/LielAmar/2FA
 # ===========================================================================================
 
+# Whether to notify when there's an update available
+Check For Updates: true
+
 # Your server name. This will be the default name of the 2fa in the authenticator app
 Server Name: "MyServer"
 
