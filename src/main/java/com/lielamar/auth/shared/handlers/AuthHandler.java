@@ -3,7 +3,6 @@ package com.lielamar.auth.shared.handlers;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
