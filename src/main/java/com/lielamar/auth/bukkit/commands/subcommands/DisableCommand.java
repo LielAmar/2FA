@@ -52,7 +52,7 @@ public class DisableCommand extends Command {
                         UUID targetUUID;
 
                         if(targetPlayer != null)
-                            targetUUID = player.getUniqueId();
+                            targetUUID = targetPlayer.getUniqueId();
                         else
                             targetUUID = AuthUtils.fetchUUID(target);
 

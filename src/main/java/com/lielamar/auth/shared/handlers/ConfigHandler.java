@@ -7,7 +7,7 @@ import java.util.List;
 
 public abstract class ConfigHandler {
 
-    private final String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/%%label%%?secret=%%key%%";
+    private final String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/";
     protected String serverName;
     protected StorageType storageType;
     protected boolean requireOnIPChange = true;

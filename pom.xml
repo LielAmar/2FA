@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.7</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,8 +23,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
 
@@ -41,11 +41,12 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
+                                    <include>com.lielamar:LielsUtils**</include>
                                     <include>org.json:json**</include>
                                     <include>com.warrenstrange:googleauth**</include>
                                     <!-- For Spigot 1.13 and above -->
                                     <include>commons-codec:commons-codec**</include>
-                                </includes>w
+                                </includes>
                             </artifactSet>
                         </configuration>
                     </execution>
@@ -56,12 +57,23 @@
 
     <repositories>
         <repository>
+            <id>lielamar-api</id>
+            <url>https://api.lielamar.com/repository/maven-public/</url>
+        </repository>
+
+        <repository>
             <id>bungeecord-repo</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.lielamar</groupId>
+            <artifactId>LielsUtils</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>

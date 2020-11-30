@@ -67,17 +67,17 @@ public class JSONStorage extends StorageHandler {
 
 
     @Override
-    public String setKey(UUID uuid, String Key) {
+    public String setKey(UUID uuid, String key) {
         try {
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if (Key == null) jsonObject.put("key", JSONObject.NULL);
-            else jsonObject.put("key", Key);
+            if (key == null) jsonObject.put("key", JSONObject.NULL);
+            else jsonObject.put("key", key);
 
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
-            return Key;
+            return key;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -113,17 +113,17 @@ public class JSONStorage extends StorageHandler {
 
 
     @Override
-    public String setIP(UUID uuid, String IP) {
+    public String setIP(UUID uuid, String ip) {
         try {
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if (IP == null) jsonObject.put("ip", JSONObject.NULL);
-            else jsonObject.put("ip", IP);
+            if (ip == null) jsonObject.put("ip", JSONObject.NULL);
+            else jsonObject.put("ip", ip);
 
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
-            return IP;
+            return ip;
         } catch (IOException e) {
             e.printStackTrace();
         }

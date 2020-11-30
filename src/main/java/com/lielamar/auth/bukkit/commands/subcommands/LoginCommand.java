@@ -2,6 +2,8 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.Main;
 import com.lielamar.auth.bukkit.commands.Command;
+import com.lielamar.auth.bukkit.events.PlayerFailedAuthenticationEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -41,10 +43,18 @@ public class LoginCommand extends Command {
                     main.getMessageHandler().sendMessage(player, "&aYou have successfully authenticated");
                 } else {
                     main.getMessageHandler().sendMessage(player, "&cIncorrect code, please try again");
+                    callFailEvent(player);
                 }
             } catch (Exception e) {
                 main.getMessageHandler().sendMessage(player, "&cThe code you entered was not valid, please try again");
+                callFailEvent(player);
             }
         }
+    }
+
+    private void callFailEvent(Player player) {
+        PlayerFailedAuthenticationEvent event =
+                new PlayerFailedAuthenticationEvent(player, main.getAuthHandler().increaseFailedAttempts(player.getUniqueId(), 1));
+        Bukkit.getPluginManager().callEvent(event);
     }
 }

@@ -92,6 +92,7 @@ public class BungeecordMessageHandler implements PluginMessageListener {
 
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subChannel = in.readUTF();                           // Getting the SubChannel name
+        UUID playerUUID = UUID.fromString(in.readUTF());            // UUID of the player to run the check on
 
         // If the SubChannel name is the 2FA's SubChannel name
         if(subChannel.equals(Constants.subChannelName)) {
@@ -106,11 +107,12 @@ public class BungeecordMessageHandler implements PluginMessageListener {
 
                 if(action.equals(Constants.getState)) {
                     state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
-                    main.getAuthHandler().changeState(player.getUniqueId(), state);
+                    main.getAuthHandler().changeState(playerUUID, state);
                 } else if(action.equals(Constants.setState)) {
                     state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
-                    if(state != main.getAuthHandler().getAuthState(player.getUniqueId()))
-                        main.getAuthHandler().changeState(player.getUniqueId(), state);
+                    if(state != main.getAuthHandler().getAuthState(playerUUID)) {
+                        main.getAuthHandler().changeState(playerUUID, state);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

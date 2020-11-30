@@ -1,7 +1,6 @@
 package com.lielamar.auth.shared.storage.mysql;
 
 import com.lielamar.auth.shared.storage.StorageHandler;
-import com.lielamar.auth.shared.storage.StorageType;
 
 import java.sql.*;
 import java.util.UUID;
@@ -69,7 +68,7 @@ public class MySQLStorage extends StorageHandler {
 
 
     @Override
-    public String setKey(UUID uuid, String Key) {
+    public String setKey(UUID uuid, String key) {
         try {
             if(!isValidConnection()) return null;
 
@@ -80,17 +79,17 @@ public class MySQLStorage extends StorageHandler {
 
             if(result.next()) {
                 statement = this.connection.prepareStatement("UPDATE Auth SET `key` = ? WHERE `uuid` = ?;");
-                statement.setString(1, Key);
+                statement.setString(1, key);
                 statement.setString(2, uuid.toString());
             } else {
                 statement = this.connection.prepareStatement("INSERT INTO Auth(`uuid`, `key`, `ip`) VALUES (?,?,?);");
                 statement.setString(1, uuid.toString());
-                statement.setString(2, Key);
+                statement.setString(2, key);
                 statement.setString(3, "");
             }
 
             statement.executeUpdate();
-            return Key;
+            return key;
         } catch(SQLException e) {
             e.printStackTrace();
         }
@@ -107,8 +106,9 @@ public class MySQLStorage extends StorageHandler {
             ResultSet result = statement.executeQuery();
 
             if(result.next()) {
-                String Key = result.getString("key");
-                return Key.equalsIgnoreCase("") ? null : Key;
+                String key = result.getString("key");
+
+                return key.equalsIgnoreCase("") ? null : key;
             }
         } catch(SQLException e) {
             e.printStackTrace();
@@ -128,7 +128,7 @@ public class MySQLStorage extends StorageHandler {
 
 
     @Override
-    public String setIP(UUID uuid, String IP) {
+    public String setIP(UUID uuid, String ip) {
         try {
             if(!isValidConnection()) return null;
 
@@ -139,17 +139,17 @@ public class MySQLStorage extends StorageHandler {
 
             if(result.next()) {
                 statement = this.connection.prepareStatement("UPDATE Auth SET `ip` = ? WHERE `uuid` = ?;");
-                statement.setString(1, IP);
+                statement.setString(1, ip);
                 statement.setString(2, uuid.toString());
             } else {
                 statement = this.connection.prepareStatement("INSERT INTO Auth(`uuid`, `key`, `ip`) VALUES (?,?,?);");
                 statement.setString(1, uuid.toString());
                 statement.setString(2, "");
-                statement.setString(3, IP);
+                statement.setString(3, ip);
             }
 
             statement.executeUpdate();
-            return IP;
+            return ip;
         } catch(SQLException e) {
             e.printStackTrace();
         }

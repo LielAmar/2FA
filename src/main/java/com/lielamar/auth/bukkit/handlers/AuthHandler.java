@@ -21,6 +21,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
@@ -61,14 +64,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             if(valid) {
                 removeQRItem(player);
                 updatePlayerIP(player);
-            } else {
-                int failedAttempts = increaseFailedAttempts(uuid, 1);
-
-                if(failedAttempts > MAX_ATTEMPTS) {
-                    Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission("2fa.alert") && !needsToAuthenticate(pl.getUniqueId())).forEach(pl ->
-                            main.getMessageHandler().sendMessage(pl, "&c%name% failed to authenticate %times% times"
-                                    .replaceAll("%name%", player.getName()).replaceAll("%times%", failedAttempts + "")));
-                }
             }
         }
         return valid;
@@ -144,20 +139,25 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
 
         authStates.put(uuid, authState);
-        autoAuthHandler.setBungeecordAuthState(player, authState);
+        if(player != null)
+            autoAuthHandler.setBungeecordAuthState(player, authState);
     }
 
     @Override
     public String getQRCodeURL(String urlTemplate, UUID uuid) {
-        String label;
+        String encodedPart = "%%label%%?secret=%%key%%&issuer=%%title%%";
+
         Player player = Bukkit.getPlayer(uuid);
-        if(player != null) {
-            label = main.getConfigHandler().getServerName() + " (" + player.getName() + ")";
-        } else {
-            label = main.getConfigHandler().getServerName();
+        String label = (player == null) ? "player" : player.getName();
+        String title = main.getConfigHandler().getServerName();
+        String key = getPendingKey(uuid);
+        encodedPart = encodedPart.replaceAll("%%label%%", label).replaceAll("%%title%%", title).replaceAll("%%key%%", key);
+
+        try {
+            return urlTemplate + URLEncoder.encode(encodedPart, StandardCharsets.UTF_8.toString());
+        } catch(UnsupportedEncodingException e) {
+            return urlTemplate + encodedPart;
         }
-        label = label.replaceAll(" ", "%20");
-        return super.getQRCodeURL(urlTemplate, uuid).replaceAll("%%label%%", label);
     }
 
 
@@ -234,6 +234,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     @SuppressWarnings("deprecation")
     public void giveQRCodeItem(Player player) {
         String url = getQRCodeURL(main.getConfigHandler().getQrCodeURL(), player.getUniqueId());
+
+        if(url == null)
+            return;
 
         new BukkitRunnable() {
             final MapView view = Bukkit.createMap(player.getWorld());
