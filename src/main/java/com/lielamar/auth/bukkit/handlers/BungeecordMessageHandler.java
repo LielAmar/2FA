@@ -3,7 +3,8 @@ package com.lielamar.auth.bukkit.handlers;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.lielamar.auth.bukkit.Main;
+
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.Bukkit;
@@ -17,8 +18,8 @@ import java.util.UUID;
 @SuppressWarnings("UnstableApiUsage")
 public class BungeecordMessageHandler implements PluginMessageListener {
 
-    private final Main main;
-    public BungeecordMessageHandler(Main main) {
+    private final TwoFactorAuthentication main;
+    public BungeecordMessageHandler(TwoFactorAuthentication main) {
         this.main = main;
     }
 

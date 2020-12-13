@@ -1,6 +1,6 @@
 package com.lielamar.auth.bungee.listeners;
 
-import com.lielamar.auth.bungee.Main;
+import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -11,8 +11,8 @@ import net.md_5.bungee.event.EventHandler;
 
 public class DisabledEvents implements Listener {
 
-    private final Main main;
-    public DisabledEvents(Main main) {
+    private final TwoFactorAuthentication main;
+    public DisabledEvents(TwoFactorAuthentication main) {
         this.main = main;
     }
 

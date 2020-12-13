@@ -1,6 +1,6 @@
 package com.lielamar.auth.bukkit.commands;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.commands.subcommands.*;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
@@ -14,11 +14,11 @@ import java.util.Set;
 
 public class CommandHandler implements CommandExecutor {
 
-    private final Main main;
+    private final TwoFactorAuthentication main;
     private final Set<Command> commands;
     private Command loginCommand, setupCommand;
 
-    public CommandHandler(Main main) {
+    public CommandHandler(TwoFactorAuthentication main) {
         this.main = main;
         this.main.getCommand(Constants.mainCommand).setExecutor(this);
 

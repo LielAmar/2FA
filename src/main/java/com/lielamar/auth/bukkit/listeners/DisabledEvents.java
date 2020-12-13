@@ -1,6 +1,6 @@
 package com.lielamar.auth.bukkit.listeners;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -16,8 +16,8 @@ import org.bukkit.event.player.*;
 
 public class DisabledEvents implements Listener {
 
-    private final Main main;
-    public DisabledEvents(Main main) {
+    private final TwoFactorAuthentication main;
+    public DisabledEvents(TwoFactorAuthentication main) {
         this.main = main;
     }
 

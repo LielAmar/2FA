@@ -1,6 +1,6 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.commands.Command;
 import com.lielamar.auth.shared.utils.AuthUtils;
 import org.bukkit.Bukkit;
@@ -11,8 +11,8 @@ import java.util.UUID;
 
 public class DisableCommand extends Command {
 
-    private final Main main;
-    public DisableCommand(String name, Main main) {
+    private final TwoFactorAuthentication main;
+    public DisableCommand(String name, TwoFactorAuthentication main) {
         super(name);
         this.main = main;
     }

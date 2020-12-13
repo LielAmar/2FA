@@ -1,6 +1,6 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
 import com.lielamar.auth.bukkit.utils.ImageRender;
 import com.lielamar.auth.shared.storage.StorageType;
@@ -37,11 +37,11 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      * This class was edited by Liel Amar to add Bungeecord, JSON, MySQL, and MongoDB support.
      */
 
-    protected final Main main;
+    protected final TwoFactorAuthentication main;
     protected final AutoAuthHandler autoAuthHandler;
     protected Hash hash;
 
-    public AuthHandler(Main main) {
+    public AuthHandler(TwoFactorAuthentication main) {
         this.main = main;
         this.autoAuthHandler = new AutoAuthHandler();
 
@@ -166,6 +166,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
     }
 
+
     /**
      * Loads the hash type (SHA-256, SHA-512, No Hash)
      */
@@ -223,6 +224,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             this.storageHandler = new JSONStorage(this.main.getDataFolder().getAbsolutePath());
         }
     }
+
 
     /**
      * Updates a player's ip in the database

@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,8 +23,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
 
@@ -39,15 +39,35 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+
                             <artifactSet>
                                 <includes>
-                                    <include>com.lielamar:LielsUtils**</include>
+                                    <include>com.lielamar:lielsutils**</include>
                                     <include>org.json:json**</include>
                                     <include>com.warrenstrange:googleauth**</include>
-                                    <!-- For Spigot 1.13 and above -->
                                     <include>commons-codec:commons-codec**</include>
                                 </includes>
                             </artifactSet>
+
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.lielamar.lielsutils</pattern>
+                                    <shadedPattern>com.lielamar.twofa.lib.lielsutils</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.json</pattern>
+                                    <shadedPattern>com.lielamar.twofa.lib.json</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.warrenstrange.googleauth</pattern>
+                                    <shadedPattern>com.lielamar.twofa.lib.googleauth</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.commons.codec</pattern>
+                                    <shadedPattern>com.lielamar.twofa.lib.commons.codec</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -70,8 +90,9 @@
     <dependencies>
         <dependency>
             <groupId>com.lielamar</groupId>
-            <artifactId>LielsUtils</artifactId>
-            <version>1.2.2</version>
+            <artifactId>lielsutils</artifactId>
+            <version>1.2.3</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -94,18 +115,21 @@
             <groupId>com.warrenstrange</groupId>
             <artifactId>googleauth</artifactId>
             <version>1.4.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.6</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
             <version>3.12.7</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

@@ -1,6 +1,6 @@
 package com.lielamar.auth.bungee.handlers;
 
-import com.lielamar.auth.bungee.Main;
+import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -14,11 +14,11 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
 
     private final String configName = "config.yml";
 
-    private final Main main;
+    private final TwoFactorAuthentication main;
 
     private boolean disableServerSwitch;
 
-    public ConfigHandler(Main main) {
+    public ConfigHandler(TwoFactorAuthentication main) {
         this.main = main;
 
         reload();

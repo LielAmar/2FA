@@ -1,6 +1,6 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.commands.Command;
 import com.lielamar.auth.bukkit.events.PlayerFailedAuthenticationEvent;
 import org.bukkit.Bukkit;
@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 
 public class LoginCommand extends Command {
 
-    private final Main main;
-    public LoginCommand(String name, Main main) {
+    private final TwoFactorAuthentication main;
+    public LoginCommand(String name, TwoFactorAuthentication main) {
         super(name);
         this.main = main;
     }
