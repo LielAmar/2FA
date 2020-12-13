@@ -11,7 +11,7 @@ import com.lielamar.lielsutils.bstats.MetricsBungee;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 
-public class Main extends Plugin {
+public class TwoFactorAuthentication extends Plugin {
 
     private MessageHandler messageHandler;
     private ConfigHandler configHandler;

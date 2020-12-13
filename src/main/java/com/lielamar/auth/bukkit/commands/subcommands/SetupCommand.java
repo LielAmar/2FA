@@ -1,14 +1,14 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.commands.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class SetupCommand extends Command {
 
-    private final Main main;
-    public SetupCommand(String name, Main main) {
+    private final TwoFactorAuthentication main;
+    public SetupCommand(String name, TwoFactorAuthentication main) {
         super(name);
         this.main = main;
     }

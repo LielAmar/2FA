@@ -1,13 +1,13 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.storage.StorageType;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandler {
 
-    private final Main main;
-    public ConfigHandler(Main main) {
+    private final TwoFactorAuthentication main;
+    public ConfigHandler(TwoFactorAuthentication main) {
         this.main = main;
 
         reload();

@@ -1,7 +1,6 @@
 package com.lielamar.auth.bungee.handlers;
 
-import com.lielamar.auth.bungee.Main;
-
+import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -16,10 +15,10 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     private final String configName = "messages.yml";
 
-    private final Main main;
+    private final TwoFactorAuthentication main;
     private Configuration messagesConfig;
 
-    public MessageHandler(Main main) {
+    public MessageHandler(TwoFactorAuthentication main) {
         this.main = main;
 
         loadConfiguration();

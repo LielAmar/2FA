@@ -1,6 +1,6 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,10 +10,10 @@ import java.io.IOException;
 
 public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
-    private final Main main;
+    private final TwoFactorAuthentication main;
     private YamlConfiguration messagesConfig;
 
-    public MessageHandler(Main main) {
+    public MessageHandler(TwoFactorAuthentication main) {
         this.main = main;
         loadConfiguration();
     }
