@@ -1,6 +1,6 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.commands.Command;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import org.bukkit.Bukkit;
@@ -13,8 +13,8 @@ import java.util.UUID;
 
 public class ReloadCommand extends Command {
 
-    private final Main main;
-    public ReloadCommand(String name, Main main) {
+    private final TwoFactorAuthentication main;
+    public ReloadCommand(String name, TwoFactorAuthentication main) {
         super(name);
         this.main = main;
     }

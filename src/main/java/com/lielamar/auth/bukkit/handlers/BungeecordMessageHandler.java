@@ -3,7 +3,8 @@ package com.lielamar.auth.bukkit.handlers;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.lielamar.auth.bukkit.Main;
+
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.Bukkit;
@@ -17,8 +18,8 @@ import java.util.UUID;
 @SuppressWarnings("UnstableApiUsage")
 public class BungeecordMessageHandler implements PluginMessageListener {
 
-    private final Main main;
-    public BungeecordMessageHandler(Main main) {
+    private final TwoFactorAuthentication main;
+    public BungeecordMessageHandler(TwoFactorAuthentication main) {
         this.main = main;
     }
 
@@ -92,6 +93,7 @@ public class BungeecordMessageHandler implements PluginMessageListener {
 
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subChannel = in.readUTF();                           // Getting the SubChannel name
+        UUID playerUUID = UUID.fromString(in.readUTF());            // UUID of the player to run the check on
 
         // If the SubChannel name is the 2FA's SubChannel name
         if(subChannel.equals(Constants.subChannelName)) {
@@ -106,11 +108,12 @@ public class BungeecordMessageHandler implements PluginMessageListener {
 
                 if(action.equals(Constants.getState)) {
                     state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
-                    main.getAuthHandler().changeState(player.getUniqueId(), state);
+                    main.getAuthHandler().changeState(playerUUID, state);
                 } else if(action.equals(Constants.setState)) {
                     state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
-                    if(state != main.getAuthHandler().getAuthState(player.getUniqueId()))
-                        main.getAuthHandler().changeState(player.getUniqueId(), state);
+                    if(state != main.getAuthHandler().getAuthState(playerUUID)) {
+                        main.getAuthHandler().changeState(playerUUID, state);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

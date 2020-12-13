@@ -1,13 +1,16 @@
 # ===========================================================================================
 # Thank you for using the Two Factor Authentication plugin by Liel Amar.
 # Special thanks to Connor Linfoot for developing the original MC2FA plugin.
-# For support, you can contact me through our discord server: https://discord.gg/NzgBrqR.
+# For support, you can contact me through my discord server: https://discord.gg/NzgBrqR.
 #
 # If you have any problems connecting to the database, whether it be MySQL or Mongo,
 # please delete this file, start up your server once again and re-set the values.
 #
 # Github: https://github.com/LielAmar/2FA
 # ===========================================================================================
+
+# Whether to notify when there's an update available
+Check For Updates: true
 
 # Your server name. This will be the default name of the 2fa in the authenticator app
 Server Name: "MyServer"
@@ -26,6 +29,10 @@ Blacklisted Commands:
 
 # Whether to send a message advising to use 2FA if the player has permissions to use it
 Advise: true
+
+# Whether to hash IPs or not
+# Can be either SHA256, SHA512 or NONE
+IP Hash: SHA256
 
 # When to require the use of 2FA
 # If you run the plugin for a BungeeCord server, please include this plugin in your BungeeCord/plugins/ folder

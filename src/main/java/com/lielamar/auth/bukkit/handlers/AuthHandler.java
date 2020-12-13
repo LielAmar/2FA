@@ -1,12 +1,16 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
 import com.lielamar.auth.bukkit.utils.ImageRender;
 import com.lielamar.auth.shared.storage.StorageType;
 import com.lielamar.auth.shared.storage.json.JSONStorage;
 import com.lielamar.auth.shared.storage.mongodb.MongoDBStorage;
 import com.lielamar.auth.shared.storage.mysql.MySQLStorage;
+import com.lielamar.auth.shared.utils.hash.Hash;
+import com.lielamar.auth.shared.utils.hash.NoHash;
+import com.lielamar.auth.shared.utils.hash.SHA256;
+import com.lielamar.auth.shared.utils.hash.SHA512;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +25,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
@@ -30,13 +37,15 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      * This class was edited by Liel Amar to add Bungeecord, JSON, MySQL, and MongoDB support.
      */
 
-    protected final Main main;
+    protected final TwoFactorAuthentication main;
     protected final AutoAuthHandler autoAuthHandler;
+    protected Hash hash;
 
-    public AuthHandler(Main main) {
+    public AuthHandler(TwoFactorAuthentication main) {
         this.main = main;
         this.autoAuthHandler = new AutoAuthHandler();
 
+        loadHashType();
         loadStorageHandler();
     }
 
@@ -61,14 +70,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             if(valid) {
                 removeQRItem(player);
                 updatePlayerIP(player);
-            } else {
-                int failedAttempts = increaseFailedAttempts(uuid, 1);
-
-                if(failedAttempts > MAX_ATTEMPTS) {
-                    Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission("2fa.alert") && !needsToAuthenticate(pl.getUniqueId())).forEach(pl ->
-                            main.getMessageHandler().sendMessage(pl, "&c%name% failed to authenticate %times% times"
-                                    .replaceAll("%name%", player.getName()).replaceAll("%times%", failedAttempts + "")));
-                }
             }
         }
         return valid;
@@ -144,26 +145,49 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
 
         authStates.put(uuid, authState);
-        autoAuthHandler.setBungeecordAuthState(player, authState);
+        if(player != null)
+            autoAuthHandler.setBungeecordAuthState(player, authState);
     }
 
     @Override
     public String getQRCodeURL(String urlTemplate, UUID uuid) {
-        String label;
+        String encodedPart = "%%label%%?secret=%%key%%&issuer=%%title%%";
+
         Player player = Bukkit.getPlayer(uuid);
-        if(player != null) {
-            label = main.getConfigHandler().getServerName() + " (" + player.getName() + ")";
-        } else {
-            label = main.getConfigHandler().getServerName();
+        String label = (player == null) ? "player" : player.getName();
+        String title = main.getConfigHandler().getServerName();
+        String key = getPendingKey(uuid);
+        encodedPart = encodedPart.replaceAll("%%label%%", label).replaceAll("%%title%%", title).replaceAll("%%key%%", key);
+
+        try {
+            return urlTemplate + URLEncoder.encode(encodedPart, StandardCharsets.UTF_8.toString());
+        } catch(UnsupportedEncodingException e) {
+            return urlTemplate + encodedPart;
         }
-        label = label.replaceAll(" ", "%20");
-        return super.getQRCodeURL(urlTemplate, uuid).replaceAll("%%label%%", label);
     }
 
 
     /**
+     * Loads the hash type (SHA-256, SHA-512, No Hash)
+     */
+    private void loadHashType() {
+        String hashType = main.getConfigHandler().getHashType();
+
+        switch (hashType.toUpperCase()) {
+            case "SHA256":
+                this.hash = new SHA256();
+                break;
+            case "SHA512":
+                this.hash = new SHA512();
+                break;
+            default:
+                this.hash = new NoHash();
+                break;
+        }
+    }
+
+    /**
      * Loads the storage handler (JSON, MySQL, MongoDB)
-     *
      */
     private void loadStorageHandler() {
         StorageType storageType = main.getConfigHandler().getStorageType();
@@ -201,6 +225,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
     }
 
+
     /**
      * Updates a player's ip in the database
      *
@@ -208,7 +233,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
     public void updatePlayerIP(Player player) {
         if(player.getAddress() != null && player.getAddress().getAddress() != null) {
-            String ip = player.getAddress().getAddress().getHostAddress();
+            String ip = this.hash.hash(player.getAddress().getAddress().getHostAddress());
             getStorageHandler().setIP(player.getUniqueId(), ip);
         }
     }
@@ -234,6 +259,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     @SuppressWarnings("deprecation")
     public void giveQRCodeItem(Player player) {
         String url = getQRCodeURL(main.getConfigHandler().getQrCodeURL(), player.getUniqueId());
+
+        if(url == null)
+            return;
 
         new BukkitRunnable() {
             final MapView view = Bukkit.createMap(player.getWorld());
@@ -377,7 +405,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             if(!needsToAuthenticate(player.getUniqueId())) return;
 
             if(player.getAddress() != null && player.getAddress().getAddress() != null) {
-                String ip = player.getAddress().getAddress().getHostAddress();
+                String ip = hash.hash(player.getAddress().getAddress().getHostAddress());
 
                 boolean hasIPChanged = getStorageHandler().getIP(player.getUniqueId()) == null
                         || !getStorageHandler().getIP(player.getUniqueId()).equalsIgnoreCase(ip);

@@ -3,7 +3,7 @@ package com.lielamar.auth.bungee.listeners;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.lielamar.auth.bungee.Main;
+import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import net.md_5.bungee.api.ProxyServer;
@@ -18,8 +18,8 @@ import java.util.UUID;
 @SuppressWarnings("UnstableApiUsage")
 public class OnPluginMessage implements Listener {
 
-    private final Main main;
-    public OnPluginMessage(Main main) {
+    private final TwoFactorAuthentication main;
+    public OnPluginMessage(TwoFactorAuthentication main) {
         this.main = main;
     }
 
@@ -72,6 +72,7 @@ public class OnPluginMessage implements Listener {
 
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF(Constants.subChannelName);                        // Setting the SubChannel of the response
+        out.writeUTF(player.getUniqueId().toString());                 // Setting the playerUUID of the response
 
         ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
         DataOutputStream msgOut = new DataOutputStream(msgBytes);

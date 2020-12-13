@@ -11,8 +11,6 @@ import java.util.UUID;
 
 public class MongoDBStorage extends StorageHandler {
 
-    private final StorageType storageType = StorageType.MONGODB;
-
     private MongoClient mongoClient;
     private MongoCollection<Document> mongoCollection;
 
@@ -61,27 +59,21 @@ public class MongoDBStorage extends StorageHandler {
 
 
     @Override
-    public StorageType getStorageType() {
-        return storageType;
-    }
-
-
-    @Override
-    public String setKey(UUID uuid, String Key) {
+    public String setKey(UUID uuid, String key) {
         Document query = new Document("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
         if(playerDocument == null) {
             Document insertDocument = new Document("uuid", uuid.toString());
-            insertDocument.append("key", Key);
+            insertDocument.append("key", key);
             insertDocument.append("ip", null);
             this.mongoCollection.insertOne(insertDocument);
         } else {
-            playerDocument.put("key", Key);
+            playerDocument.put("key", key);
             this.mongoCollection.updateOne(query, playerDocument);
         }
 
-        return Key;
+        return key;
     }
 
     @Override
@@ -106,21 +98,21 @@ public class MongoDBStorage extends StorageHandler {
 
 
     @Override
-    public String setIP(UUID uuid, String IP) {
+    public String setIP(UUID uuid, String ip) {
         Document query = new Document("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
         if(playerDocument == null) {
             Document insertDocument = new Document("uuid", uuid.toString());
             insertDocument.append("key", null);
-            insertDocument.append("ip", IP);
+            insertDocument.append("ip", ip);
             this.mongoCollection.insertOne(insertDocument);
         } else {
-            playerDocument.put("ip", IP);
+            playerDocument.put("ip", ip);
             this.mongoCollection.updateOne(query, playerDocument);
         }
 
-        return IP;
+        return ip;
     }
 
     @Override

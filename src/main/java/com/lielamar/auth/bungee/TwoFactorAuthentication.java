@@ -7,10 +7,11 @@ import com.lielamar.auth.bungee.listeners.DisabledEvents;
 import com.lielamar.auth.bungee.listeners.OnBungeePlayerConnections;
 import com.lielamar.auth.bungee.listeners.OnPluginMessage;
 import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.lielsutils.bstats.MetricsBungee;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 
-public class Main extends Plugin {
+public class TwoFactorAuthentication extends Plugin {
 
     private MessageHandler messageHandler;
     private ConfigHandler configHandler;
@@ -19,6 +20,7 @@ public class Main extends Plugin {
     @Override
     public void onEnable() {
         this.setupAuth();
+        this.setupBStats();
         this.setupListeners();
     }
 
@@ -26,6 +28,11 @@ public class Main extends Plugin {
         this.messageHandler = new MessageHandler(this);
         this.configHandler = new ConfigHandler(this);
         this.authHandler = new AuthHandler();
+    }
+
+    public void setupBStats() {
+        int pluginId = 9355;
+        new MetricsBungee(this, pluginId);
     }
 
     public void setupListeners() {

@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.0.2"
+version: "1.0.9"
 author: "LielAmar"
 main: com.lielamar.auth.bungee.Main
 description: Add another layer of protection to your server

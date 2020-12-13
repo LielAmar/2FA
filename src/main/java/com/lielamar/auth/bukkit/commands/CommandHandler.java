@@ -1,6 +1,6 @@
 package com.lielamar.auth.bukkit.commands;
 
-import com.lielamar.auth.bukkit.Main;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.commands.subcommands.*;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
@@ -14,11 +14,11 @@ import java.util.Set;
 
 public class CommandHandler implements CommandExecutor {
 
-    private final Main main;
+    private final TwoFactorAuthentication main;
     private final Set<Command> commands;
     private Command loginCommand, setupCommand;
 
-    public CommandHandler(Main main) {
+    public CommandHandler(TwoFactorAuthentication main) {
         this.main = main;
         this.main.getCommand(Constants.mainCommand).setExecutor(this);
 
@@ -69,6 +69,13 @@ public class CommandHandler implements CommandExecutor {
         }
 
         Player player = (Player)cs;
+
+        if(main.getAuthHandler() == null) {
+            main.getMessageHandler().sendMessage(player, "&cSomething went wrong. Please contact a Staff Member!");
+            return false;
+        } else if(main.getAuthHandler().getAuthState(player.getUniqueId()) == null) {
+            main.getAuthHandler().playerJoin(player.getUniqueId());
+        }
 
         if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.PENDING_LOGIN)) {
             loginCommand.execute(player, args);
