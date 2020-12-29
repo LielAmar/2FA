@@ -17,6 +17,8 @@ public abstract class AuthHandler {
 
     protected StorageHandler storageHandler;
     protected HashMap<UUID, AuthState> authStates = new HashMap<>();
+    protected int authentications;
+
     private final HashMap<UUID, String> pendingKeys = new HashMap<>();
     private final Map<UUID, Integer> failedAttempts = new HashMap<>();
 
@@ -24,6 +26,13 @@ public abstract class AuthHandler {
         DISABLED, PENDING_SETUP, PENDING_LOGIN, AUTHENTICATED
     }
 
+    public int getAuthentications() {
+        return this.authentications;
+    }
+
+    public void resetAuthentications() {
+        this.authentications = 0;
+    }
 
     /**
      * Returns a Player's Auth State
@@ -85,6 +94,7 @@ public abstract class AuthHandler {
         String key = getKey(uuid);
         if(key != null && new GoogleAuthenticator().authorize(key, code)) {
             changeState(uuid, AuthState.AUTHENTICATED);
+            authentications++;
             return true;
         }
         return false;
@@ -103,6 +113,7 @@ public abstract class AuthHandler {
             changeState(uuid, AuthState.AUTHENTICATED);
             getStorageHandler().setKey(uuid, key);
             pendingKeys.remove(uuid);
+            authentications++;
             return true;
         }
         return false;

@@ -72,6 +72,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 updatePlayerIP(player);
             }
         }
+
         return valid;
     }
 
