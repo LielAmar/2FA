@@ -69,7 +69,7 @@ public class MySQLStorage extends StorageHandler {
     public void checkReconnect() {
         try {
             if(!isValidConnection())
-                this.connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s", this.host, this.port, this.database), this.username, this.password);
+                this.connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?autoReconnect=true", this.host, this.port, this.database), this.username, this.password);
         } catch(SQLException exception) {
             exception.printStackTrace();
         }
