@@ -32,7 +32,13 @@ public class TwoFactorAuthentication extends Plugin {
 
     public void setupBStats() {
         int pluginId = 9355;
-        new MetricsBungee(this, pluginId);
+        MetricsBungee metrics = new MetricsBungee(this, pluginId);
+
+        metrics.addCustomChart(new MetricsBungee.SingleLineChart("authentications", () -> {
+            int value = authHandler.getAuthentications();
+            authHandler.resetAuthentications();
+            return value;
+        }));
     }
 
     public void setupListeners() {

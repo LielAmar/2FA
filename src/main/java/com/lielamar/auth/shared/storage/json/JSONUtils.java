@@ -1,11 +1,9 @@
 package com.lielamar.auth.shared.storage.json;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class JSONUtils {
 
@@ -17,7 +15,17 @@ public class JSONUtils {
      * @throws IOException   Throws an exception if something goes wrong
      */
     public static JSONObject read(InputStream is) throws IOException {
-        String fileData = IOUtils.toString(is);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+
+        StringBuilder fileDataBuilder = new StringBuilder();
+        String line;
+        while((line = br.readLine()) != null) {
+            fileDataBuilder.append(line);
+            fileDataBuilder.append('\n');
+        }
+
+        String fileData = fileDataBuilder.toString();
+
         if(fileData.length() < 2)
             fileData = "{}";
         is.close();
