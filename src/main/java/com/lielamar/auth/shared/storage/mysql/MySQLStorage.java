@@ -66,9 +66,20 @@ public class MySQLStorage extends StorageHandler {
         return this.connection != null && !this.connection.isClosed();
     }
 
+    public void checkReconnect() {
+        try {
+            if(!isValidConnection())
+                this.connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?autoReconnect=true", this.host, this.port, this.database), this.username, this.password);
+        } catch(SQLException exception) {
+            exception.printStackTrace();
+        }
+    }
+
 
     @Override
     public String setKey(UUID uuid, String key) {
+        checkReconnect();
+
         try {
             if(!isValidConnection()) return null;
 
@@ -98,6 +109,8 @@ public class MySQLStorage extends StorageHandler {
 
     @Override
     public String getKey(UUID uuid) {
+        checkReconnect();
+
         try {
             if(!isValidConnection()) return null;
 
@@ -129,6 +142,8 @@ public class MySQLStorage extends StorageHandler {
 
     @Override
     public String setIP(UUID uuid, String ip) {
+        checkReconnect();
+
         try {
             if(!isValidConnection()) return null;
 
@@ -158,6 +173,8 @@ public class MySQLStorage extends StorageHandler {
 
     @Override
     public String getIP(UUID uuid) {
+        checkReconnect();
+
         try {
             if(!isValidConnection()) return null;
 

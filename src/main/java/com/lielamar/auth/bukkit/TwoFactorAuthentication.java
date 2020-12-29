@@ -50,7 +50,13 @@ public class TwoFactorAuthentication extends JavaPlugin {
 
     public void setupBStats() {
         int pluginId = 9355;
-        new MetricsSpigot(this, pluginId);
+        MetricsSpigot metrics = new MetricsSpigot(this, pluginId);
+
+        metrics.addCustomChart(new MetricsSpigot.SingleLineChart("authentications", () -> {
+            int value = authHandler.getAuthentications();
+            authHandler.resetAuthentications();
+            return value;
+        }));
     }
 
     public void registerListeners() {
