@@ -11,6 +11,7 @@ import com.lielamar.auth.shared.utils.hash.Hash;
 import com.lielamar.auth.shared.utils.hash.NoHash;
 import com.lielamar.auth.shared.utils.hash.SHA256;
 import com.lielamar.auth.shared.utils.hash.SHA512;
+import com.lielamar.lielsutils.SpigotUtils;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -39,11 +40,14 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     protected final TwoFactorAuthentication main;
     protected final AutoAuthHandler autoAuthHandler;
+    protected final int version;
     protected Hash hash;
 
     public AuthHandler(TwoFactorAuthentication main) {
         this.main = main;
         this.autoAuthHandler = new AutoAuthHandler();
+
+        this.version = SpigotUtils.getVersion(Bukkit.getVersion().split("MC: 1.")[1]);
 
         loadHashType();
         loadStorageHandler();
@@ -273,11 +277,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 try {
                     ImageRender renderer = new ImageRender(url);
                     view.addRenderer(renderer);
-
-                    String versionRaw = Bukkit.getVersion().split("MC: 1.")[1];
-                    if(versionRaw.contains(".")) versionRaw = versionRaw.split("\\.")[0];
-                    if(versionRaw.contains(")")) versionRaw = versionRaw.split("\\)")[0];
-                    int version = Integer.parseInt(versionRaw);
 
                     ItemStack mapItem = new ItemStack(Material.MAP);
                     if(version >= 13) {
