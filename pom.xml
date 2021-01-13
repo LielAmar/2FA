@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.7</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -91,7 +91,7 @@
         <dependency>
             <groupId>com.lielamar</groupId>
             <artifactId>lielsutils</artifactId>
-            <version>1.2.6</version>
+            <version>1.2.8</version>
             <scope>compile</scope>
         </dependency>
 
