@@ -12,6 +12,12 @@
 # Whether to notify when there's an update available
 Check For Updates: true
 
+# Amount of maps the plugin will reserve for it to display QR Codes
+Reserved Maps: 20
+
+# DO NOT TOUCH THIS. THIS SAVES THE MAP IDS TO USE BY THE PLUGIN. CHANGING THIS MAY CAUSE PROBLEMS WITH MAPS!
+Map IDs: []
+
 # Your server name. This will be the default name of the 2fa in the authenticator app
 Server Name: "MyServer"
 

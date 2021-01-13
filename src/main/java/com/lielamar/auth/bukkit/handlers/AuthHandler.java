@@ -16,6 +16,7 @@ import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -40,12 +41,18 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     protected final TwoFactorAuthentication main;
     protected final AutoAuthHandler autoAuthHandler;
-    protected final int version;
+
+    protected Map<Integer, Long> lastMapIdUse;
+
+    protected int version;
     protected Hash hash;
 
     public AuthHandler(TwoFactorAuthentication main) {
         this.main = main;
         this.autoAuthHandler = new AutoAuthHandler();
+
+        this.lastMapIdUse = new HashMap<>();
+        for(int i : main.getConfigHandler().getMapIDs()) lastMapIdUse.put(i, -1L);
 
         this.version = SpigotUtils.getVersion(Bukkit.getVersion().split("MC: 1.")[1]);
 
@@ -269,11 +276,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return;
 
         new BukkitRunnable() {
-            final MapView view = Bukkit.createMap(player.getWorld());
+            final MapView view = getMap(player.getWorld());
 
             @Override
             public void run() {
                 view.getRenderers().forEach(view::removeRenderer);
+
                 try {
                     ImageRender renderer = new ImageRender(url);
                     view.addRenderer(renderer);
@@ -286,7 +294,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                             mapItem.setItemMeta(mapMeta);
                         }
                     } else {
-                        mapItem = new ItemStack(Material.MAP, 1, getMapID(view));
+                        mapItem = new ItemStack(Material.MAP, 1, SpigotUtils.getMapID(view));
                     }
 
                     ItemMeta meta = mapItem.getItemMeta();
@@ -320,6 +328,39 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     }
 
     /**
+     * If we have X map ids where X is smaller than the amount of maps assigned to the plugin, the plugin will create a new map and save its ID in the config for future use.
+     * If X is equals to or greater than the amount of maps assigned, we get the map with the longest time passed since it was reassigned.
+     *
+     * @param world   World to create the map in
+     * @return        Created/Assigned MapView object
+     */
+    @SuppressWarnings("deprecation")
+    public MapView getMap(World world) {
+        MapView mapView;
+
+        if(lastMapIdUse.size() < main.getConfigHandler().getAmountOfReservedMaps()) {
+            mapView = Bukkit.createMap(world);
+            main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add(mapView.getId()));
+        } else {
+            int mapIdWithLongestTime = -1;
+            long currentTimeMillis = System.currentTimeMillis();
+
+            for(int i : lastMapIdUse.keySet()) {
+                if(mapIdWithLongestTime == -1 || (currentTimeMillis-lastMapIdUse.get(mapIdWithLongestTime)) < currentTimeMillis-lastMapIdUse.get(i))
+                    mapIdWithLongestTime = i;
+            }
+
+            mapView = Bukkit.getMap(mapIdWithLongestTime);
+        }
+
+        if(mapView == null) return null;
+
+        lastMapIdUse.put(mapView.getId(), System.currentTimeMillis());
+
+        return mapView;
+    }
+
+    /**
      * Removes all QR Code items from the player's inventory
      *
      * @param player   Player to remove QR Code items of
@@ -340,26 +381,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public boolean isQRCodeItem(ItemStack item) {
         return item != null && item.getType() != Material.AIR && item.hasItemMeta() && item.getItemMeta() != null && item.getItemMeta().hasDisplayName()
                 && item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GRAY + "QR Code");
-    }
-
-    /**
-     * Returns the ID of a MapView
-     *
-     * @param view   MapView to get the ID of
-     * @return       ID of view
-     */
-    public static short getMapID(MapView view) {
-        try {
-            return (short) view.getId();
-        } catch (NoSuchMethodError e) {
-            try {
-                Class<?> MapView = Class.forName("org.bukkit.map.MapView");
-                Object mapID = MapView.getMethod("getId").invoke(view);
-                return (short) mapID;
-            } catch (Exception e1) {
-                return 1;
-            }
-        }
     }
 
 
