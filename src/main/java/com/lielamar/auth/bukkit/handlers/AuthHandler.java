@@ -340,7 +340,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         if(lastMapIdUse.size() < main.getConfigHandler().getAmountOfReservedMaps()) {
             mapView = Bukkit.createMap(world);
-            main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add(mapView.getId()));
+            main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add((version >= 13) ? mapView.getId() : SpigotUtils.getMapID(mapView)));
         } else {
             int mapIdWithLongestTime = -1;
             long currentTimeMillis = System.currentTimeMillis();
@@ -355,7 +355,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         if(mapView == null) return null;
 
-        lastMapIdUse.put(mapView.getId(), System.currentTimeMillis());
+        lastMapIdUse.put((version >= 13) ? mapView.getId() : SpigotUtils.getMapID(mapView), System.currentTimeMillis());
 
         return mapView;
     }
