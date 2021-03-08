@@ -2,6 +2,7 @@ package com.lielamar.auth.bungee.listeners;
 
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.AuthHandler;
+import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -29,7 +30,7 @@ public class DisabledEvents implements Listener {
                     String command = args[0];
                     if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.equalsIgnoreCase(command)) {
                         event.setCancelled(true);
-                        main.getMessageHandler().sendMessage(player, "&cPlease validate your account with two-factor authentication");
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }
                 }
             } else {
@@ -37,7 +38,7 @@ public class DisabledEvents implements Listener {
                     String command = args[0];
                     if(this.main.getConfigHandler().getBlacklistedCommands().contains(command)) {
                         event.setCancelled(true);
-                        main.getMessageHandler().sendMessage(player, "&cPlease validate your account with two-factor authentication");
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }
                 }
             }
@@ -51,7 +52,7 @@ public class DisabledEvents implements Listener {
         if(this.main.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_LOGIN) {
             if(this.main.getConfigHandler().isDisableServerSwitch()) {
                 event.setCancelled(true);
-                main.getMessageHandler().sendMessage(player, "&cPlease validate your account with two-factor authentication");
+                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
             }
         }
     }

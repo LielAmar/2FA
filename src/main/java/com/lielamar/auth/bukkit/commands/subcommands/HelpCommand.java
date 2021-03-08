@@ -1,37 +1,61 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
-import com.lielamar.auth.bukkit.commands.Command;
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
+import com.lielamar.auth.shared.handlers.MessageHandler;
+import com.lielamar.lielsutils.commands.Command;
+import com.lielamar.lielsutils.modules.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+import java.util.Set;
+
 public class HelpCommand extends Command {
 
-    public HelpCommand(String name) {
+    private final TwoFactorAuthentication main;
+    private final Set<Command> commands;
+
+    public HelpCommand(String name, TwoFactorAuthentication main, Set<Command> commands) {
         super(name);
+
+        this.main = main;
+        this.commands = commands;
     }
 
     @Override
     public String[] getAliases() {
-        return null;
+        return new String[] { "assist" };
     }
 
     @Override
     public String[] getPermissions() {
-        return null;
+        return new String[] { "2fa.help" };
+    }
+
+    @Override
+    public String getDescription() {
+        return ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.DESCRIPTION_OF_HELP_COMMAND.getMessage());
     }
 
     @Override
     public void execute(CommandSender commandSender, String[] args) {
-        Player player = (Player) commandSender;
+        if(!hasPermissions(commandSender)) {
+            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+        } else {
+            main.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_HEADER);
 
-        player.sendMessage(ChatColor.GRAY + "----- " + ChatColor.AQUA + "2FA" + ChatColor.GRAY + " -----");
-        player.sendMessage(ChatColor.GRAY + "• " + ChatColor.AQUA + "/2fa remove" + ChatColor.GRAY + " - Disable your 2FA");
-        player.sendMessage(ChatColor.GRAY + "• " + ChatColor.AQUA + "/2fa enable" + ChatColor.GRAY + " - Enable your 2FA");
-        if(player.hasPermission("2fa.remove.others"))
-            player.sendMessage(ChatColor.GRAY + "• " + ChatColor.AQUA + "/2fa remove <player>" + ChatColor.GRAY + " - Disable a player's 2FA");
-        if(player.hasPermission("2fa.reload"))
-            player.sendMessage(ChatColor.GRAY + "• " + ChatColor.AQUA + "/2fa reload" + ChatColor.GRAY + " - Reload the 2FA plugin");
-        player.sendMessage(ChatColor.GRAY + "----- -------- -----");
+            this.commands.forEach(cmd -> {
+                if(cmd.hasPermissions(commandSender)) {
+                    main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.HELP_COMMAND,
+                            new Pair<>("%command%", "/2FA " + cmd.getName()),
+                            new Pair<>("%description%", cmd.getDescription()),
+                            new Pair<>("%aliases%", Arrays.toString(cmd.getAliases()))
+                    );
+                }
+            });
+
+            main.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_FOOTER);
+        }
     }
 }

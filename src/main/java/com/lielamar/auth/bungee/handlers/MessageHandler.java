@@ -2,6 +2,7 @@ package com.lielamar.auth.bungee.handlers;
 
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
@@ -13,10 +14,9 @@ import java.io.IOException;
 
 public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
-    private final String configName = "messages.yml";
-
     private final TwoFactorAuthentication main;
-    private Configuration messagesConfig;
+    private Configuration config;
+    private File file;
 
     public MessageHandler(TwoFactorAuthentication main) {
         this.main = main;
@@ -24,58 +24,42 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
         loadConfiguration();
     }
 
-    public String getPrefix() {
-        String prefix = super.getPrefix();
-        if(messagesConfig.contains("Prefix"))
-            prefix = messagesConfig.getString("Prefix") + "&r ";
-
-        return ChatColor.translateAlternateColorCodes('&', prefix);
+    @Override
+    protected void sendRaw(final Object player, final String message) {
+        if(player instanceof ProxiedPlayer)
+            ((ProxiedPlayer)player).sendMessage(ChatMessageType.CHAT, new TextComponent(ChatColor.translateAlternateColorCodes('&', message)));
     }
 
-    public String getMessage(String message) {
-        message = messagesConfig.getString(message, message);
-        return getPrefix() + ChatColor.translateAlternateColorCodes('&', message);
-    }
-
-    public void sendMessage(ProxiedPlayer player, String message) {
-        message = getMessage(message);
-        player.sendMessage(new TextComponent(message).toLegacyText());
-    }
-
+    @Override
     public void loadConfiguration() {
         if(!main.getDataFolder().exists())
-            main.getDataFolder().mkdir();
+            main.getDataFolder().mkdirs();
 
-        File file = new File(main.getDataFolder(), configName);
+        this.file = new File(main.getDataFolder(), super.messagesFileName);
 
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if(!this.file.exists()) {
+            try { this.file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
         }
 
         try {
-            messagesConfig = ConfigurationProvider.getProvider(net.md_5.bungee.config.YamlConfiguration.class).load(file);
+            this.config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(this.file);
 
-            if(!messagesConfig.contains("Prefix")) {
-                messagesConfig.set("Prefix", "&7[&b2FA&7]");
-            }
-
-            for(String message : getDefaults()) {
-                if(!messagesConfig.contains(message)) {
-                    messagesConfig.set(message, message);
+            for (TwoFAMessages message : TwoFAMessages.values()) {
+                if (!this.config.contains(message.name())) {
+                    this.config.set(message.name(), message.getMessage());
+                } else {
+                    message.setMessage(this.config.getString(message.name()));
                 }
-            }
-
-            try {
-                ConfigurationProvider.getProvider(YamlConfiguration.class).save(messagesConfig, new File(main.getDataFolder(), configName));
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        saveConfiguration();
+    }
+
+    @Override
+    public void saveConfiguration() {
+        try { ConfigurationProvider.getProvider(YamlConfiguration.class).save(this.config, this.file); } catch (IOException e) { e.printStackTrace(); }
     }
 }

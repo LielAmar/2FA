@@ -7,6 +7,7 @@ import org.bukkit.event.HandlerList;
 public class PlayerFailedAuthenticationEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
+
     private final Player player;
     private final int failedAttempts;
 

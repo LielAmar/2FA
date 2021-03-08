@@ -3,6 +3,7 @@ package com.lielamar.auth.bukkit.handlers;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
 import com.lielamar.auth.bukkit.utils.ImageRender;
+import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.storage.StorageType;
 import com.lielamar.auth.shared.storage.json.JSONStorage;
 import com.lielamar.auth.shared.storage.mongodb.MongoDBStorage;
@@ -127,12 +128,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         // If the player doesn't need to authenticate (they don't have a key)
         if(!needsToAuthenticate(player.getUniqueId())) {
             if(player.hasPermission("2fa.demand")) {
-                main.getMessageHandler().sendMessage(player, "&6You are required to enable 2FA!");
+                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
                 createKey(player.getUniqueId());
             } else {
                 if(main.getConfigHandler().is2FAAdvised()) {
-                    main.getMessageHandler().sendMessage(player, "&6This server supports two-factor authentication and is highly recommended");
-                    main.getMessageHandler().sendMessage(player, "&6Get started by running \"/2fa enable\"");
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
                 }
             }
         } else {
@@ -316,9 +317,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         player.getInventory().setHeldItemSlot(0);
                     }
 
-                    sendClickableMessage(player, main.getMessageHandler().getMessage("&aPlease click here to open the QR code"), url.replaceAll("128x128", "256x256"));
-                    main.getMessageHandler().sendMessage(player, "&aPlease use the QR code given to setup two-factor authentication");
-                    main.getMessageHandler().sendMessage(player, "&aPlease validate by entering your code: /2fa <code>");
+                    sendClickableMessage(player, MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage(), url.replaceAll("128x128", "256x256"));
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA);
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.PLEASE_AUTHENTICATE);
                 } catch (IOException | NumberFormatException e) {
                     e.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
@@ -436,7 +437,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
                 if(!isRequiredDueToIPChange && !isRequiredOnEveryJoin) {
                     changeState(player.getUniqueId(), AuthState.AUTHENTICATED);
-                    main.getMessageHandler().sendMessage(player, "&aYou were authenticated automatically");
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.AUTHENTICATED_AUTOMATICALLY);
                     return;
                 }
             }
@@ -444,8 +445,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             player.setWalkSpeed(0);
             player.setFlySpeed(0);
 
-            main.getMessageHandler().sendMessage(player, "&cTwo-factor authentication is enabled on this account");
-            main.getMessageHandler().sendMessage(player, "&cPlease authenticate using /2fa <code>");
+            main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.TWOFA_IS_ENABLED);
+            main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.PLEASE_AUTHENTICATE);
         }
     }
 }

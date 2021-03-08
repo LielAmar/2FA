@@ -1,6 +1,7 @@
 package com.lielamar.auth.bukkit.listeners;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
+import com.lielamar.auth.bukkit.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -17,6 +18,7 @@ import org.bukkit.event.player.*;
 public class DisabledEvents implements Listener {
 
     private final TwoFactorAuthentication main;
+
     public DisabledEvents(TwoFactorAuthentication main) {
         this.main = main;
     }
@@ -26,7 +28,7 @@ public class DisabledEvents implements Listener {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             if(event.getTo() != null && (event.getTo().getBlockZ() != event.getFrom().getBlockZ() || event.getTo().getBlockX() != event.getFrom().getBlockX())) {
                 event.setTo(event.getFrom());
-                main.getMessageHandler().sendMessage(event.getPlayer(), "&cPlease validate your account with two-factor authentication");
+                main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
             }
         }
     }
@@ -35,7 +37,7 @@ public class DisabledEvents implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
-            main.getMessageHandler().sendMessage(event.getPlayer(), "&cPlease validate your account with two-factor authentication");
+            main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
         }
     }
 
@@ -43,7 +45,7 @@ public class DisabledEvents implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
-            main.getMessageHandler().sendMessage(event.getPlayer(), "&cPlease validate your account with two-factor authentication");
+            main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
         }
     }
 
@@ -51,7 +53,7 @@ public class DisabledEvents implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
-            main.getMessageHandler().sendMessage(event.getPlayer(), "&cPlease validate your account with two-factor authentication");
+            main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
         }
     }
 
@@ -115,7 +117,7 @@ public class DisabledEvents implements Listener {
                     String command = args[0];
                     if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.equalsIgnoreCase(command)) {
                         event.setCancelled(true);
-                        main.getMessageHandler().sendMessage(event.getPlayer(), "&cPlease validate your account with two-factor authentication");
+                        main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }
                 }
             } else {
@@ -123,7 +125,7 @@ public class DisabledEvents implements Listener {
                     String command = args[0];
                     if(this.main.getConfigHandler().getBlacklistedCommands().contains(command)) {
                         event.setCancelled(true);
-                        main.getMessageHandler().sendMessage(event.getPlayer(), "&cPlease validate your account with two-factor authentication");
+                        main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }
                 }
             }

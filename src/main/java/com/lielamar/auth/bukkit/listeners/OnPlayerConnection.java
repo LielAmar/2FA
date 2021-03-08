@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class OnPlayerConnection implements Listener {
 
     private final TwoFactorAuthentication main;
+
     public OnPlayerConnection(TwoFactorAuthentication main) {
         this.main = main;
     }

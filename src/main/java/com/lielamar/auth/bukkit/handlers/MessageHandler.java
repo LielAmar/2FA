@@ -2,8 +2,8 @@ package com.lielamar.auth.bukkit.handlers;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,59 +11,47 @@ import java.io.IOException;
 public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
     private final TwoFactorAuthentication main;
-    private YamlConfiguration messagesConfig;
+    private YamlConfiguration config;
+    private File file;
 
     public MessageHandler(TwoFactorAuthentication main) {
         this.main = main;
+
         loadConfiguration();
     }
 
-    public String getPrefix() {
-        String prefix = super.getPrefix();
-        if(messagesConfig.isSet("Prefix"))
-            prefix = messagesConfig.getString("Prefix") + "&r ";
-
-        return ChatColor.translateAlternateColorCodes('&', prefix);
+    @Override
+    protected void sendRaw(Object player, final String message) {
+        if(player instanceof CommandSender)
+            ((CommandSender)player).sendMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
 
-    public String getMessage(String message) {
-        message = messagesConfig.getString(message, message);
-        return getPrefix() + ChatColor.translateAlternateColorCodes('&', message);
-    }
-
-    public void sendMessage(Player player, String message) {
-        message = getMessage(message);
-        player.sendMessage(message);
-    }
-
+    @Override
     public void loadConfiguration() {
-        if(!main.getDataFolder().exists()) {
+        if(!main.getDataFolder().exists())
             main.getDataFolder().mkdirs();
-        }
-        File messagesFile = new File(main.getDataFolder(), "messages.yml");
-        if(!messagesFile.exists()) {
-            try {
-                messagesFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
 
-        if(!messagesConfig.isSet("Prefix")) {
-            messagesConfig.set("Prefix", "&7[&b2FA&7]");
+        this.file = new File(main.getDataFolder(), super.messagesFileName);
+
+        if(!this.file.exists()) {
+            try { this.file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
         }
 
-        for(String message : getDefaults()) {
-            if(!messagesConfig.isSet(message)) {
-                messagesConfig.set(message, message);
+        this.config = YamlConfiguration.loadConfiguration(this.file);
+
+        for(TwoFAMessages message : TwoFAMessages.values()) {
+            if(!this.config.contains(message.name())) {
+                this.config.set(message.name(), message.getMessage());
+            } else {
+                message.setMessage(this.config.getString(message.name()));
             }
         }
 
-        try {
-            messagesConfig.save(messagesFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        saveConfiguration();
+    }
+
+    @Override
+    public void saveConfiguration() {
+        try { this.config.save(this.file); } catch (IOException e) { e.printStackTrace(); }
     }
 }

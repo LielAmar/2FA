@@ -1,20 +1,22 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
-import com.lielamar.auth.bukkit.commands.Command;
-import com.lielamar.auth.shared.utils.AuthUtils;
-import org.bukkit.Bukkit;
+import com.lielamar.auth.shared.handlers.MessageHandler;
+import com.lielamar.lielsutils.commands.Command;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class DisableCommand extends Command {
 
     private final TwoFactorAuthentication main;
+    private final DisableForOthersCommand disableForOthersCommand;
+
     public DisableCommand(String name, TwoFactorAuthentication main) {
         super(name);
+
         this.main = main;
+        this.disableForOthersCommand = new DisableForOthersCommand(name, main);
     }
 
     @Override
@@ -24,51 +26,35 @@ public class DisableCommand extends Command {
 
     @Override
     public String[] getPermissions() {
-        return null;
+        return new String[] { "2fa.remove" };
     }
 
     @Override
-    public void execute(CommandSender commandSender, String[] targets) {
-        Player player = (Player) commandSender;
+    public String getDescription() {
+        return ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.DESCRIPTION_OF_DISABLE_COMMAND.getMessage());
+    }
 
+    @Override
+    public void execute(final CommandSender commandSender, final String[] targets) {
         if(targets.length == 0) {
-            if(!player.hasPermission("2fa.remove")) {
-                main.getMessageHandler().sendMessage(player, "&cYou do not have permission to run this command");
+            if(!hasPermissions(commandSender)) {
+                main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
             } else {
-                if(main.getAuthHandler().is2FAEnabled(player.getUniqueId())) {
-                    main.getAuthHandler().resetKey(player.getUniqueId());
-                    main.getMessageHandler().sendMessage(player, "&aYour 2FA has been reset");
+                if(!(commandSender instanceof Player)) {
+                    main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.MUST_BE_A_PLAYER);
                 } else {
-                    main.getMessageHandler().sendMessage(player, "&cYou are not setup with 2FA");
+                    Player player = (Player) commandSender;
+
+                    if(main.getAuthHandler().is2FAEnabled(player.getUniqueId())) {
+                        main.getAuthHandler().resetKey(player.getUniqueId());
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.RESET_2FA);
+                    } else {
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NOT_SETUP);
+                    }
                 }
             }
         } else {
-            if(!player.hasPermission("2fa.remove.others")) {
-                main.getMessageHandler().sendMessage(player, "&cYou do not have permission to run this command");
-            } else {
-                Bukkit.getScheduler().runTask(main, () -> {
-                    for(String target : targets) {
-                        Player targetPlayer = Bukkit.getPlayer(target);
-                        UUID targetUUID;
-
-                        if(targetPlayer != null)
-                            targetUUID = targetPlayer.getUniqueId();
-                        else
-                            targetUUID = AuthUtils.fetchUUID(target);
-
-                        if(targetUUID == null) {
-                            main.getMessageHandler().sendMessage(player, "&cPlayer %name% could not be found".replaceAll("%name%", target));
-                        } else {
-                            if(main.getAuthHandler().is2FAEnabled(targetUUID)) {
-                                main.getAuthHandler().resetKey(targetUUID);
-                                main.getMessageHandler().sendMessage(player, "&a%name%'s 2FA has been reset".replaceAll("%name%", target));
-                            } else {
-                                main.getMessageHandler().sendMessage(player, "&c%name% is not setup with 2FA".replaceAll("%name%", target));
-                            }
-                        }
-                    }
-                });
-            }
+            disableForOthersCommand.execute(commandSender, targets);
         }
     }
 }

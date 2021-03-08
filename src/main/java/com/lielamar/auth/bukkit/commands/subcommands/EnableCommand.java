@@ -1,16 +1,20 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
-import com.lielamar.auth.bukkit.commands.Command;
 import com.lielamar.auth.shared.handlers.AuthHandler;
+import com.lielamar.auth.shared.handlers.MessageHandler;
+import com.lielamar.lielsutils.commands.Command;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class EnableCommand extends Command {
 
     private final TwoFactorAuthentication main;
+
     public EnableCommand(String name, TwoFactorAuthentication main) {
         super(name);
+
         this.main = main;
     }
 
@@ -25,16 +29,25 @@ public class EnableCommand extends Command {
     }
 
     @Override
-    public void execute(CommandSender commandSender, String[] args) {
-        Player player = (Player) commandSender;
+    public String getDescription() {
+        return ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.DESCRIPTION_OF_ENABLE_COMMAND.getMessage());
+    }
 
-        if(!hasPermissions(player)) {
-            main.getMessageHandler().sendMessage(player, "&cYou do not have permission to run this command");
+    @Override
+    public void execute(CommandSender commandSender, String[] args) {
+        if(!hasPermissions(commandSender)) {
+            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
         } else {
-            if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.DISABLED)) {
-                main.getAuthHandler().createKey(player.getUniqueId());
+            if(!(commandSender instanceof Player)) {
+                main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.MUST_BE_A_PLAYER);
             } else {
-                main.getMessageHandler().sendMessage(player, "&cYou are already setup with 2FA");
+                Player player = (Player) commandSender;
+
+                if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.DISABLED)) {
+                    main.getAuthHandler().createKey(player.getUniqueId());
+                } else {
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.ALREADY_SETUP);
+                }
             }
         }
     }

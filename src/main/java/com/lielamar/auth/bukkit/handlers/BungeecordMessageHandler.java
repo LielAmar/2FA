@@ -19,6 +19,7 @@ import java.util.UUID;
 public class BungeecordMessageHandler implements PluginMessageListener {
 
     private final TwoFactorAuthentication main;
+
     public BungeecordMessageHandler(TwoFactorAuthentication main) {
         this.main = main;
     }
