@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.2.0"
+version: "1.2.1"
 authors: [LielAmar]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
 description: Add another layer of protection to your server
@@ -15,6 +15,7 @@ permissions:
     default: op
     children:
       2fa.use: true
+      2fa.help: true
       2fa.setup: true
       2fa.remove: true
       2fa.remove.others: true
@@ -22,6 +23,9 @@ permissions:
   2fa.use:
     description: Permissions to use the /2FA command
     default: op
+  2fa.help:
+    description: Permissions to view the help page
+    default: p
   2fa.setup:
     description: Permissions to set up 2FA
     default: op
