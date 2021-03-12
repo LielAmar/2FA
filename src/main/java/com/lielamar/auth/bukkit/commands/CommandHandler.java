@@ -78,7 +78,7 @@ public class CommandHandler implements CommandExecutor {
             if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.PENDING_LOGIN)) {
                 loginCommand.execute(player, args);
                 return false;
-            } else if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.PENDING_SETUP)) {
+            } else if(main.getAuthHandler().isPendingSetup(player.getUniqueId())) {
                 setupCommand.execute(player, args);
                 return false;
             }

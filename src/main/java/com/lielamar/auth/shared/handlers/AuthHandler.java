@@ -23,7 +23,7 @@ public abstract class AuthHandler {
     private final Map<UUID, Integer> failedAttempts = new HashMap<>();
 
     public enum AuthState {
-        DISABLED, PENDING_SETUP, PENDING_LOGIN, AUTHENTICATED
+        DISABLED, PENDING_SETUP, DEMAND_SETUP, PENDING_LOGIN, AUTHENTICATED
     }
 
     public int getAuthentications() {
@@ -55,7 +55,7 @@ public abstract class AuthHandler {
     public boolean is2FAEnabled(UUID uuid) {
         if(!authStates.containsKey(uuid))
             return false;
-        return authStates.get(uuid).equals(AuthState.PENDING_LOGIN) || authStates.get(uuid).equals(AuthState.AUTHENTICATED);
+        return authStates.get(uuid).equals(AuthState.DEMAND_SETUP) || authStates.get(uuid).equals(AuthState.PENDING_LOGIN) || authStates.get(uuid).equals(AuthState.AUTHENTICATED);
     }
 
     /**
@@ -65,7 +65,7 @@ public abstract class AuthHandler {
      * @return       Whether or not the player is pending setup
      */
     public boolean isPendingSetup(UUID uuid) {
-        return authStates.get(uuid).equals(AuthState.PENDING_SETUP);
+        return authStates.get(uuid).equals(AuthState.PENDING_SETUP) || authStates.get(uuid).equals(AuthState.DEMAND_SETUP);
     }
 
     /**
@@ -92,7 +92,7 @@ public abstract class AuthHandler {
      */
     public boolean validateKey(UUID uuid, Integer code) {
         String key = getKey(uuid);
-        if(key != null && new GoogleAuthenticator().authorize(key, code)) {
+        if(key != null && new GoogleAuthenticator().authorize(key, code) && authStates.get(uuid).equals(AuthState.PENDING_LOGIN)) {
             changeState(uuid, AuthState.AUTHENTICATED);
             authentications++;
             return true;
@@ -109,7 +109,7 @@ public abstract class AuthHandler {
      */
     public boolean approveKey(UUID uuid, Integer code) {
         String key = getPendingKey(uuid);
-        if(key != null && new GoogleAuthenticator().authorize(key, code)) {
+        if(key != null && new GoogleAuthenticator().authorize(key, code) && (authStates.get(uuid).equals(AuthState.PENDING_SETUP) || authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
             changeState(uuid, AuthState.AUTHENTICATED);
             getStorageHandler().setKey(uuid, key);
             pendingKeys.remove(uuid);
@@ -192,8 +192,7 @@ public abstract class AuthHandler {
         return null;
     }
 
-    public void playerJoin(UUID uuid) {
-    }
+    public void playerJoin(UUID uuid) {}
 
     public void playerQuit(UUID uuid) {
         pendingKeys.remove(uuid);

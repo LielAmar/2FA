@@ -112,6 +112,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return;
         }
 
+        // Removing previous QR codes
+        for(ItemStack item : player.getInventory().getContents()) {
+            if(isQRCodeItem(item))
+                player.getInventory().remove(item);
+        }
+
         // If the player doesn't have permission to use 2fa
         if(!player.hasPermission("2fa.use")) {
             changeState(uuid, AuthState.DISABLED);
@@ -130,6 +136,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             if(player.hasPermission("2fa.demand")) {
                 main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
                 createKey(player.getUniqueId());
+                changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
             } else {
                 if(main.getConfigHandler().is2FAAdvised()) {
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
@@ -317,7 +324,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         player.getInventory().setHeldItemSlot(0);
                     }
 
-                    sendClickableMessage(player, MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage(), url.replaceAll("128x128", "256x256"));
+                    sendClickableMessage(player, ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()), url.replaceAll("128x128", "256x256"));
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA);
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.PLEASE_AUTHENTICATE);
                 } catch (IOException | NumberFormatException e) {

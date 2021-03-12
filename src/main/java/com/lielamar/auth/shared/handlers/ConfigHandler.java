@@ -1,9 +1,19 @@
 package com.lielamar.auth.shared.handlers;
 
 import com.lielamar.auth.shared.storage.StorageType;
+import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.player.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ConfigHandler {
 
@@ -18,6 +28,7 @@ public abstract class ConfigHandler {
     protected boolean requireOnEveryLogin = false;
     protected boolean advice2FA = true;
     protected boolean disableCommands = true;
+    protected Map<Class<? extends Event>, Boolean> disabledEvents = new HashMap<>();
     protected List<String> whitelistedCommands = new ArrayList<>();
     protected List<String> blacklistedCommands = new ArrayList<>();
 
@@ -39,6 +50,9 @@ public abstract class ConfigHandler {
     public boolean isCommandsDisabled() {
         return this.disableCommands;
     }
+    public Map<Class<? extends Event>, Boolean> getDisabledEvents() {
+        return this.disabledEvents;
+    }
     public List<String> getWhitelistedCommands() {
         return this.whitelistedCommands;
     }
@@ -47,4 +61,31 @@ public abstract class ConfigHandler {
     }
 
     public abstract void reload();
+
+
+    protected enum ShorterEvents {
+        MOVE(PlayerMoveEvent.class),
+        BLOCK_BREAK(BlockBreakEvent.class),
+        BLOCK_PLACE(BlockPlaceEvent.class),
+        CHAT(AsyncPlayerChatEvent.class),
+        DROP(PlayerDropItemEvent.class),
+        PICKUP(PlayerPickupItemEvent.class),
+        GET_DAMAGE(EntityDamageEvent.class),
+        DAMAGE_OTHERS(EntityDamageByEntityEvent.class),
+        CLICK_INVENTORY(InventoryClickEvent.class),
+        CHANGE_SLOT(PlayerItemHeldEvent.class),
+        COMMANDS(PlayerCommandPreprocessEvent.class),
+        MOVE_ITEM(InventoryMoveItemEvent.class),
+        INTERACT_WITH_FRAMES(PlayerInteractEntityEvent.class);
+
+        private final Class<? extends Event> matchingEvent;
+
+        ShorterEvents(Class<? extends Event> matchingEvent) {
+            this.matchingEvent = matchingEvent;
+        }
+
+        public Class<? extends Event> getMatchingEvent() {
+            return this.matchingEvent;
+        }
+    }
 }

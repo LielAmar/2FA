@@ -6,7 +6,6 @@ import com.lielamar.lielsutils.commands.Command;
 import com.lielamar.lielsutils.modules.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Set;

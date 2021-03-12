@@ -21,24 +21,38 @@ Map IDs: []
 # Your server name. This will be the default name of the 2fa in the authenticator app
 Server Name: "MyServer"
 
-# Disable all commands if not yet authenticated (other than 2fa ones)
-Disable Commands: true
-
-# If the above is true you can whitelist commands with the below
-Whitelisted Commands:
-  - "help"
-
-# If commands are not disabled you can use the below to blacklist specific commands instead
-Blacklisted Commands:
-  - "op"
-  - "spawn"
-
 # Whether to send a message advising to use 2FA if the player has permissions to use it
 Advise: true
 
 # Whether to hash IPs or not
 # Can be either SHA256, SHA512 or NONE
 IP Hash: SHA256
+
+# Events to disable if a player is not logged in yet
+# true = will block the player, false = will allow the player to continue with the event
+Disabled Events:
+  Move: true
+  Block Break: true
+  Block Place: true
+  Chat: true
+  Drop: true
+  Pickup: true
+  Get Damage: true
+  Damage Others: true
+  Click Inventory: true
+  Change Slot: true
+  Commands: true
+  Move Item: true
+  Interact With Frames: true
+
+# If the 'Commands' key above is true you can whitelist commands with the below section
+Whitelisted Commands:
+  - "help"
+
+# If commands are enabled you can use the below to blacklist specific commands instead
+Blacklisted Commands:
+  - "op"
+  - "spawn"
 
 # When to require the use of 2FA
 # If you run the plugin for a BungeeCord server, please include this plugin in your BungeeCord/plugins/ folder

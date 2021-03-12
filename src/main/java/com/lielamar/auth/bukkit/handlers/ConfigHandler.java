@@ -2,6 +2,7 @@ package com.lielamar.auth.bukkit.handlers;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.storage.StorageType;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -28,7 +29,18 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
         this.requireOnIPChange = config.getBoolean("Require When.IP Changes");
         this.requireOnEveryLogin = config.getBoolean("Require When.Every Login");
         this.advice2FA = config.getBoolean("Advise");
-        this.disableCommands = config.getBoolean("Disable Commands");
+
+        ConfigurationSection disabledEventsSection = config.getConfigurationSection("Disabled Events");
+        try {
+            if(disabledEventsSection != null) {
+                for(String key : disabledEventsSection.getKeys(false))
+                    this.disabledEvents.put(ShorterEvents.valueOf(key.toUpperCase().replaceAll(" ", "_")).getMatchingEvent(), disabledEventsSection.getBoolean(key));
+            }
+        } catch(IllegalArgumentException exception) {
+            exception.printStackTrace();
+            System.out.println("[2FA] The plugin detected that your configuration is having some wrong Disabled Events. Please re-check your configuration and make sure the Disabled Events names are correct!");
+        }
+
         this.whitelistedCommands = config.getStringList("Whitelisted Commands");
         this.blacklistedCommands = config.getStringList("Blacklisted Commands");
 

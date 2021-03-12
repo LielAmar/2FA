@@ -23,7 +23,7 @@ public class SetupCommand extends Command {
 
     @Override
     public String[] getPermissions() {
-        return new String[] { "2fa.enable" };
+        return new String[] { "2fa.use" };
     }
 
     @Override
@@ -45,16 +45,20 @@ public class SetupCommand extends Command {
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.USAGE);
                 } else {
                     try {
-                        StringBuilder code = new StringBuilder();
-
-                        for(String arg : args)
-                            code.append(arg);
-
-                        boolean approved = main.getAuthHandler().approveKey(player.getUniqueId(), Integer.parseInt(code.toString()));
-                        if(approved) {
-                            main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SUCCESSFULLY_SETUP);
+                        if(!main.getAuthHandler().isPendingSetup(player.getUniqueId())) {
+                            main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.DIDNT_SETUP_YET);
                         } else {
-                            main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INCORRECT_CODE);
+                            StringBuilder code = new StringBuilder();
+
+                            for(String arg : args)
+                                code.append(arg);
+
+                            boolean approved = main.getAuthHandler().approveKey(player.getUniqueId(), Integer.parseInt(code.toString()));
+                            if(approved) {
+                                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SUCCESSFULLY_SETUP);
+                            } else {
+                                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INCORRECT_CODE);
+                            }
                         }
                     } catch (Exception e) {
                         main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVALID_CODE);

@@ -3,6 +3,7 @@ package com.lielamar.auth.bukkit.listeners;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -25,6 +26,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             if(event.getTo() != null && (event.getTo().getBlockZ() != event.getFrom().getBlockZ() || event.getTo().getBlockX() != event.getFrom().getBlockX())) {
                 event.setTo(event.getFrom());
@@ -35,6 +38,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
             main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
@@ -43,6 +48,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
             main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
@@ -51,6 +58,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
             main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
@@ -59,6 +68,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onItemDrop(PlayerDropItemEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         } else if(this.main.getAuthHandler().isQRCodeItem(event.getItemDrop().getItemStack())) {
@@ -68,6 +79,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onItemPickup(PlayerPickupItemEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         } else if(this.main.getAuthHandler().isQRCodeItem(event.getItem().getItemStack())) {
@@ -77,6 +90,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             if(this.main.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
@@ -87,6 +102,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(event.getDamager() instanceof Player) {
             Player player = (Player) event.getDamager();
             if(this.main.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
@@ -97,6 +114,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(this.main.getAuthHandler().needsToAuthenticate(event.getWhoClicked().getUniqueId())) {
             event.setCancelled(true);
             event.getWhoClicked().closeInventory();
@@ -109,10 +128,22 @@ public class DisabledEvents implements Listener {
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)
+    public void onSlotChange(PlayerItemHeldEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
+        if(!this.main.getAuthHandler().isQRCodeItem(event.getPlayer().getInventory().getItem(event.getNewSlot()))) {
+            if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onCommand(PlayerCommandPreprocessEvent event) {
         if(this.main.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             String[] args = event.getMessage().substring(1).split("\\s+");
-            if(this.main.getConfigHandler().isCommandsDisabled()) {
+
+            if(this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) {
                 if(args.length > 0) {
                     String command = args[0];
                     if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.equalsIgnoreCase(command)) {
@@ -134,6 +165,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onItemMove(InventoryMoveItemEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(this.main.getAuthHandler().isQRCodeItem(event.getItem()) && event.getDestination().getType() != InventoryType.PLAYER) {
             event.setCancelled(true);
         }
@@ -142,6 +175,8 @@ public class DisabledEvents implements Listener {
     @EventHandler (priority = EventPriority.HIGHEST)
     @SuppressWarnings("deprecation")
     public void onItemFrameInteract(PlayerInteractEntityEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(event.getRightClicked() instanceof ItemFrame) {
             if(this.main.getAuthHandler().isQRCodeItem(event.getPlayer().getItemInHand())) {
                 event.setCancelled(true);
