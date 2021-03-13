@@ -59,8 +59,8 @@ public class JSONStorage extends StorageHandler {
                 if (changed)
                     JSONUtils.write(jsonObject, new FileOutputStream(file));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
         return file;
     }
@@ -78,8 +78,8 @@ public class JSONStorage extends StorageHandler {
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
             return key;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
         return null;
     }
@@ -95,8 +95,8 @@ public class JSONStorage extends StorageHandler {
             if (key == JSONObject.NULL) return null;
 
             return key.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
         return null;
     }
@@ -124,8 +124,8 @@ public class JSONStorage extends StorageHandler {
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
             return ip;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
         return null;
     }
@@ -141,8 +141,8 @@ public class JSONStorage extends StorageHandler {
             if (ip == JSONObject.NULL) return null;
 
             return ip.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
         return null;
     }

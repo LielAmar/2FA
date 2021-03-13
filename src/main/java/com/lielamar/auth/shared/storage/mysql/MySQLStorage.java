@@ -22,7 +22,7 @@ public class MySQLStorage extends StorageHandler {
         this.port = port;
 
         try { openConnection(); }
-        catch(SQLException | ClassNotFoundException e) { e.printStackTrace(); }
+        catch(SQLException | ClassNotFoundException exception) { exception.printStackTrace(); }
     }
 
 
@@ -101,8 +101,8 @@ public class MySQLStorage extends StorageHandler {
 
             statement.executeUpdate();
             return key;
-        } catch(SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException exception) {
+            exception.printStackTrace();
         }
         return null;
     }
@@ -123,8 +123,8 @@ public class MySQLStorage extends StorageHandler {
 
                 return key.equalsIgnoreCase("") ? null : key;
             }
-        } catch(SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException exception) {
+            exception.printStackTrace();
         }
         return null;
     }
@@ -165,8 +165,8 @@ public class MySQLStorage extends StorageHandler {
 
             statement.executeUpdate();
             return ip;
-        } catch(SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException exception) {
+            exception.printStackTrace();
         }
         return null;
     }
@@ -186,8 +186,8 @@ public class MySQLStorage extends StorageHandler {
                 String IP = result.getString("ip");
                 return IP.equalsIgnoreCase("") ? null : IP;
             }
-        } catch(SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException exception) {
+            exception.printStackTrace();
         }
         return null;
     }

@@ -1,5 +1,6 @@
 package com.lielamar.auth.bukkit;
 
+import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.lielsutils.bstats.MetricsSpigot;
 import com.lielamar.auth.bukkit.commands.CommandHandler;
 import com.lielamar.auth.bukkit.handlers.AuthHandler;
@@ -9,7 +10,6 @@ import com.lielamar.auth.bukkit.handlers.MessageHandler;
 import com.lielamar.auth.bukkit.listeners.DisabledEvents;
 import com.lielamar.auth.bukkit.listeners.OnAuthStateChange;
 import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
-import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.update.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -67,8 +67,8 @@ public class TwoFactorAuthentication extends JavaPlugin {
         pm.registerEvents(new DisabledEvents(this), this);
 
         pluginMessageListener = new BungeecordMessageHandler(this);
-        getServer().getMessenger().registerOutgoingPluginChannel(this, Constants.channelName);
-        getServer().getMessenger().registerIncomingPluginChannel(this, Constants.channelName, pluginMessageListener);
+        getServer().getMessenger().registerOutgoingPluginChannel(this, PluginMessagingHandler.channelName);
+        getServer().getMessenger().registerIncomingPluginChannel(this, PluginMessagingHandler.channelName, pluginMessageListener);
     }
 
     public BungeecordMessageHandler getPluginMessageListener() { return this.pluginMessageListener; }

@@ -1,12 +1,12 @@
 name: 2FA
-version: "1.2.3"
+version: "1.2.4"
 authors: [LielAmar]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
 description: Add another layer of protection to your server
 
 commands:
   2fa:
-    description: Setup your 2FA app/Enter your 2FA code
+    description: Main 2FA Command
     aliases: [auth]
 
 permissions:

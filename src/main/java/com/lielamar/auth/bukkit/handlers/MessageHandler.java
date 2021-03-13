@@ -34,7 +34,7 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
         this.file = new File(main.getDataFolder(), super.messagesFileName);
 
         if(!this.file.exists()) {
-            try { this.file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
+            try { this.file.createNewFile(); } catch (IOException exception) { exception.printStackTrace(); }
         }
 
         this.config = YamlConfiguration.loadConfiguration(this.file);
@@ -52,6 +52,6 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     @Override
     public void saveConfiguration() {
-        try { this.config.save(this.file); } catch (IOException e) { e.printStackTrace(); }
+        try { this.config.save(this.file); } catch (IOException exception) { exception.printStackTrace(); }
     }
 }

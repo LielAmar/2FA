@@ -6,80 +6,155 @@ import com.google.common.io.ByteStreams;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.AuthHandler;
-import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.auth.shared.handlers.Callback;
+import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import javax.annotation.Nonnull;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class BungeecordMessageHandler implements PluginMessageListener {
+public class BungeecordMessageHandler extends PluginMessagingHandler implements PluginMessageListener {
 
     private final TwoFactorAuthentication main;
+    private final Map<UUID, Callback> callbackFunctions;
 
     public BungeecordMessageHandler(TwoFactorAuthentication main) {
         this.main = main;
+        this.callbackFunctions = new HashMap<>();
+
+        // Looping over the callbacks, if it's been more than 15 seconds cancel the callback
+        Bukkit.getScheduler().runTaskTimerAsynchronously(main, () -> {
+            long currentTimestamp = System.currentTimeMillis();
+
+            callbackFunctions.forEach((key, value) -> {
+                if(value != null) {
+                    if((currentTimestamp - value.getExecutionStamp())/1000 > 15)
+                        callbackFunctions.remove(key);
+                }
+            });
+        }, 300L, 300L);
     }
+
+    /**
+     * Sets the header of a message
+     *
+     * @param msg        Message Stream
+     * @param uuid       UUID of the player attached to the message
+     * @param callback   Callback function to call once a response is received
+     */
+    public void setMessageHeader(ByteArrayDataOutput msg, UUID uuid, Callback callback) {
+        msg.writeUTF(super.subChannelName);                          // Setting the SubChannel of the message
+        msg.writeUTF(attachCallbackFunction(callback).toString());   // Setting the Message UUID
+        msg.writeUTF(uuid.toString());                               // Setting the UUID of the player
+    }
+
+    /**
+     * Sets the body of a message
+     *
+     * @param msgBody      Message Body
+     * @param action       Action
+     * @param parameters   Parameters to set in the body
+     */
+    public void setMessageBody(ByteArrayOutputStream msgBody, MessageAction action, String... parameters) {
+        DataOutputStream bodyData = new DataOutputStream(msgBody);
+        try {
+            bodyData.writeUTF(action.name());   // Setting the action of the message
+
+            for(String param : parameters)      // Setting the parameters
+                bodyData.writeUTF(param);
+        } catch(IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    /**
+     * Applies the message body
+     *
+     * @param msg       Message Stream
+     * @param msgBody   Message Body
+     */
+    public void applyMessageBody(ByteArrayDataOutput msg, ByteArrayOutputStream msgBody) {
+        msg.writeShort(msgBody.toByteArray().length);   // Setting the body length
+        msg.write(msgBody.toByteArray());               // Setting the body data
+    }
+
+    /**
+     * Sends the message to bungeecord
+     *
+     * @param uuid   Player attached to the message
+     * @param msg    Message object as ByteArray
+     */
+    public void sendMessage(UUID uuid, ByteArrayDataOutput msg) {
+        Player player = Bukkit.getPlayer(uuid);
+
+        if(player != null && player.isOnline())
+            player.sendPluginMessage(this.main, super.channelName, msg.toByteArray());
+    }
+
+
+    /**
+     * Generates a random UUID for the message and attaches the callback function to call it later when a response is made
+     *
+     * @param callback   Callback function to save
+     * @return           Random generated UUID
+     */
+    public UUID attachCallbackFunction(Callback callback) {
+        UUID randomUUID = UUID.randomUUID();
+        this.callbackFunctions.put(randomUUID, callback);
+        return randomUUID;
+    }
+
 
     /**
      * Communicates with BungeeCord and sets the player authentication state to {authenticated}
      *
-     * @param uuid    UUID of the player to set (un)authenticated
-     * @param state   AuthState to set for the player on BungeeCord
+     * @param uuid       UUID of the player to set (un)authenticated
+     * @param state      AuthState to set for the player on BungeeCord
+     * @param callback   A callback function to call whenever a response for the message is received
      */
-    public void setBungeeCordAuthState(UUID uuid, AuthHandler.AuthState state) {
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+    public void setBungeeCordAuthState(UUID uuid, AuthHandler.AuthState state, Callback callback) {
+        ByteArrayDataOutput msg = ByteStreams.newDataOutput();
+        this.setMessageHeader(msg, uuid, callback);
 
-        out.writeUTF(Constants.subChannelName);            // Setting the SubChannel of the message
-        out.writeUTF(uuid.toString());                                // Setting the UUID of the player
+        ByteArrayOutputStream msgBody = new ByteArrayOutputStream();
+        this.setMessageBody(msgBody, MessageAction.SET_STATE, state.name());
+        this.applyMessageBody(msg, msgBody);
 
-        ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
-        DataOutputStream msgOut = new DataOutputStream(msgBytes);
-        try {
-            msgOut.writeUTF(Constants.setState);           // Setting the action of the message
-            msgOut.writeUTF(state.name());                            // Setting the state of the player
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-
-        out.writeShort(msgBytes.toByteArray().length);                 // Setting the message length
-        out.write(msgBytes.toByteArray());                             // Setting the message data as ByteArray
-
-        Player player = Bukkit.getPlayer(uuid);
-        if(player != null && player.isOnline())
-            player.sendPluginMessage(main, Constants.channelName, out.toByteArray());
+        this.sendMessage(uuid, msg);
     }
+
+    public void setBungeeCordAuthState(UUID uuid, AuthHandler.AuthState state) {
+        this.setBungeeCordAuthState(uuid, state, null);
+    }
+
 
     /**
      * Communicates with BungeeCord and gets the player authentication state
      *
-     * @param uuid            UUID of the player to get check if authenticated
+     * @param uuid       UUID of the player to get check if authenticated
+     * @param callback   A callback function to call whenever a response for the message is received
      */
-    public void getBungeeCordAUthState(UUID uuid) {
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+    public void getBungeeCordAuthState(UUID uuid, AuthHandler.AuthState defaultState, Callback callback) {
+        ByteArrayDataOutput msg = ByteStreams.newDataOutput();
+        this.setMessageHeader(msg, uuid, callback);
 
-        out.writeUTF(Constants.subChannelName);            // Setting the SubChannel of the message
-        out.writeUTF(uuid.toString());                                // Setting the UUID of the player
+        ByteArrayOutputStream msgBody = new ByteArrayOutputStream();
+        this.setMessageBody(msgBody, MessageAction.GET_STATE, defaultState.name());
+        this.applyMessageBody(msg, msgBody);
 
-        ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
-        DataOutputStream msgOut = new DataOutputStream(msgBytes);
-        try {
-            msgOut.writeUTF(Constants.getState);           // Setting the action of the message
-            msgOut.writeUTF(main.getAuthHandler().getAuthState(uuid).name()); // Default auth state
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-
-        out.writeShort(msgBytes.toByteArray().length);                 // Setting the message length
-        out.write(msgBytes.toByteArray());                             // Setting the message data as ByteArray
-
-        Player player = Bukkit.getPlayer(uuid);
-        if(player != null && player.isOnline())
-            player.sendPluginMessage(main, Constants.channelName, out.toByteArray());
+        this.sendMessage(uuid, msg);
     }
+
+    public void getBungeeCordAuthState(UUID uuid, AuthHandler.AuthState defaultState) {
+        this.getBungeeCordAuthState(uuid, defaultState, null);
+    }
+
 
     /**
      * Handles the responses from BungeeCord for the above methods
@@ -90,34 +165,33 @@ public class BungeecordMessageHandler implements PluginMessageListener {
      */
     @Override
     public void onPluginMessageReceived(String channel, @Nonnull Player player, @Nonnull byte[] message) {
-        if(!channel.equals(Constants.channelName)) return;
+        // If the Channel name is not the 2FA's Channel name we want to return
+        if(!channel.equals(super.channelName)) return;
 
-        ByteArrayDataInput in = ByteStreams.newDataInput(message);
-        String subChannel = in.readUTF();                           // Getting the SubChannel name
-        UUID playerUUID = UUID.fromString(in.readUTF());            // UUID of the player to run the check on
+        ByteArrayDataInput response = ByteStreams.newDataInput(message);
+        String subChannel = response.readUTF();
+        UUID messageUUID = UUID.fromString(response.readUTF());
+        UUID playerUUID = UUID.fromString(response.readUTF());
 
         // If the SubChannel name is the 2FA's SubChannel name
-        if(subChannel.equals(Constants.subChannelName)) {
-            short length = in.readShort();                          // Length of the message
-            byte[] msgBytes = new byte[length];                     // Message itself
-            in.readFully(msgBytes);
+        if(subChannel.equals(super.subChannelName)) {
+            short bodyLength = response.readShort();
+            byte[] msgBody = new byte[bodyLength];
+            response.readFully(msgBody);
 
-            DataInputStream msgIn = new DataInputStream(new ByteArrayInputStream(msgBytes));
+            DataInputStream msgBodyData = new DataInputStream(new ByteArrayInputStream(msgBody));
             try {
-                String action = msgIn.readUTF();                    // The message action (isAuthenticated/setAuthenticated)
-                AuthHandler.AuthState state;                        // Default response value
+                MessageAction action = MessageAction.valueOf(msgBodyData.readUTF());
 
-                if(action.equals(Constants.getState)) {
-                    state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
+                if(action == MessageAction.GET_STATE) {
+                    AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
                     main.getAuthHandler().changeState(playerUUID, state);
-                } else if(action.equals(Constants.setState)) {
-                    state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
-                    if(state != main.getAuthHandler().getAuthState(playerUUID)) {
-                        main.getAuthHandler().changeState(playerUUID, state);
-                    }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                Callback callback = this.callbackFunctions.getOrDefault(messageUUID, null);
+                if(callback != null) callback.execute();
+            } catch (IOException exception) {
+                exception.printStackTrace();
             }
         }
     }

@@ -6,7 +6,7 @@ import com.lielamar.auth.bungee.handlers.MessageHandler;
 import com.lielamar.auth.bungee.listeners.DisabledEvents;
 import com.lielamar.auth.bungee.listeners.OnBungeePlayerConnections;
 import com.lielamar.auth.bungee.listeners.OnPluginMessage;
-import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.lielsutils.bstats.MetricsBungee;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
@@ -47,7 +47,7 @@ public class TwoFactorAuthentication extends Plugin {
         pm.registerListener(this, new OnBungeePlayerConnections(this));
         pm.registerListener(this, new DisabledEvents(this));
 
-        getProxy().registerChannel(Constants.channelName);
+        getProxy().registerChannel(PluginMessagingHandler.channelName);
     }
 
     public MessageHandler getMessageHandler() { return this.messageHandler; }

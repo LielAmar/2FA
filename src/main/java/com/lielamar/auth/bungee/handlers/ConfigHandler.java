@@ -34,8 +34,8 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
         if(!file.exists()) {
             try(InputStream in = main.getResourceAsStream("bungeeconfig.yml")) {
                 Files.copy(in, file.toPath());
-            } catch(IOException e) {
-                e.printStackTrace();
+            } catch(IOException exception) {
+                exception.printStackTrace();
             }
         }
 
@@ -46,8 +46,8 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
             this.disableServerSwitch = config.getBoolean("Disable Server Switch");
             this.whitelistedCommands = config.getStringList("Whitelisted Commands");
             this.blacklistedCommands = config.getStringList("Blacklisted Commands");
-        } catch(IOException e) {
-            e.printStackTrace();
+        } catch(IOException exception) {
+            exception.printStackTrace();
         }
     }
 

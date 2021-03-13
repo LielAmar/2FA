@@ -3,6 +3,7 @@ package com.lielamar.auth.bukkit.handlers;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
 import com.lielamar.auth.bukkit.utils.ImageRender;
+import com.lielamar.auth.shared.handlers.Callback;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.storage.StorageType;
 import com.lielamar.auth.shared.storage.json.JSONStorage;
@@ -41,7 +42,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
 
     protected final TwoFactorAuthentication main;
-    protected final AutoAuthHandler autoAuthHandler;
+    protected final ExtraAuthHandler extraAuthHandler;
 
     protected Map<Integer, Long> lastMapIdUse;
 
@@ -50,7 +51,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     public AuthHandler(TwoFactorAuthentication main) {
         this.main = main;
-        this.autoAuthHandler = new AutoAuthHandler();
+        this.extraAuthHandler = new ExtraAuthHandler();
 
         this.lastMapIdUse = new HashMap<>();
         for(int i : main.getConfigHandler().getMapIDs()) lastMapIdUse.put(i, -1L);
@@ -107,46 +108,48 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public void playerJoin(UUID uuid) {
         super.playerJoin(uuid);
 
-        Player player = Bukkit.getPlayer(uuid);
-        if(player == null || !player.isOnline()) {
-            return;
-        }
-
-        // Removing previous QR codes
-        for(ItemStack item : player.getInventory().getContents()) {
-            if(isQRCodeItem(item))
-                player.getInventory().remove(item);
-        }
-
-        // If the player doesn't have permission to use 2fa
-        if(!player.hasPermission("2fa.use")) {
-            changeState(uuid, AuthState.DISABLED);
-            return;
-        }
-
-        // If the player has a key, wait for an authentication, otherwise, set them as 2fa disabled
-        if(getStorageHandler().getKey(uuid) != null) {
-            changeState(uuid, AuthState.PENDING_LOGIN);
-        } else {
-            changeState(uuid, AuthState.DISABLED);
-        }
-
-        // If the player doesn't need to authenticate (they don't have a key)
-        if(!needsToAuthenticate(player.getUniqueId())) {
-            if(player.hasPermission("2fa.demand")) {
-                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
-                createKey(player.getUniqueId());
-                changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
-            } else {
-                if(main.getConfigHandler().is2FAAdvised()) {
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
-                }
+        // The reason there's a 1 tick delay before every message is that if you send a ChannelMessage too fast, sometimes bungeecord doesn't register the message.
+        Bukkit.getScheduler().runTaskLater(this.main, () -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if(player == null || !player.isOnline()) {
+                return;
             }
-        } else {
-            // try to auto authenticate the player
-            autoAuthHandler.autoAuthenticate(player);
-        }
+
+            // Removing previous QR codes
+            for(ItemStack item : player.getInventory().getContents()) {
+                if(isQRCodeItem(item))
+                    player.getInventory().remove(item);
+            }
+
+            // If the player doesn't have permission to use 2fa
+            if(!player.hasPermission("2fa.use")) {
+                changeState(uuid, AuthState.DISABLED);
+                return;
+            }
+
+            // If the player has a key, wait for an authentication, otherwise, set them as 2fa disabled
+            if(getStorageHandler().getKey(uuid) != null) {
+                changeState(uuid, AuthState.PENDING_LOGIN);
+            } else {
+                changeState(uuid, AuthState.DISABLED);
+            }
+
+            // If the player doesn't need to authenticate (they don't have a key)
+            if(!needsToAuthenticate(player.getUniqueId())) {
+                if(player.hasPermission("2fa.demand")) {
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
+                    createKey(player.getUniqueId());
+                    changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
+                } else {
+                    if(main.getConfigHandler().is2FAAdvised()) {
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
+                    }
+                }
+            } else {
+                extraAuthHandler.autoAuthenticate(player); // try to auto authenticate the player
+            }
+        }, 1L);
     }
 
     @Override
@@ -165,8 +168,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
 
         authStates.put(uuid, authState);
+
         if(player != null)
-            autoAuthHandler.setBungeecordAuthState(player, authState);
+            extraAuthHandler.updatePlayersBungeecordAuthState(player);
     }
 
     @Override
@@ -181,7 +185,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         try {
             return urlTemplate + URLEncoder.encode(encodedPart, StandardCharsets.UTF_8.toString());
-        } catch(UnsupportedEncodingException e) {
+        } catch(UnsupportedEncodingException exception) {
             return urlTemplate + encodedPart;
         }
     }
@@ -327,8 +331,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     sendClickableMessage(player, ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()), url.replaceAll("128x128", "256x256"));
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA);
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.PLEASE_AUTHENTICATE);
-                } catch (IOException | NumberFormatException e) {
-                    e.printStackTrace();
+                } catch (IOException | NumberFormatException exception) {
+                    exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
                 }
             }
@@ -395,39 +399,37 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     /**
      * Inner class to handle BungeeCord communication
      */
-    public class AutoAuthHandler {
+    public class ExtraAuthHandler {
 
         private final boolean isBungeecord;
 
-        public AutoAuthHandler() {
+        public ExtraAuthHandler() {
             this.isBungeecord = SpigotConfig.bungee && !Bukkit.getServer().getOnlineMode();
         }
 
         /**
-         * Handles BungeeCord authentication
+         * Handles BungeeCord authentication states
          *
-         * @param player   Player to update BungeeCord authentication
-         * @param state    State to set the player's BungeeCord authentication to
+         * @param player   Player to update BungeeCord authentication state
          */
-        public void setBungeecordAuthState(Player player, AuthState state) {
-            if(isBungeecord) {
-                main.getPluginMessageListener().setBungeeCordAuthState(player.getUniqueId(), state);
-            }
+        public void updatePlayersBungeecordAuthState(Player player) {
+            if(isBungeecord)
+                main.getPluginMessageListener().setBungeeCordAuthState(player.getUniqueId(), getAuthState(player.getUniqueId()));
         }
 
         public void autoAuthenticate(Player player) {
-            if(isBungeecord) {
-                bungeecordAutoAuthenticate(player);
-            } else {
-                spigotAutoAuthenticate(player);
-            }
+            if(isBungeecord) bungeecordAutoAuthenticate(player);
+            else spigotAutoAuthenticate(player);
         }
 
         private void bungeecordAutoAuthenticate(Player player) {
             if(!needsToAuthenticate(player.getUniqueId())) return;
 
-            Bukkit.getScheduler().runTaskLater(main, () -> main.getPluginMessageListener().getBungeeCordAUthState(player.getUniqueId()), 1L);
-            Bukkit.getScheduler().runTaskLater(main, () -> spigotAutoAuthenticate(player), 2L);
+            final long currentTimestamp = System.currentTimeMillis();
+            main.getPluginMessageListener().getBungeeCordAuthState(player.getUniqueId(), getAuthState(player.getUniqueId()), new Callback() {
+                public void execute() { spigotAutoAuthenticate(player); }
+                public long getExecutionStamp() { return currentTimestamp; }
+            });
         }
 
         private void spigotAutoAuthenticate(Player player) {

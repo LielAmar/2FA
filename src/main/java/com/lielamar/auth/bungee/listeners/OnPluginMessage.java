@@ -5,6 +5,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.AuthHandler;
+import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -16,47 +17,53 @@ import java.io.*;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class OnPluginMessage implements Listener {
+public class OnPluginMessage extends PluginMessagingHandler implements Listener {
 
     private final TwoFactorAuthentication main;
+
     public OnPluginMessage(TwoFactorAuthentication main) {
         this.main = main;
     }
 
     @EventHandler
     public void onQueryReceive(PluginMessageEvent event) {
-        if(!event.getTag().equals(Constants.channelName)) return;
+        // If the Channel name is not the 2FA's Channel name we want to return
+        if(!event.getTag().equals(super.channelName)) return;
 
-        ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
-        String subChannel = in.readUTF();                                    // Getting the SubChannel name
+        ByteArrayDataInput msg = ByteStreams.newDataInput(event.getData());
+        String subChannel = msg.readUTF();
 
-        if(subChannel.equals(Constants.subChannelName)) {
-            UUID playerUUID = UUID.fromString(in.readUTF());                 // UUID of the player to run the check on
+        // If the SubChannel name is the 2FA's SubChannel name
+        if(subChannel.equals(super.subChannelName)) {
+            UUID messageUUID = UUID.fromString(msg.readUTF());
+            UUID playerUUID = UUID.fromString(msg.readUTF());
+
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
 
-            short length = in.readShort();                                   // Length of the message
-            byte[] msgBytes = new byte[length];                              // Message itself
-            in.readFully(msgBytes);
+            short bodyLength = msg.readShort();
+            byte[] msgBody = new byte[bodyLength];
+            msg.readFully(msgBody);
 
-            DataInputStream msgIn = new DataInputStream(new ByteArrayInputStream(msgBytes));
+            DataInputStream msgBodyData = new DataInputStream(new ByteArrayInputStream(msgBody));
             try {
-                String action = msgIn.readUTF();                             // The message action (isAuthenticated/setAuthenticated)
+                MessageAction action = MessageAction.valueOf(msgBodyData.readUTF());
 
-                if(action.equals(Constants.getState)) {
-                    AuthHandler.AuthState defaultState = AuthHandler.AuthState.valueOf(msgIn.readUTF());
+                if(action == MessageAction.GET_STATE) {
+                    AuthHandler.AuthState defaultState = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
+
                     if(main.getAuthHandler().getAuthState(player.getUniqueId()) == null)
                         main.getAuthHandler().changeState(player.getUniqueId(), defaultState);
+                } else if(action == MessageAction.SET_STATE) {
+                    AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
 
-                    sendResponse(player, action);
-                } else if(action.equals(Constants.setState)) {
-                    AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgIn.readUTF());
-                    if(state != main.getAuthHandler().getAuthState(player.getUniqueId()))
-                        main.getAuthHandler().changeState(player.getUniqueId(), state);
-
-                    sendResponse(player, action);
+                    main.getAuthHandler().changeState(player.getUniqueId(), state);
+                } else {
+                    return;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                sendResponse(messageUUID, player, action);
+            } catch (IOException exception) {
+                exception.printStackTrace();
             }
         }
     }
@@ -64,31 +71,30 @@ public class OnPluginMessage implements Listener {
     /**
      * Sends back a response from BungeeCord to spigot
      *
-     * @param player   Player to send the response of
-     * @param action   The action of the message (isAuthenticated/setAuthenticated)
+     * @param messageUUID   UUID of the message
+     * @param player        Player to send the response of
+     * @param action        The action of the message (isAuthenticated/setAuthenticated)
      */
-    public void sendResponse(ProxiedPlayer player, String action) {
+    public void sendResponse(UUID messageUUID, ProxiedPlayer player, MessageAction action) {
         AuthHandler.AuthState state = main.getAuthHandler().getAuthState(player.getUniqueId());
 
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF(Constants.subChannelName);                        // Setting the SubChannel of the response
-        out.writeUTF(player.getUniqueId().toString());                 // Setting the playerUUID of the response
+        ByteArrayDataOutput response = ByteStreams.newDataOutput();
+        response.writeUTF(super.subChannelName);
+        response.writeUTF(messageUUID.toString());
+        response.writeUTF(player.getUniqueId().toString());
 
-        ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
-        DataOutputStream msgOut = new DataOutputStream(msgBytes);
+        ByteArrayOutputStream msgBody = new ByteArrayOutputStream();
+        DataOutputStream msgBodyData = new DataOutputStream(msgBody);
         try {
-            msgOut.writeUTF(action);                                   // Setting the action of the response
-            if(state != null)
-                msgOut.writeUTF(state.name());                         // Setting the value of the response
-            else
-                msgOut.writeUTF("null");
-        } catch(IOException e) {
-            e.printStackTrace();
+            msgBodyData.writeUTF(action.name());
+            msgBodyData.writeUTF(state != null ? state.name() : "null");
+        } catch(IOException exception) {
+            exception.printStackTrace();
         }
 
-        out.writeShort(msgBytes.toByteArray().length);                 // Setting the message length
-        out.write(msgBytes.toByteArray());                             // Setting the message data as ByteArray
+        response.writeShort(msgBody.toByteArray().length);
+        response.write(msgBody.toByteArray());
 
-        player.getServer().getInfo().sendData(Constants.channelName, out.toByteArray());
+        player.getServer().getInfo().sendData(super.channelName, response.toByteArray());
     }
 }

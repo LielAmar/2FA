@@ -1,7 +1,6 @@
 package com.lielamar.auth.bungee.listeners;
 
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
-import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -13,6 +12,7 @@ import net.md_5.bungee.event.EventHandler;
 public class DisabledEvents implements Listener {
 
     private final TwoFactorAuthentication main;
+
     public DisabledEvents(TwoFactorAuthentication main) {
         this.main = main;
     }
@@ -23,7 +23,7 @@ public class DisabledEvents implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
 
-        if(this.main.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_LOGIN) {
+        if(this.main.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
             String[] args = event.getMessage().substring(1).split("\\s+");
             if(this.main.getConfigHandler().isCommandsDisabled()) {
                 if(args.length > 0) {
@@ -46,10 +46,10 @@ public class DisabledEvents implements Listener {
     }
 
     @EventHandler
-    public void onServerSwitch(ServerConnectEvent event) {
+    public void onServerConnect(ServerConnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
 
-        if(this.main.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_LOGIN) {
+        if(this.main.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
             if(this.main.getConfigHandler().isDisableServerSwitch()) {
                 event.setCancelled(true);
                 main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);

@@ -27,7 +27,7 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
     @Override
     protected void sendRaw(final Object player, final String message) {
         if(player instanceof ProxiedPlayer)
-            ((ProxiedPlayer)player).sendMessage(ChatMessageType.CHAT, new TextComponent(ChatColor.translateAlternateColorCodes('&', message)));
+            ((ProxiedPlayer)player).sendMessage(ChatMessageType.CHAT, TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
         this.file = new File(main.getDataFolder(), super.messagesFileName);
 
         if(!this.file.exists()) {
-            try { this.file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
+            try { this.file.createNewFile(); } catch (IOException exception) { exception.printStackTrace(); }
         }
 
         try {
@@ -51,8 +51,8 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
                     message.setMessage(this.config.getString(message.name()));
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
 
         saveConfiguration();
@@ -60,6 +60,6 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     @Override
     public void saveConfiguration() {
-        try { ConfigurationProvider.getProvider(YamlConfiguration.class).save(this.config, this.file); } catch (IOException e) { e.printStackTrace(); }
+        try { ConfigurationProvider.getProvider(YamlConfiguration.class).save(this.config, this.file); } catch (IOException exception) { exception.printStackTrace(); }
     }
 }

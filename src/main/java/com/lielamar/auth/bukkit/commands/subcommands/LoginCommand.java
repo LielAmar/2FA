@@ -56,7 +56,7 @@ public class LoginCommand extends Command {
                         main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INCORRECT_CODE);
                         callFailEvent(player);
                     }
-                } catch (Exception e) {
+                } catch (Exception exception) {
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVALID_CODE);
                     callFailEvent(player);
                 }

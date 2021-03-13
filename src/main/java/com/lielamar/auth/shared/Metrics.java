@@ -291,10 +291,10 @@ public class Metrics {
                                     JsonObject object = new JsonParser().parse(jsonString).getAsJsonObject();
                                     pluginData.add(object);
                                 }
-                            } catch (ClassNotFoundException e) {
+                            } catch (ClassNotFoundException exception) {
                                 // minecraft version 1.14+
                                 if (logFailedRequests) {
-                                    this.plugin.getLogger().log(Level.SEVERE, "Encountered unexpected exception", e);
+                                    this.plugin.getLogger().log(Level.SEVERE, "Encountered unexpected exception", exception);
                                 }
                             }
                         }
