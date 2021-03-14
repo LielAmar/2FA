@@ -32,8 +32,10 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
         Bukkit.getScheduler().runTaskTimerAsynchronously(main, () -> {
             long currentTimestamp = System.currentTimeMillis();
 
-            callbackFunctions.forEach((key, value) -> {
-                if(value != null) {
+            callbackFunctions.keySet().forEach(key -> {
+                Callback value = callbackFunctions.get(key);
+
+                if(callbackFunctions.get(key) != null) {
                     if((currentTimestamp - value.getExecutionStamp())/1000 > 15)
                         callbackFunctions.remove(key);
                 }
