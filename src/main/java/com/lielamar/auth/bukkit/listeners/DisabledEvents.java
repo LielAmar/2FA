@@ -3,7 +3,6 @@ package com.lielamar.auth.bukkit.listeners;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;

@@ -42,7 +42,7 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
 
                 if(value != null) {
                     if((currentTimestamp - value.getExecutionStamp())/1000 > 15)
-                        callbackFunctions.remove(key);
+                        iterator.remove();
                 }
             }
         }, 300L, 300L);
@@ -192,7 +192,7 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
 
                 if(action == MessageAction.GET_STATE) {
                     AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
-                    main.getAuthHandler().changeState(playerUUID, state);
+                    main.getAuthHandler().changeState(playerUUID, state, false);
                 }
 
                 Callback callback = this.callbackFunctions.getOrDefault(messageUUID, null);

@@ -121,39 +121,52 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     player.getInventory().remove(item);
             }
 
-            // If the player doesn't have permission to use 2fa
-            if(!player.hasPermission("2fa.use")) {
-                changeState(uuid, AuthState.DISABLED);
-                return;
-            }
+            long currentTimestamp = System.currentTimeMillis();
 
-            // If the player has a key, wait for an authentication, otherwise, set them as 2fa disabled
-            if(getStorageHandler().getKey(uuid) != null) {
-                changeState(uuid, AuthState.PENDING_LOGIN);
-            } else {
-                changeState(uuid, AuthState.DISABLED);
-            }
+            // Loading the player auth state from bungeecord, and continuing only after it had finished
+            extraAuthHandler.loadPlayerAuthState(player, new Callback() {
+                public void execute() {
+                    // If the loaded AuthState is Authenticated, meaning the player authenticated previously, we want to break.
+                    if(getAuthState(player.getUniqueId()) == AuthState.AUTHENTICATED) return;
 
-            // If the player doesn't need to authenticate (they don't have a key)
-            if(!needsToAuthenticate(player.getUniqueId())) {
-                if(player.hasPermission("2fa.demand")) {
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
-                    createKey(player.getUniqueId());
-                    changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
-                } else {
-                    if(main.getConfigHandler().is2FAAdvised()) {
-                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
-                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
+                    // If the player doesn't have permission to use 2fa
+                    if(!player.hasPermission("2fa.use")) {
+                        changeState(uuid, AuthState.DISABLED);
+                        return;
+                    }
+
+                    // If the player has a key, wait for an authentication, otherwise, set them as 2fa disabled
+                    changeState(uuid, (getStorageHandler().getKey(uuid) == null ? AuthState.DISABLED : AuthState.PENDING_LOGIN));
+
+                    // we want to check whether the player needs to authenticate or not (if they have a key or not).
+                    // If not, we want to either advise them or demand from them to setup 2fa.
+                    if(!needsToAuthenticate(player.getUniqueId())) {
+                        if(player.hasPermission("2fa.demand")) {
+                            main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
+                            createKey(player.getUniqueId());
+                            changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
+                        } else {
+                            if(main.getConfigHandler().is2FAAdvised()) {
+                                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
+                                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
+                            }
+                        }
+                    // Else, we will try to auto authenticate them
+                    } else {
+                        extraAuthHandler.autoAuthenticate(player);
                     }
                 }
-            } else {
-                extraAuthHandler.autoAuthenticate(player); // try to auto authenticate the player
-            }
+                public long getExecutionStamp() { return currentTimestamp; }
+            });
         }, 1L);
     }
 
     @Override
     public void changeState(UUID uuid, AuthState authState) {
+        changeState(uuid, authState, true);
+    }
+
+    public void changeState(UUID uuid, AuthState authState, boolean updateBungeecord) {
         if(authState == getAuthState(uuid))
             return;
 
@@ -169,7 +182,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         authStates.put(uuid, authState);
 
-        if(player != null)
+        if(player != null && updateBungeecord)
             extraAuthHandler.updatePlayersBungeecordAuthState(player);
     }
 
@@ -408,15 +421,33 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
 
         /**
-         * Handles BungeeCord authentication states
+         * Updates the player's AuthState on the Bungeecord Server
          *
-         * @param player   Player to update BungeeCord authentication state
+         * @param player   Player to update BungeeCord AuthState of
          */
         public void updatePlayersBungeecordAuthState(Player player) {
             if(isBungeecord)
                 main.getPluginMessageListener().setBungeeCordAuthState(player.getUniqueId(), getAuthState(player.getUniqueId()));
         }
 
+        /**
+         * Loads the player's AuthState from the BungeeCord server
+         *
+         * @param player     Player to load BungeeCord AuthState of
+         * @param callback   Callback function to execute after the AuthState is fully loaded.
+         */
+        public void loadPlayerAuthState(Player player, Callback callback) {
+            if(isBungeecord) {
+                AuthState defaultState = getAuthState(player.getUniqueId());
+                main.getPluginMessageListener().getBungeeCordAuthState(player.getUniqueId(), (defaultState == null ? AuthState.DISABLED : defaultState), callback);
+            }
+        }
+
+        /**
+         * Auto authenticates the player through either Bungeecord or Spigot.
+         *
+         * @param player   Player to auto authenticate
+         */
         public void autoAuthenticate(Player player) {
             if(isBungeecord) bungeecordAutoAuthenticate(player);
             else spigotAutoAuthenticate(player);
