@@ -75,12 +75,20 @@ public class CommandHandler implements CommandExecutor {
                 main.getAuthHandler().playerJoin(player.getUniqueId());
             }
 
-            if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.PENDING_LOGIN)) {
-                loginCommand.execute(player, args);
-                return false;
-            } else if(main.getAuthHandler().isPendingSetup(player.getUniqueId())) {
-                setupCommand.execute(player, args);
-                return false;
+            if(args.length == 0) { // If we don't receive an argument we want to either execute the help command if they have 2fa setup, or execute the setup (enable) command if they don't have it setup.
+                Command subCommand = (main.getAuthHandler().is2FAEnabled(player.getUniqueId()) ? getCommand(Constants.helpCommand) : getCommand(Constants.enableCommand));
+                if(subCommand != null) {
+                    subCommand.execute(commandSender, args);
+                    return true;
+                }
+            } else { // If we received an argument, we want to try to authenticate the user
+                if(main.getAuthHandler().getAuthState(player.getUniqueId()).equals(AuthHandler.AuthState.PENDING_LOGIN)) {
+                    loginCommand.execute(player, args);
+                    return false;
+                } else if(main.getAuthHandler().isPendingSetup(player.getUniqueId())) {
+                    setupCommand.execute(player, args);
+                    return false;
+                }
             }
         }
 

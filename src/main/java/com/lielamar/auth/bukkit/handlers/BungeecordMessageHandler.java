@@ -15,6 +15,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import javax.annotation.Nonnull;
 import java.io.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,14 +33,18 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
         Bukkit.getScheduler().runTaskTimerAsynchronously(main, () -> {
             long currentTimestamp = System.currentTimeMillis();
 
-            callbackFunctions.keySet().forEach(key -> {
-                Callback value = callbackFunctions.get(key);
+            Iterator<UUID> iterator = callbackFunctions.keySet().iterator();
+            UUID key;
+            Callback value;
+            while(iterator.hasNext()) {
+                key = iterator.next();
+                value = callbackFunctions.get(key);
 
-                if(callbackFunctions.get(key) != null) {
+                if(value != null) {
                     if((currentTimestamp - value.getExecutionStamp())/1000 > 15)
                         callbackFunctions.remove(key);
                 }
-            });
+            }
         }, 300L, 300L);
     }
 
