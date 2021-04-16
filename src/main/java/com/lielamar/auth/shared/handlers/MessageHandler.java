@@ -67,7 +67,7 @@ public abstract class MessageHandler {
         SOMETHING_WENT_WRONG("&cSomething went wrong. Please contact a Staff Member!"),
         HELP_HEADER("&7----- &b2FA &7-----"),
         HELP_COMMAND("&7\u2022 &b%command% &e%aliases%&7: %description%"),
-        HELP_FOOTER("----- -------- -----"),
+        HELP_FOOTER("&7----- -------- -----"),
         DESCRIPTION_OF_DISABLE_COMMAND("Disables 2FA"),
         DESCRIPTION_OF_DISABLE_OTHERS_COMMAND("Disable 2FA for other users"),
         DESCRIPTION_OF_ENABLE_COMMAND("Enables 2FA"),

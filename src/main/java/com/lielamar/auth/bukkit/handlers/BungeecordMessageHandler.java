@@ -197,7 +197,7 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
 
                 Callback callback = this.callbackFunctions.getOrDefault(messageUUID, null);
                 if(callback != null) callback.execute();
-            } catch (IOException exception) {
+            } catch (IOException | IllegalArgumentException exception) {
                 exception.printStackTrace();
             }
         }

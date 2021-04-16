@@ -332,7 +332,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     if(player.getInventory().firstEmpty() != -1) {
                         ItemStack oldItem = null;
 
-                        if(player.getInventory().firstEmpty() != 0)
+                        if(player.getInventory().firstEmpty() > 9)
                             oldItem = player.getInventory().getItem(0);
                         player.getInventory().setItem(0, mapItem);
 
@@ -437,9 +437,13 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
          * @param callback   Callback function to execute after the AuthState is fully loaded.
          */
         public void loadPlayerAuthState(Player player, Callback callback) {
+            AuthState defaultState = getAuthState(player.getUniqueId());
+
             if(isBungeecord) {
-                AuthState defaultState = getAuthState(player.getUniqueId());
                 main.getPluginMessageListener().getBungeeCordAuthState(player.getUniqueId(), (defaultState == null ? AuthState.DISABLED : defaultState), callback);
+            } else {
+                changeState(player.getUniqueId(), (defaultState == null ? AuthState.DISABLED : defaultState));
+                callback.execute();
             }
         }
 
