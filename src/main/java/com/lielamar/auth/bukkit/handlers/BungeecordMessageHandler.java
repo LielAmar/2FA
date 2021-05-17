@@ -101,7 +101,7 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
         Player player = Bukkit.getPlayer(uuid);
 
         if(player != null && player.isOnline())
-            player.sendPluginMessage(this.main, super.channelName, msg.toByteArray());
+            player.sendPluginMessage(this.main, channelName, msg.toByteArray());
     }
 
 
@@ -113,7 +113,8 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
      */
     public UUID attachCallbackFunction(Callback callback) {
         UUID randomUUID = UUID.randomUUID();
-        this.callbackFunctions.put(randomUUID, callback);
+        if(callback != null)
+            this.callbackFunctions.put(randomUUID, callback);
         return randomUUID;
     }
 
@@ -163,6 +164,18 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
     }
 
 
+    public void loadBungeecord(UUID uuid, Callback callback) {
+        ByteArrayDataOutput msg = ByteStreams.newDataOutput();
+        this.setMessageHeader(msg, uuid, callback);
+
+        ByteArrayOutputStream msgBody = new ByteArrayOutputStream();
+        this.setMessageBody(msgBody, MessageAction.LOAD_BUNGEECORD);
+        this.applyMessageBody(msg, msgBody);
+
+        sendMessage(uuid, msg);
+    }
+
+
     /**
      * Handles the responses from BungeeCord for the above methods
      *
@@ -173,10 +186,11 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
     @Override
     public void onPluginMessageReceived(String channel, @Nonnull Player player, @Nonnull byte[] message) {
         // If the Channel name is not the 2FA's Channel name we want to return
-        if(!channel.equals(super.channelName)) return;
+        if(!channel.equals(channelName)) return;
 
         ByteArrayDataInput response = ByteStreams.newDataInput(message);
         String subChannel = response.readUTF();
+
         UUID messageUUID = UUID.fromString(response.readUTF());
         UUID playerUUID = UUID.fromString(response.readUTF());
 
@@ -189,6 +203,10 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
             DataInputStream msgBodyData = new DataInputStream(new ByteArrayInputStream(msgBody));
             try {
                 MessageAction action = MessageAction.valueOf(msgBodyData.readUTF());
+
+                // If the Bungeecord server sends us a "Load Bungeecord" message, we set bungeecord to true.
+                if(action == MessageAction.LOAD_BUNGEECORD)
+                    this.main.getAuthHandler().isBungeecordEnabled = true;
 
                 if(action == MessageAction.GET_STATE) {
                     AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());

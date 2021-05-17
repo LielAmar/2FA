@@ -44,6 +44,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     protected final TwoFactorAuthentication main;
     protected final ExtraAuthHandler extraAuthHandler;
 
+    public boolean isBungeecordEnabled;
+    public boolean loadedBungeecord;
+
     protected Map<Integer, Long> lastMapIdUse;
 
     protected int version;
@@ -52,6 +55,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public AuthHandler(TwoFactorAuthentication main) {
         this.main = main;
         this.extraAuthHandler = new ExtraAuthHandler();
+
+        this.isBungeecordEnabled = false;
+        this.loadedBungeecord = false;
 
         this.lastMapIdUse = new HashMap<>();
         for(int i : main.getConfigHandler().getMapIDs()) lastMapIdUse.put(i, -1L);
@@ -108,6 +114,33 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public void playerJoin(UUID uuid) {
         super.playerJoin(uuid);
 
+        // Loading players when they join, regardless of anything
+        handlePlayerJoin(uuid);
+
+        // If it's the first log in to the server, we also want to load bungeecord.
+        // If bungeecord loaded successfully, the provided Callback is being called, which is loading the player again.
+        if(SpigotConfig.bungee && !loadedBungeecord) {
+            loadedBungeecord = true;
+
+            final long currentTimestamp = System.currentTimeMillis();
+
+            Bukkit.getScheduler().runTaskLater(this.main, () -> {
+                this.main.getPluginMessageListener().loadBungeecord(uuid, new Callback() {
+                    public void execute() {
+                        handlePlayerJoin(uuid);
+                    }
+                    public long getExecutionStamp() { return currentTimestamp; }
+                });
+            }, 1L);
+        }
+    }
+
+    /**
+     * A util method to handle the player join event. It removes the map copies from their inventory, loads their auth state (from either spigot/bungeecord), etc.
+     *
+     * @param uuid   UUID of the player to handle
+     */
+    private void handlePlayerJoin(UUID uuid) {
         // The reason there's a 1 tick delay before every message is that if you send a ChannelMessage too fast, sometimes bungeecord doesn't register the message.
         Bukkit.getScheduler().runTaskLater(this.main, () -> {
             Player player = Bukkit.getPlayer(uuid);
@@ -151,7 +184,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                                 main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
                             }
                         }
-                    // Else, we will try to auto authenticate them
+                        // Else, we will try to auto authenticate them
                     } else {
                         extraAuthHandler.autoAuthenticate(player);
                     }
@@ -160,6 +193,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             });
         }, 1L);
     }
+
 
     @Override
     public void changeState(UUID uuid, AuthState authState) {
@@ -413,20 +447,13 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      * Inner class to handle BungeeCord communication
      */
     public class ExtraAuthHandler {
-
-        private final boolean isBungeecord;
-
-        public ExtraAuthHandler() {
-            this.isBungeecord = SpigotConfig.bungee && !Bukkit.getServer().getOnlineMode();
-        }
-
         /**
          * Updates the player's AuthState on the Bungeecord Server
          *
          * @param player   Player to update BungeeCord AuthState of
          */
         public void updatePlayersBungeecordAuthState(Player player) {
-            if(isBungeecord)
+            if(isBungeecordEnabled)
                 main.getPluginMessageListener().setBungeeCordAuthState(player.getUniqueId(), getAuthState(player.getUniqueId()));
         }
 
@@ -439,7 +466,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         public void loadPlayerAuthState(Player player, Callback callback) {
             AuthState defaultState = getAuthState(player.getUniqueId());
 
-            if(isBungeecord) {
+            if(isBungeecordEnabled) {
                 main.getPluginMessageListener().getBungeeCordAuthState(player.getUniqueId(), (defaultState == null ? AuthState.DISABLED : defaultState), callback);
             } else {
                 changeState(player.getUniqueId(), (defaultState == null ? AuthState.DISABLED : defaultState));
@@ -453,7 +480,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
          * @param player   Player to auto authenticate
          */
         public void autoAuthenticate(Player player) {
-            if(isBungeecord) bungeecordAutoAuthenticate(player);
+            if(isBungeecordEnabled) bungeecordAutoAuthenticate(player);
             else spigotAutoAuthenticate(player);
         }
 

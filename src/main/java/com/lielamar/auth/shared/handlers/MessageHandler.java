@@ -72,7 +72,8 @@ public abstract class MessageHandler {
         DESCRIPTION_OF_DISABLE_OTHERS_COMMAND("Disable 2FA for other users"),
         DESCRIPTION_OF_ENABLE_COMMAND("Enables 2FA"),
         DESCRIPTION_OF_HELP_COMMAND("Shows the Help Menu of the 2FA Plugin"),
-        DESCRIPTION_OF_RELOAD_COMMAND("Reloads the Config");
+        DESCRIPTION_OF_RELOAD_COMMAND("Reloads the Config"),
+        DESCRIPTION_OF_PRINT_INFO_COMMAND("Prints useful info about the plugin");
 
         private String message;
 

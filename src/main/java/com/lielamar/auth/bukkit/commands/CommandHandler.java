@@ -37,6 +37,7 @@ public class CommandHandler implements CommandExecutor {
         commands.add(new EnableCommand(Constants.enableCommand, main));
         commands.add(new DisableCommand(Constants.disableCommand, main));
         commands.add(new ReloadCommand(Constants.reloadCommand, main));
+        commands.add(new ReportCommand(Constants.reportCommand, main));
         commands.add(new HelpCommand(Constants.helpCommand, main, commands));
     }
 

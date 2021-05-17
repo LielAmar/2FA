@@ -6,6 +6,7 @@ public abstract class PluginMessagingHandler {
     protected final String subChannelName = "ForwardToPlayer";
 
     protected enum MessageAction {
+        LOAD_BUNGEECORD,
         GET_STATE,
         SET_STATE
     }

@@ -28,7 +28,7 @@ public class OnPluginMessage extends PluginMessagingHandler implements Listener 
     @EventHandler
     public void onQueryReceive(PluginMessageEvent event) {
         // If the Channel name is not the 2FA's Channel name we want to return
-        if(!event.getTag().equals(super.channelName)) return;
+        if(!event.getTag().equals(channelName)) return;
 
         ByteArrayDataInput msg = ByteStreams.newDataInput(event.getData());
         String subChannel = msg.readUTF();
@@ -57,8 +57,6 @@ public class OnPluginMessage extends PluginMessagingHandler implements Listener 
                     AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
 
                     main.getAuthHandler().changeState(player.getUniqueId(), state);
-                } else {
-                    return;
                 }
 
                 sendResponse(messageUUID, player, action);
@@ -95,6 +93,6 @@ public class OnPluginMessage extends PluginMessagingHandler implements Listener 
         response.writeShort(msgBody.toByteArray().length);
         response.write(msgBody.toByteArray());
 
-        player.getServer().getInfo().sendData(super.channelName, response.toByteArray());
+        player.getServer().getInfo().sendData(channelName, response.toByteArray());
     }
 }
