@@ -40,7 +40,7 @@ public class MySQLStorage extends StorageHandler {
             if(isValidConnection()) throw new IllegalStateException("A MySQL instance already exists for the following database: " + this.database);
 
             Class.forName("com.mysql.jdbc.Driver");
-            this.connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s", this.host, this.port, this.database), this.username, this.password);
+            this.connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?autoReconnect=true", this.host, this.port, this.database), this.username, this.password);
             this.createTables();
         }
     }
