@@ -1,8 +1,7 @@
 # 2 Factor Authentication
 
-[<img alt="spigot" src="https://lielamar.com/plugins/github_spigot.png" size=1.5>](https://www.spigotmc.org/resources/2-factor-authentication-bungeecord-json-mysql-mongodb.85594/)
-<br>[<img alt="discord" src="https://lielamar.com/plugins/github_discord.png" size=1.5>](https://discord.gg/NzgBrqR)
-
+[![Discord](https://img.shields.io/discord/416652224505184276?color=%235865F2&label=Join%20My%20Discord)](https://discord.gg/NzgBrqR)
+[![Spigot](https://img.shields.io/badge/dynamic/json?color=yellow&label=Check%20it%20on%20Spigot&query=downloads&suffix=%20Downloads&url=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F85594)](https://www.spigotmc.org/resources/85594/)
 
 ## Information
 2FA is a Spigot/Paper plugin, with BungeeCord support.
