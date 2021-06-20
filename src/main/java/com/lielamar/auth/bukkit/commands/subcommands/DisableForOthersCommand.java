@@ -1,6 +1,8 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.lielamar.lielsutils.commands.Command;
 import com.lielamar.lielsutils.modules.Pair;
@@ -65,5 +67,13 @@ public class DisableForOthersCommand extends Command {
                 }
             });
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender commandSender, String[] args) {
+        if(!hasPermissions(commandSender))
+            return null;
+
+        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
     }
 }

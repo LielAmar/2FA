@@ -8,13 +8,17 @@ import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.commands.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class CommandHandler implements CommandExecutor {
+public class CommandHandler implements CommandExecutor, TabCompleter {
 
     private final TwoFactorAuthentication main;
     private final Set<Command> commands;
@@ -23,6 +27,7 @@ public class CommandHandler implements CommandExecutor {
     public CommandHandler(TwoFactorAuthentication main) {
         this.main = main;
         this.main.getCommand(Constants.mainCommand).setExecutor(this);
+        this.main.getCommand(Constants.mainCommand).setTabCompleter(this);
 
         this.commands = new HashSet<>();
         this.setupCommands();
@@ -66,6 +71,11 @@ public class CommandHandler implements CommandExecutor {
 
     @Override
     public boolean onCommand(@Nonnull CommandSender commandSender, @Nonnull org.bukkit.command.Command cmd, @Nonnull String cmdLabel, @Nonnull String[] args) {
+        if(!commandSender.hasPermission("2fa.use")) {
+            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+            return false;
+        }
+
         if(commandSender instanceof Player) {
             Player player = (Player) commandSender;
 
@@ -106,5 +116,50 @@ public class CommandHandler implements CommandExecutor {
         }
 
         return false;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender commandSender, org.bukkit.command.Command cmd, String cmdLabel, String[] args) {
+        if(!commandSender.hasPermission("2fa.use"))
+            return null;
+
+        // if we don't have any arguments we want to return a list of all sub commands the sender has permissions to
+        if(args.length == 0)
+            return commands.stream().filter(subCommand -> subCommand.hasPermissions(commandSender)).map(Command::getName).collect(Collectors.toList());
+
+        Command subCommand = getCommand(args[0]);
+
+        // If we don't have a subCommand matching the given argument, we want to return a list of all sub commands the sender has permissions to
+        // and their name/one of their aliases contains the given argument value.
+        // Example: if the input is "dis" we want to return the list: [disable] if the sender has permissions for this command
+        if(subCommand == null) {
+
+            return commands.stream()
+                    // Filtering only the commands the sender has permissions to
+                    .filter(subCmd -> subCmd.hasPermissions(commandSender))
+
+                    // Mapping only commands that their name/one of their aliases match the argument
+                    .map(subCmd -> {
+                        if(subCmd.getName().toLowerCase().contains(args[0].toLowerCase()))
+                            return subCmd.getName();
+
+                        List<String> aliases = Arrays.stream(subCmd.getAliases())
+                                .filter(subCmdAlias -> subCmdAlias.toLowerCase().contains(args[0].toLowerCase()))
+                                .collect(Collectors.toList());
+
+                        if(aliases.size() != 0)
+                            return aliases.get(0);
+
+                        return "";
+                    })
+                    // Collecting the result
+                    .collect(Collectors.toList());
+        }
+
+        // If we have a matching subCommand, we want to trim down the arguments array from the first argument, and then call the subCommand #onTabComplete to handle the event
+        String[] arguments = new String[args.length-1];
+        System.arraycopy(args, 1, arguments, 0, arguments.length);
+
+        return subCommand.onTabComplete(commandSender, arguments);
     }
 }

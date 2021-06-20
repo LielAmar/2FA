@@ -7,6 +7,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class DisableCommand extends Command {
 
     private final TwoFactorAuthentication main;
@@ -56,5 +58,16 @@ public class DisableCommand extends Command {
         } else {
             disableForOthersCommand.execute(commandSender, targets);
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender commandSender, String[] args) {
+        if(!hasPermissions(commandSender))
+            return null;
+
+        if(args.length != 0)
+            return disableForOthersCommand.onTabComplete(commandSender, args);
+
+        return null;
     }
 }
