@@ -86,13 +86,15 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
                 main.getAuthHandler().playerJoin(player.getUniqueId());
             }
 
-            if(args.length == 0) { // If we don't receive an argument we want to either execute the help command if they have 2fa setup, or execute the setup (enable) command if they don't have it setup.
+            // If we don't receive an argument we want to either execute the help command if they have 2fa setup, or execute the setup (enable) command if they don't have it setup.
+            if(args.length == 0) {
                 Command subCommand = (main.getAuthHandler().is2FAEnabled(player.getUniqueId()) ? getCommand(Constants.helpCommand) : getCommand(Constants.enableCommand));
                 if(subCommand != null) {
                     subCommand.execute(commandSender, args);
                     return true;
                 }
-            } else { // If we received an argument, we want to try to authenticate the user
+            // If we received an argument, we want to try to authenticate the user
+            } else {
                 if(main.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_LOGIN) {
                     loginCommand.execute(player, args);
                     return false;

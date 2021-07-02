@@ -7,10 +7,6 @@ import net.md_5.bungee.api.plugin.Event;
 
 public class PlayerStateChangeEvent extends Event implements Cancellable {
 
-    /**
-     * This class was originally written by Connor Linfoot (https://github.com/ConnorLinfoot/MC2FA).
-     */
-
     private final ProxiedPlayer player;
     private boolean cancelled = false;
     private AuthHandler.AuthState authState;

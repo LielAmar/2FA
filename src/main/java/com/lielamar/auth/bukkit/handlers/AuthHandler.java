@@ -114,25 +114,19 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public void playerJoin(UUID uuid) {
         super.playerJoin(uuid);
 
-        // Loading players when they join, regardless of anything
-        handlePlayerJoin(uuid);
-
-        // If it's the first log in to the server, we also want to load bungeecord.
-        // If bungeecord loaded successfully, the provided Callback is being called, which is loading the player again.
+        // If no player has joined the server yet, meaning there was no opportunity to check if the server is using bungeecord
+        //   * we check if the server is using bungeecord by sending a message to bungeecord and expecting a response. Once we get a response we know the server is using bungeecord
+        // then we want to firstly send the #loadBungeecord message to bungeecord, and only then load the player.
+        // If bungeecord was already loaded (we know this through loadedBungeecord, which changes to true after the initial load), we only want to load the player because we already know whether
+        // the server is using bungeecord or not.
         if(SpigotConfig.bungee && !loadedBungeecord) {
             loadedBungeecord = true;
 
-            final long currentTimestamp = System.currentTimeMillis();
-
-            Bukkit.getScheduler().runTaskLater(this.main, () -> {
-                this.main.getPluginMessageListener().loadBungeecord(uuid, new Callback() {
-                    public void execute() {
-                        handlePlayerJoin(uuid);
-                    }
-                    public long getExecutionStamp() { return currentTimestamp; }
-                });
-            }, 1L);
+            Bukkit.getScheduler().runTaskLater(this.main, () -> this.main.getPluginMessageListener().loadBungeecord(uuid, null), 1L);
         }
+
+        // Loading the player, only after the above code is done executing (since it's not async).
+        handlePlayerJoin(uuid);
     }
 
     /**
