@@ -1,7 +1,6 @@
 package com.lielamar.auth.shared.storage.mongodb;
 
 import com.lielamar.auth.shared.storage.StorageHandler;
-import com.lielamar.auth.shared.storage.StorageType;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -70,7 +69,7 @@ public class MongoDBStorage extends StorageHandler {
             this.mongoCollection.insertOne(insertDocument);
         } else {
             playerDocument.put("key", key);
-            this.mongoCollection.updateOne(query, playerDocument);
+            this.mongoCollection.updateOne(query, new Document("$set", playerDocument));
         }
 
         return key;
@@ -109,7 +108,7 @@ public class MongoDBStorage extends StorageHandler {
             this.mongoCollection.insertOne(insertDocument);
         } else {
             playerDocument.put("ip", ip);
-            this.mongoCollection.updateOne(query, playerDocument);
+            this.mongoCollection.updateOne(query, new Document("$set", playerDocument));
         }
 
         return ip;

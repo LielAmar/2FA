@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -47,6 +47,8 @@
                                     <include>org.json:json**</include>
                                     <include>com.warrenstrange:googleauth**</include>
                                     <include>commons-codec:commons-codec**</include>
+                                    <include>org.mongodb:mongodb-driver**</include>
+                                    <include>org.mongodb:bson**</include>
                                 </includes>
                             </artifactSet>
 
@@ -141,7 +143,14 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
             <version>3.12.7</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <version>4.3.0-beta4</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
