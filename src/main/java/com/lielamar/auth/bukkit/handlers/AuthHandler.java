@@ -356,17 +356,27 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         mapItem.setItemMeta(meta);
                     }
 
-                    // If inventory is not full
-                    if(player.getInventory().firstEmpty() != -1) {
-                        ItemStack oldItem = null;
+                    // If the inventory is full we don't want to remove any of the player's items, but rather tell them to use the clickable message
+                    // to authenticate
+                    // otherwise, we want to add the map with the qr code to their first available hotbar slot and move the item in that slot.
+                    if(player.getInventory().firstEmpty() == -1) {
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVENTORY_FULL_USE_CLICKABLE_MESSAGE);
+                    } else {
+                        int availableFirstSlot = player.getInventory().firstEmpty();
 
-                        if(player.getInventory().firstEmpty() > 9)
-                            oldItem = player.getInventory().getItem(0);
-                        player.getInventory().setItem(0, mapItem);
+                        if(availableFirstSlot > 8) {
+                            ItemStack oldItem = player.getInventory().firstEmpty() != 0 ? player.getInventory().getItem(0) : null;
 
-                        if(oldItem != null)
-                            player.getInventory().addItem(oldItem);
-                        player.getInventory().setHeldItemSlot(0);
+                            player.getInventory().setItem(0, mapItem);
+
+                            if(oldItem != null)
+                                player.getInventory().addItem(oldItem);
+
+                            player.getInventory().setHeldItemSlot(0);
+                        } else {
+                            player.getInventory().setItem(availableFirstSlot, mapItem);
+                            player.getInventory().setHeldItemSlot(availableFirstSlot);
+                        }
                     }
 
                     sendClickableMessage(player, ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()), url.replaceAll("128x128", "256x256"));
@@ -393,7 +403,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         if(lastMapIdUse.size() < main.getConfigHandler().getAmountOfReservedMaps()) {
             mapView = Bukkit.createMap(world);
-            main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add((version >= 13) ? mapView.getId() : SpigotUtils.getMapID(mapView)));
+            main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add((int) SpigotUtils.getMapID(mapView)));
         } else {
             int mapIdWithLongestTime = -1;
             long currentTimeMillis = System.currentTimeMillis();
@@ -403,12 +413,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     mapIdWithLongestTime = i;
             }
 
-            mapView = Bukkit.getMap(mapIdWithLongestTime);
+            mapView = Bukkit.getMap((short) mapIdWithLongestTime);
         }
 
         if(mapView == null) return null;
 
-        lastMapIdUse.put((version >= 13) ? mapView.getId() : SpigotUtils.getMapID(mapView), System.currentTimeMillis());
+        lastMapIdUse.put((int) SpigotUtils.getMapID(mapView), System.currentTimeMillis());
 
         return mapView;
     }

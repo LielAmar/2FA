@@ -44,7 +44,10 @@ public class EnableCommand extends Command {
                 Player player = (Player) commandSender;
 
                 if(main.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.DISABLED) {
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GENERATING_KEY);
                     main.getAuthHandler().createKey(player.getUniqueId());
+                } else if(main.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_SETUP) {
+                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.ALREADY_IN_SETUP_MODE);
                 } else {
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.ALREADY_SETUP);
                 }
