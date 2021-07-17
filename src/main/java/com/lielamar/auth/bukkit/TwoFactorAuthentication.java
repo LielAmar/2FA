@@ -1,6 +1,7 @@
 package com.lielamar.auth.bukkit;
 
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
+import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.lielsutils.bstats.MetricsSpigot;
 import com.lielamar.auth.bukkit.commands.CommandHandler;
 import com.lielamar.auth.bukkit.handlers.AuthHandler;
@@ -19,8 +20,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class TwoFactorAuthentication extends JavaPlugin {
 
     private BungeecordMessageHandler pluginMessageListener;
+
     private MessageHandler messageHandler;
     private ConfigHandler configHandler;
+    private StorageHandler storageHandler;
     private AuthHandler authHandler;
     private CommandHandler commandHandler;
 
@@ -28,27 +31,28 @@ public class TwoFactorAuthentication extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
-        if(getConfig().getBoolean("Check For Updates"))
-            new UpdateChecker(this, 85594).checkForUpdates();
+        new DependencyManager(this);
 
         this.setupAuth();
-        this.setupBStats();
         this.registerListeners();
+        this.setupBStats();
+        this.setupUpdateChecker();
 
+        // Applying 2fa for online players
         for(Player pl : Bukkit.getOnlinePlayers())
             this.authHandler.playerJoin(pl.getUniqueId());
     }
 
+
     public void setupAuth() {
         this.messageHandler = new MessageHandler(this);
         this.configHandler = new ConfigHandler(this);
+        this.storageHandler = StorageHandler.loadStorageHandler(this.configHandler, getDataFolder().getAbsolutePath());
         this.authHandler = new AuthHandler(this);
-
-        if(commandHandler == null)
-            this.commandHandler = new CommandHandler(this);
+        this.commandHandler = new CommandHandler(this);
     }
 
-    public void setupBStats() {
+    private void setupBStats() {
         int pluginId = 9355;
         MetricsSpigot metrics = new MetricsSpigot(this, pluginId);
 
@@ -59,7 +63,13 @@ public class TwoFactorAuthentication extends JavaPlugin {
         }));
     }
 
-    public void registerListeners() {
+    private void setupUpdateChecker() {
+        // Whether the plugin should check for updates
+        if(this.configHandler.shouldCheckForUpdates())
+            new UpdateChecker(this, 85594).checkForUpdates();
+    }
+
+    private void registerListeners() {
         PluginManager pm = Bukkit.getPluginManager();
 
         pm.registerEvents(new OnAuthStateChange(), this);
@@ -71,8 +81,11 @@ public class TwoFactorAuthentication extends JavaPlugin {
         getServer().getMessenger().registerIncomingPluginChannel(this, PluginMessagingHandler.channelName, pluginMessageListener);
     }
 
+
     public BungeecordMessageHandler getPluginMessageListener() { return this.pluginMessageListener; }
     public MessageHandler getMessageHandler() { return this.messageHandler; }
     public ConfigHandler getConfigHandler() { return this.configHandler; }
+    public StorageHandler getStorageHandler() { return this.storageHandler; }
     public AuthHandler getAuthHandler() { return this.authHandler; }
+    public CommandHandler getCommandHandler() { return this.commandHandler; }
 }

@@ -1,6 +1,7 @@
 package com.lielamar.auth.shared.handlers;
 
 import com.lielamar.lielsutils.modules.Pair;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class MessageHandler {
 
@@ -80,7 +81,7 @@ public abstract class MessageHandler {
 
         private String message;
 
-        TwoFAMessages(final String message) {
+        TwoFAMessages(@NotNull final String message) {
             this.message = message;
         }
 

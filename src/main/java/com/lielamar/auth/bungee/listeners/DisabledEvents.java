@@ -25,7 +25,7 @@ public class DisabledEvents implements Listener {
 
         if(this.main.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
             String[] args = event.getMessage().substring(1).split("\\s+");
-            if(this.main.getConfigHandler().isCommandsDisabled()) {
+            if(this.main.getConfigHandler().isDisableCommands()) {
                 if(args.length > 0) {
                     String command = args[0];
                     if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.equalsIgnoreCase(command)) {

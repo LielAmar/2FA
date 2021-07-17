@@ -8,6 +8,7 @@ import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.commands.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
@@ -26,8 +27,12 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 
     public CommandHandler(TwoFactorAuthentication main) {
         this.main = main;
-        this.main.getCommand(Constants.mainCommand).setExecutor(this);
-        this.main.getCommand(Constants.mainCommand).setTabCompleter(this);
+
+        PluginCommand pluginCommand = this.main.getCommand(Constants.mainCommand);
+        if(pluginCommand != null) {
+            pluginCommand.setExecutor(this);
+            pluginCommand.setTabCompleter(this);
+        }
 
         this.commands = new HashSet<>();
         this.setupCommands();

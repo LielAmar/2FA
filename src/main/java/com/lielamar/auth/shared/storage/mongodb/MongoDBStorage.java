@@ -13,22 +13,27 @@ public class MongoDBStorage extends StorageHandler {
     private MongoClient mongoClient;
     private MongoCollection<Document> mongoCollection;
 
-    private final String uri;
     private final String host;
     private final String database;
     private final int port;
     private final String username;
     private final String password;
-    private final boolean requiredAuth;
 
-    public MongoDBStorage(String uri, String host, String database, String username, String password, int port, boolean requiredAuth) {
-        this.uri = uri;
+    private final String uri;
+
+    private final String fullPlayersCollectionName;
+
+    public MongoDBStorage(String host, String database, String username, String password, int port,
+                          String collectionPrefix, String uri) {
         this.host = host;
         this.database = database;
         this.port = port;
         this.username = username;
         this.password = password;
-        this.requiredAuth = requiredAuth;
+
+        this.uri = uri;
+
+        this.fullPlayersCollectionName = collectionPrefix + "players";
 
         openConnection();
     }
@@ -40,11 +45,11 @@ public class MongoDBStorage extends StorageHandler {
         if(this.mongoClient != null)
             throw new IllegalStateException("A MongoDB instance already exists for the following database: " + this.database);
 
-        if(!this.uri.equalsIgnoreCase("null")) {
+        if(this.uri.length() > 0) {
             MongoClientURI uri = new MongoClientURI(this.uri);
             this.mongoClient = new MongoClient(uri);
         } else {
-            if(this.requiredAuth) {
+            if(this.username.length() > 0 && this.password.length() > 0) {
                 MongoCredential credential = MongoCredential.createCredential(this.username, this.database, this.password.toCharArray());
                 this.mongoClient = new MongoClient(new ServerAddress(this.host, this.port), credential, MongoClientOptions.builder().build());
             } else {
@@ -53,7 +58,7 @@ public class MongoDBStorage extends StorageHandler {
         }
 
         MongoDatabase mongoDatabase = mongoClient.getDatabase(this.database);
-        this.mongoCollection = mongoDatabase.getCollection("players");
+        this.mongoCollection = mongoDatabase.getCollection(fullPlayersCollectionName);
     }
 
 

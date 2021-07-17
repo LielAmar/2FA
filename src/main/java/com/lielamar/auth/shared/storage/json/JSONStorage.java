@@ -1,7 +1,6 @@
 package com.lielamar.auth.shared.storage.json;
 
 import com.lielamar.auth.shared.storage.StorageHandler;
-import com.lielamar.auth.shared.storage.StorageType;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -12,7 +11,7 @@ public class JSONStorage extends StorageHandler {
     private final File dir;
 
     public JSONStorage(String path) {
-        this.dir = new File(path + "/auth/");
+        this.dir = new File(path + "/players/");
         this.dir.mkdir();
     }
 
@@ -37,8 +36,8 @@ public class JSONStorage extends StorageHandler {
         File file = new File(this.dir, uuid.toString() + ".json");
 
         try {
-            if (!file.exists()) {
-                if (file.createNewFile()) {
+            if(!file.exists()) {
+                if(file.createNewFile()) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("key", JSONObject.NULL);
                     jsonObject.put("ip", JSONObject.NULL);
@@ -47,16 +46,16 @@ public class JSONStorage extends StorageHandler {
             } else {
                 JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
                 boolean changed = false;
-                if (!jsonObject.has("key")) {
+                if(!jsonObject.has("key")) {
                     jsonObject.put("key", JSONObject.NULL);
                     changed = true;
                 }
-                if (!jsonObject.has("ip")) {
+                if(!jsonObject.has("ip")) {
                     jsonObject.put("ip", JSONObject.NULL);
                     changed = true;
                 }
 
-                if (changed)
+                if(changed)
                     JSONUtils.write(jsonObject, new FileOutputStream(file));
             }
         } catch (IOException exception) {
@@ -72,13 +71,13 @@ public class JSONStorage extends StorageHandler {
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if (key == null) jsonObject.put("key", JSONObject.NULL);
+            if(key == null) jsonObject.put("key", JSONObject.NULL);
             else jsonObject.put("key", key);
 
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
             return key;
-        } catch (IOException exception) {
+        } catch(IOException exception) {
             exception.printStackTrace();
         }
         return null;
@@ -90,12 +89,12 @@ public class JSONStorage extends StorageHandler {
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if (!jsonObject.has("key")) return null;
+            if(!jsonObject.has("key")) return null;
             Object key = jsonObject.get("key");
-            if (key == JSONObject.NULL) return null;
+            if(key == JSONObject.NULL) return null;
 
             return key.toString();
-        } catch (IOException exception) {
+        } catch(IOException exception) {
             exception.printStackTrace();
         }
         return null;
@@ -118,13 +117,13 @@ public class JSONStorage extends StorageHandler {
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if (ip == null) jsonObject.put("ip", JSONObject.NULL);
+            if(ip == null) jsonObject.put("ip", JSONObject.NULL);
             else jsonObject.put("ip", ip);
 
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
             return ip;
-        } catch (IOException exception) {
+        } catch(IOException exception) {
             exception.printStackTrace();
         }
         return null;
@@ -136,9 +135,9 @@ public class JSONStorage extends StorageHandler {
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if (!jsonObject.has("ip")) return null;
+            if(!jsonObject.has("ip")) return null;
             Object ip = jsonObject.get("ip");
-            if (ip == JSONObject.NULL) return null;
+            if(ip == JSONObject.NULL) return null;
 
             return ip.toString();
         } catch (IOException exception) {

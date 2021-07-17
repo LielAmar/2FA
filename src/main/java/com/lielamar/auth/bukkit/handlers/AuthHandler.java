@@ -5,10 +5,6 @@ import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
 import com.lielamar.auth.bukkit.utils.ImageRender;
 import com.lielamar.auth.shared.handlers.Callback;
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.shared.storage.StorageType;
-import com.lielamar.auth.shared.storage.json.JSONStorage;
-import com.lielamar.auth.shared.storage.mongodb.MongoDBStorage;
-import com.lielamar.auth.shared.storage.mysql.MySQLStorage;
 import com.lielamar.auth.shared.utils.hash.Hash;
 import com.lielamar.auth.shared.utils.hash.NoHash;
 import com.lielamar.auth.shared.utils.hash.SHA256;
@@ -19,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -54,6 +49,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     public AuthHandler(TwoFactorAuthentication main) {
         this.main = main;
+        super.storageHandler = this.main.getStorageHandler();
+
         this.extraAuthHandler = new ExtraAuthHandler();
 
         this.isBungeecordEnabled = false;
@@ -65,7 +62,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         this.version = SpigotUtils.getVersion(Bukkit.getVersion().split("MC: 1.")[1]);
 
         loadHashType();
-        loadStorageHandler();
     }
 
     @Override
@@ -173,7 +169,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                             createKey(player.getUniqueId());
                             changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
                         } else {
-                            if(main.getConfigHandler().is2FAAdvised()) {
+                            if(main.getConfigHandler().shouldAdvise2FA()) {
                                 main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
                                 main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
                             }
@@ -236,7 +232,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      * Loads the hash type (SHA-256, SHA-512, No Hash)
      */
     private void loadHashType() {
-        String hashType = main.getConfigHandler().getHashType();
+        String hashType = main.getConfigHandler().getIpHashType();
 
         switch (hashType.toUpperCase()) {
             case "SHA256":
@@ -250,46 +246,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 break;
         }
     }
-
-    /**
-     * Loads the storage handler (JSON, MySQL, MongoDB)
-     */
-    private void loadStorageHandler() {
-        StorageType storageType = main.getConfigHandler().getStorageType();
-
-        if(storageType == StorageType.MYSQL) {
-            ConfigurationSection mysql = main.getConfig().getConfigurationSection("MySQL");
-
-            if(mysql != null) {
-                String host = mysql.getString("credentials.host");
-                String database = mysql.getString("credentials.database");
-                String username = mysql.getString("credentials.auth.username");
-                String password = mysql.getString("credentials.auth.password");
-                int port = mysql.getInt("credentials.port");
-
-                this.storageHandler = new MySQLStorage(host, database, username, password, port);
-            }
-        } else if(storageType == StorageType.MONGODB) {
-            ConfigurationSection mongodb = main.getConfig().getConfigurationSection("MongoDB");
-
-            if(mongodb != null) {
-                String uri = mongodb.getString("credentials.uri");
-                String host = mongodb.getString("credentials.host");
-                String database = mongodb.getString("credentials.database");
-                String username = mongodb.getString("credentials.auth.username");
-                String password = mongodb.getString("credentials.auth.password");
-                int port = mongodb.getInt("credentials.port");
-                boolean requiredAuth = mongodb.getBoolean("credentials.auth.required");
-
-                this.storageHandler = new MongoDBStorage(uri, host, database, username, password, port, requiredAuth);
-            }
-        }
-
-        if(this.storageHandler == null) {
-            this.storageHandler = new JSONStorage(this.main.getDataFolder().getAbsolutePath());
-        }
-    }
-
 
     /**
      * Updates a player's ip in the database
@@ -507,8 +463,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 boolean hasIPChanged = getStorageHandler().getIP(player.getUniqueId()) == null
                         || !getStorageHandler().getIP(player.getUniqueId()).equalsIgnoreCase(ip);
 
-                boolean isRequiredDueToIPChange = main.getConfigHandler().isRequiredOnIPChange() && hasIPChanged;
-                boolean isRequiredOnEveryJoin = main.getConfigHandler().isRequiredOnEveryLogin();
+                boolean isRequiredDueToIPChange = main.getConfigHandler().shouldRequiredOnIPChange() && hasIPChanged;
+                boolean isRequiredOnEveryJoin = main.getConfigHandler().shouldRequiredOnEveryLogin();
 
                 if(!isRequiredDueToIPChange && !isRequiredOnEveryJoin) {
                     changeState(player.getUniqueId(), AuthState.AUTHENTICATED);

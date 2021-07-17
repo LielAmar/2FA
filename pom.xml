@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.3.4</version>
+    <version>1.4.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,33 +43,12 @@
 
                             <artifactSet>
                                 <includes>
+                                    <include>net.byteflux:libby-core**</include>
+                                    <include>net.byteflux:libby-bukkit**</include>
                                     <include>com.lielamar:lielsutils**</include>
                                     <include>org.json:json**</include>
-                                    <include>com.warrenstrange:googleauth**</include>
-                                    <include>commons-codec:commons-codec**</include>
-                                    <include>org.mongodb:mongodb-driver**</include>
-                                    <include>org.mongodb:bson**</include>
                                 </includes>
                             </artifactSet>
-
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.lielamar.lielsutils</pattern>
-                                    <shadedPattern>com.lielamar.twofa.lib.lielsutils</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.json</pattern>
-                                    <shadedPattern>com.lielamar.twofa.lib.json</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.warrenstrange.googleauth</pattern>
-                                    <shadedPattern>com.lielamar.twofa.lib.googleauth</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.commons.codec</pattern>
-                                    <shadedPattern>com.lielamar.twofa.lib.commons.codec</shadedPattern>
-                                </relocation>
-                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -92,15 +71,42 @@
             <id>velocity-repo</id>
             <url>https://repo.velocitypowered.com/snapshots/</url>
         </repository>
+
+        <repository>
+            <id>alessio-repo</id>
+            <url>https://repo.alessiodp.com/releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>net.byteflux</groupId>
+            <artifactId>libby-core</artifactId>
+            <version>1.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.byteflux</groupId>
+            <artifactId>libby-bukkit</artifactId>
+            <version>1.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.lielamar</groupId>
             <artifactId>lielsutils</artifactId>
             <version>1.3.1</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20200518</version>
+            <scope>compile</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.bukkit</groupId>
@@ -129,35 +135,49 @@
             <groupId>com.warrenstrange</groupId>
             <artifactId>googleauth</artifactId>
             <version>1.4.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.6</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>4.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.0.0-alpha</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.23</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
-            <version>3.12.7</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>bson</artifactId>
-            <version>4.3.0-beta4</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20200518</version>
-            <scope>compile</scope>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.12.9</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

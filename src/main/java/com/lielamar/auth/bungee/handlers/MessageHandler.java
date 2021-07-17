@@ -44,14 +44,14 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
         try {
             this.config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(this.file);
 
-            for (TwoFAMessages message : TwoFAMessages.values()) {
-                if (!this.config.contains(message.name())) {
+            for(TwoFAMessages message : TwoFAMessages.values()) {
+                if(!this.config.contains(message.name())) {
                     this.config.set(message.name(), message.getMessage());
                 } else {
                     message.setMessage(this.config.getString(message.name()));
                 }
             }
-        } catch (IOException exception) {
+        } catch(IOException exception) {
             exception.printStackTrace();
         }
 
