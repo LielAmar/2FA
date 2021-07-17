@@ -4,71 +4,106 @@ import net.byteflux.libby.BukkitLibraryManager;
 import net.byteflux.libby.Library;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Enumeration;
+import java.util.Properties;
+
 public class DependencyManager {
 
-    public DependencyManager(Plugin plugin) {
-        this.loadDependencies(plugin);
+    public DependencyManager(Plugin plugin, Properties properties) {
+        this.loadDependencies(plugin, properties);
     }
 
-    private void loadDependencies(Plugin plugin) {
+    private void loadDependencies(Plugin plugin, Properties properties) {
         BukkitLibraryManager loader = new BukkitLibraryManager(plugin);
 
-        loader.addMavenCentral();
-        loader.addRepository("https://repo.alessiodp.com/releases/");
+        if(Boolean.parseBoolean(properties.getProperty("load_maven_central", "true")))
+            loader.addMavenCentral();
 
-        System.out.println("[+] Downloading library: Google Auth v1.4.0");
+        String googleAuthGroupId = properties.getProperty("group_id_google_auth", "com.warrenstrange");
+        String commonsCodecGroupId = properties.getProperty("group_id_commons_codec", "commons-codec");
+        String hikariCpGroupId = properties.getProperty("group_id_hikari_cp", "com.zaxxer");
+        String h2GroupId = properties.getProperty("group_id_h2", "com.h2database");
+        String mariaDBGroupId = properties.getProperty("group_id_maria_db", "org.mariadb.jdbc");
+        String postgresGroupId = properties.getProperty("group_id_postgres", "org.postgresql");
+        String mongoDBGroupId = properties.getProperty("group_id_mongo_db", "org.mongodb");
+
+        String googleAuthArtifactId = properties.getProperty("artifact_id_google_auth", "googleauth");
+        String commonsCodecArtifactId = properties.getProperty("artifact_id_commons_codec", "commons-codec");
+        String hikariCpArtifactId = properties.getProperty("artifact_id_hikari_cp", "HikariCP");
+        String h2ArtifactId = properties.getProperty("artifact_id_h2", "h2");
+        String mariaDBArtifactId = properties.getProperty("artifact_id_maria_db", "mariadb-java-client");
+        String postgresArtifactId = properties.getProperty("artifact_id_postgres", "postgresql");
+        String mongoDBArtifactId = properties.getProperty("artifact_id_mongo_db", "mongo-java-driver");
+
+        String googleAuthVersion = properties.getProperty("version_google_auth", "1.4.0");
+        String commonsCodecVersion = properties.getProperty("version_commons_codec", "1.6");
+        String hikariCpVersion = properties.getProperty("version_hikari_cp", "4.0.3");
+        String h2Version = properties.getProperty("version_h2", "1.4.200");
+        String mariaDBVersion = properties.getProperty("version_maria_db", "3.0.0-alpha");
+        String postgresVersion = properties.getProperty("version_postgres", "42.2.23");
+        String mongoDBVersion = properties.getProperty("version_mongo_db", "3.12.7");
+
+
+        Enumeration<?> iter = properties.propertyNames();
+        while(iter.hasMoreElements()) {
+            Object val = iter.nextElement();
+            System.out.println(val + ": " + properties.getProperty((String)val));
+        }
+
+
+        System.out.println("[+] Loading dependency: Google Auth v" + googleAuthVersion);
         Library library = Library.builder()
-                .groupId("com.warrenstrange")
-                .artifactId("googleauth")
-                .version("1.4.0")
+                .groupId(googleAuthGroupId)
+                .artifactId(googleAuthArtifactId)
+                .version(googleAuthVersion)
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Downloading library: Commons-Codec v1.6");
+        System.out.println("[+] Loading dependency: Commons-Codec v" + commonsCodecVersion);
         library = Library.builder()
-                .groupId("commons-codec")
-                .artifactId("commons-codec")
-                .version("1.6")
+                .groupId(commonsCodecGroupId)
+                .artifactId(commonsCodecArtifactId)
+                .version(commonsCodecVersion)
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Downloading library: HikariCP v4.0.3");
+        System.out.println("[+] Loading dependency: HikariCP v" + hikariCpVersion);
         library = Library.builder()
-                .groupId("com.zaxxer")
-                .artifactId("HikariCP")
-                .version("4.0.3")
+                .groupId(hikariCpGroupId)
+                .artifactId(hikariCpArtifactId)
+                .version(hikariCpVersion)
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Downloading library: H2 v1.4.200");
+        System.out.println("[+] Loading dependency: H2 v" + h2Version);
         library = Library.builder()
-                .groupId("com.h2database")
-                .artifactId("h2")
-                .version("1.4.200")
+                .groupId(h2GroupId)
+                .artifactId(h2ArtifactId)
+                .version(h2Version)
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Downloading library: MariaDB v3.0.0-alpha");
+        System.out.println("[+] Loading dependency: MariaDB v" + mariaDBVersion);
         library = Library.builder()
-                .groupId("org.mariadb.jdbc")
-                .artifactId("mariadb-java-client")
-                .version("3.0.0-alpha")
+                .groupId(mariaDBGroupId)
+                .artifactId(mariaDBArtifactId)
+                .version(mariaDBVersion)
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Downloading library: PostgreSQL v42.2.23");
+        System.out.println("[+] Loading dependency: PostgreSQL v" + postgresVersion);
         library = Library.builder()
-                .groupId("org.postgresql")
-                .artifactId("postgresql")
-                .version("42.2.23")
+                .groupId(postgresGroupId)
+                .artifactId(postgresArtifactId)
+                .version(postgresVersion)
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Downloading library: MongoDB v3.12.7");
+        System.out.println("[+] Loading dependency: MongoDB v" + mongoDBVersion);
         library = Library.builder()
-                .groupId("org.mongodb")
-                .artifactId("mongo-java-driver")
-                .version("3.12.7")
+                .groupId(mongoDBGroupId)
+                .artifactId(mongoDBArtifactId)
+                .version(mongoDBVersion)
                 .build();
         loader.loadLibrary(library);
     }

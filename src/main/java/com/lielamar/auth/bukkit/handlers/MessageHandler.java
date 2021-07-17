@@ -1,23 +1,17 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.auth.bukkit.TwoFactorAuthentication;
+import com.lielamar.lielsutils.files.FileManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
-
-import java.io.File;
-import java.io.IOException;
 
 public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
-    private final TwoFactorAuthentication main;
-    private YamlConfiguration config;
-    private File file;
+    private final FileManager.Config config;
 
-    public MessageHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    public MessageHandler(FileManager fileManager) {
+        this.config = fileManager.getConfig(super.messagesFileName);
 
-        loadConfiguration();
+        this.reload();
     }
 
     @Override
@@ -27,31 +21,19 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
     }
 
     @Override
-    public void loadConfiguration() {
-        if(!main.getDataFolder().exists())
-            main.getDataFolder().mkdirs();
-
-        this.file = new File(main.getDataFolder(), super.messagesFileName);
-
-        if(!this.file.exists()) {
-            try { this.file.createNewFile(); } catch (IOException exception) { exception.printStackTrace(); }
-        }
-
-        this.config = YamlConfiguration.loadConfiguration(this.file);
-
+    public void reload() {
         for(TwoFAMessages message : TwoFAMessages.values()) {
-            if(!this.config.contains(message.name())) {
+            if(!this.config.contains(message.name()))
                 this.config.set(message.name(), message.getMessage());
-            } else {
+            else
                 message.setMessage(this.config.getString(message.name()));
-            }
         }
 
-        saveConfiguration();
+        this.saveConfiguration();
     }
 
     @Override
     public void saveConfiguration() {
-        try { this.config.save(this.file); } catch (IOException exception) { exception.printStackTrace(); }
+        this.config.saveConfig();
     }
 }

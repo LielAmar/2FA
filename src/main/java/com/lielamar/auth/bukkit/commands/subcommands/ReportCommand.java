@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
-import org.spigotmc.SpigotConfig;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -80,7 +79,7 @@ public class ReportCommand extends Command {
                 print.println(Bukkit.getVersion());
                 print.println(Bukkit.getBukkitVersion());
                 print.println("");
-                print.println("Using bungeecord: " + SpigotConfig.bungee);
+                print.println("Using bungeecord: " + Class.forName("org.spigotmc.SpigotConfig").getField("bungee").getBoolean(null));
                 print.println("Loaded bungeecord: " + this.main.getAuthHandler().isBungeecordEnabled);
                 print.println("");
                 print.println("Send this on Github Issue Tracker: https://github.com/LielAmar/2FA/issues");
@@ -89,7 +88,7 @@ public class ReportCommand extends Command {
                 print.close();
 
                 commandSender.sendMessage(ChatColor.GREEN + "Created a Bug Report file, Use this for your Bug Report! :)");
-            } catch (IOException exception) {
+            } catch (IOException | ClassNotFoundException | NoSuchFieldException | IllegalAccessException exception) {
                 exception.printStackTrace();
 
                 commandSender.sendMessage(ChatColor.RED + "Failed to create a Bug Report file!");

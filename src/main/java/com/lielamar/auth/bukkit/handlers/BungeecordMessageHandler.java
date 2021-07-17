@@ -11,8 +11,8 @@ import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -184,7 +184,7 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
      * @param message   Content of the response
      */
     @Override
-    public void onPluginMessageReceived(String channel, @Nonnull Player player, @Nonnull byte[] message) {
+    public void onPluginMessageReceived(String channel, @NotNull Player player, @NotNull byte[] message) {
         // If the Channel name is not the 2FA's Channel name we want to return
         if(!channel.equals(channelName)) return;
 

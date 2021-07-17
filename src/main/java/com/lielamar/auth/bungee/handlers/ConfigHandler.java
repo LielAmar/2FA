@@ -12,8 +12,6 @@ import java.nio.file.Files;
 
 public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandler {
 
-    private final String configName = "config.yml";
-
     private final TwoFactorAuthentication main;
 
     private boolean disableCommands = true;
@@ -30,7 +28,7 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
         if(!main.getDataFolder().exists())
             main.getDataFolder().mkdir();
 
-        File file = new File(main.getDataFolder(), configName);
+        File file = new File(main.getDataFolder(), super.configFileName);
 
         if(!file.exists()) {
             try(InputStream in = main.getResourceAsStream("bungeeconfig.yml")) {
