@@ -21,7 +21,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.spigotmc.SpigotConfig;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -115,7 +114,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         // then we want to firstly send the #loadBungeecord message to bungeecord, and only then load the player.
         // If bungeecord was already loaded (we know this through loadedBungeecord, which changes to true after the initial load), we only want to load the player because we already know whether
         // the server is using bungeecord or not.
-        if(SpigotConfig.bungee && !loadedBungeecord) {
+        if(!loadedBungeecord) {
             loadedBungeecord = true;
 
             Bukkit.getScheduler().runTaskLater(this.main, () -> this.main.getPluginMessageListener().loadBungeecord(uuid, null), 1L);

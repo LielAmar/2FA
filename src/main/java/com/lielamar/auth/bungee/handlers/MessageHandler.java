@@ -21,7 +21,7 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
     public MessageHandler(TwoFactorAuthentication main) {
         this.main = main;
 
-        loadConfiguration();
+        this.reload();
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
     }
 
     @Override
-    public void loadConfiguration() {
+    public void reload() {
         if(!main.getDataFolder().exists())
             main.getDataFolder().mkdirs();
 

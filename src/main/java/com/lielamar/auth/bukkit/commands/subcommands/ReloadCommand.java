@@ -51,7 +51,7 @@ public class ReloadCommand extends Command {
             }
 
             main.reloadConfig();
-            main.getMessageHandler().loadConfiguration();
+            main.getMessageHandler().reload();
             main.setupAuth();
 
             for(UUID uuid : states.keySet())

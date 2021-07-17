@@ -1,24 +1,21 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.storage.StorageMethod;
+import com.lielamar.lielsutils.files.FileManager;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandler {
 
-    private final TwoFactorAuthentication main;
+    private final FileManager.Config config;
 
-    public ConfigHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    public ConfigHandler(FileManager fileManager) {
+        this.config = fileManager.getConfig(super.configFileName);
 
-        reload();
+        this.reload();
     }
 
     @Override
     public void reload() {
-        FileConfiguration config = main.getConfig();
-
         if(!config.contains("qr-code-service"))
             config.set("qr-code-service", super.qrCodeURL);
         else
@@ -166,6 +163,6 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
             super.mongodbURI = config.getString("storage-data.mongodb-uri");
 
 
-        main.saveConfig();
+        config.saveConfig();
     }
 }

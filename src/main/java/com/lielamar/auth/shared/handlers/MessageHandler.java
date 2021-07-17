@@ -34,7 +34,7 @@ public abstract class MessageHandler {
 
     protected abstract void sendRaw(final Object p0, final String p1);
 
-    public abstract void loadConfiguration();
+    public abstract void reload();
 
     public abstract void saveConfiguration();
 

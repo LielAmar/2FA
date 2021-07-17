@@ -5,8 +5,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -29,7 +29,7 @@ public class ImageRender extends MapRenderer {
     }
 
     @Override
-    public void render(@Nonnull MapView view, @Nonnull MapCanvas canvas, @Nonnull Player player) {
+    public void render(@NotNull MapView view, @NotNull MapCanvas canvas, @NotNull Player player) {
         if(this.hasRendered) return;
 
         view.setScale(MapView.Scale.CLOSEST);
