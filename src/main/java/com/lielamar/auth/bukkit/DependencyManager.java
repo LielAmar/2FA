@@ -2,15 +2,31 @@ package com.lielamar.auth.bukkit;
 
 import net.byteflux.libby.BukkitLibraryManager;
 import net.byteflux.libby.Library;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Enumeration;
+import java.io.IOException;
 import java.util.Properties;
 
 public class DependencyManager {
 
-    public DependencyManager(Plugin plugin, Properties properties) {
-        this.loadDependencies(plugin, properties);
+    public DependencyManager(Plugin plugin) {
+        try {
+            Properties properties = new Properties();
+            properties.load(TwoFactorAuthentication.class.getClassLoader().getResourceAsStream("project.properties"));
+
+            this.loadDependencies(plugin, properties);
+        } catch(IOException exception) {
+            exception.printStackTrace();
+
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA failed to load dependencies. The plugin might not support all features!");
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] This has most likely happened because your server doesn't have access to the internet!");
+        } catch(Exception exception) {
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA detected that you are using Java 16 without the --add-opens java.base/java.lang=ALL-UNNAMED flag!");
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] If you want the plugin to support all features, please add this flag to your startup script");
+            Bukkit.getPluginManager().disablePlugin(plugin);
+        }
     }
 
     private void loadDependencies(Plugin plugin, Properties properties) {
@@ -43,15 +59,7 @@ public class DependencyManager {
         String postgresVersion = properties.getProperty("version_postgres", "42.2.23");
         String mongoDBVersion = properties.getProperty("version_mongo_db", "3.12.7");
 
-
-        Enumeration<?> iter = properties.propertyNames();
-        while(iter.hasMoreElements()) {
-            Object val = iter.nextElement();
-            System.out.println(val + ": " + properties.getProperty((String)val));
-        }
-
-
-        System.out.println("[+] Loading dependency: Google Auth v" + googleAuthVersion);
+        System.out.println("[2FA] Loaded library Google Auth v" + googleAuthVersion);
         Library library = Library.builder()
                 .groupId(googleAuthGroupId)
                 .artifactId(googleAuthArtifactId)
@@ -59,7 +67,7 @@ public class DependencyManager {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Loading dependency: Commons-Codec v" + commonsCodecVersion);
+        System.out.println("[2FA] Loaded library Commons-Codec v" + commonsCodecVersion);
         library = Library.builder()
                 .groupId(commonsCodecGroupId)
                 .artifactId(commonsCodecArtifactId)
@@ -67,7 +75,7 @@ public class DependencyManager {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Loading dependency: HikariCP v" + hikariCpVersion);
+        System.out.println("[2FA] Loaded library HikariCP v" + hikariCpVersion);
         library = Library.builder()
                 .groupId(hikariCpGroupId)
                 .artifactId(hikariCpArtifactId)
@@ -75,7 +83,7 @@ public class DependencyManager {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Loading dependency: H2 v" + h2Version);
+        System.out.println("[2FA] Loaded library H2 v" + h2Version);
         library = Library.builder()
                 .groupId(h2GroupId)
                 .artifactId(h2ArtifactId)
@@ -83,7 +91,7 @@ public class DependencyManager {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Loading dependency: MariaDB v" + mariaDBVersion);
+        System.out.println("[2FA] Loaded library MariaDB v" + mariaDBVersion);
         library = Library.builder()
                 .groupId(mariaDBGroupId)
                 .artifactId(mariaDBArtifactId)
@@ -91,7 +99,7 @@ public class DependencyManager {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Loading dependency: PostgreSQL v" + postgresVersion);
+        System.out.println("[2FA] Loaded library PostgreSQL v" + postgresVersion);
         library = Library.builder()
                 .groupId(postgresGroupId)
                 .artifactId(postgresArtifactId)
@@ -99,7 +107,7 @@ public class DependencyManager {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[+] Loading dependency: MongoDB v" + mongoDBVersion);
+        System.out.println("[2FA] Loaded library MongoDB v" + mongoDBVersion);
         library = Library.builder()
                 .groupId(mongoDBGroupId)
                 .artifactId(mongoDBArtifactId)

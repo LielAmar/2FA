@@ -1,6 +1,7 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
+import com.lielamar.auth.bukkit.utils.ServerVersion;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.lielsutils.commands.Command;
 import org.bukkit.Bukkit;
@@ -78,6 +79,7 @@ public class ReportCommand extends Command {
                 print.println("Server Jar & Version:");
                 print.println(Bukkit.getVersion());
                 print.println(Bukkit.getBukkitVersion());
+                print.println(ServerVersion.getInstance().getVersion());
                 print.println("");
                 print.println("Using bungeecord: " + Class.forName("org.spigotmc.SpigotConfig").getField("bungee").getBoolean(null));
                 print.println("Loaded bungeecord: " + this.main.getAuthHandler().isBungeecordEnabled);
