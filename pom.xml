@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,6 +20,7 @@
         <group-id.commons-codec>commons-codec</group-id.commons-codec>
         <group-id.hikari-cp>com.zaxxer</group-id.hikari-cp>
         <group-id.h2>com.h2database</group-id.h2>
+        <group-id.mysql>mysql</group-id.mysql>
         <group-id.maria-db>org.mariadb.jdbc</group-id.maria-db>
         <group-id.postgres>org.postgresql</group-id.postgres>
         <group-id.mongo-db>org.mongodb</group-id.mongo-db>
@@ -28,6 +29,7 @@
         <artifact-id.commons-codec>commons-codec</artifact-id.commons-codec>
         <artifact-id.hikari-cp>HikariCP</artifact-id.hikari-cp>
         <artifact-id.h2>h2</artifact-id.h2>
+        <artifact-id.mysql>mysql-connector-java</artifact-id.mysql>
         <artifact-id.maria-db>mariadb-java-client</artifact-id.maria-db>
         <artifact-id.postgres>postgresql</artifact-id.postgres>
         <artifact-id.mongo-db>mongo-java-driver</artifact-id.mongo-db>
@@ -36,7 +38,8 @@
         <version.commons-codec>1.6</version.commons-codec>
         <version.hikari-cp>4.0.3</version.hikari-cp>
         <version.h2>1.4.200</version.h2>
-        <version.maria-db>3.0.0-alpha</version.maria-db>
+        <version.mysql>8.0.26</version.mysql>
+        <version.maria-db>2.7.3</version.maria-db>
         <version.postgres>42.2.23</version.postgres>
         <version.mongo-db>3.12.7</version.mongo-db>
 
@@ -196,6 +199,12 @@
             <artifactId>${artifact-id.h2}</artifactId>
             <version>${version.h2}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.mysql}</groupId>
+            <artifactId>${artifact-id.mysql}</artifactId>
+            <version>${version.mysql}</version>
         </dependency>
 
         <dependency>

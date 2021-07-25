@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.4.1"
+version: "1.4.2"
 authors: [LielAmar]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
 description: Add another layer of protection to your server
@@ -9,7 +9,8 @@ libraries:
   - commons-codec:commons-codec:1.6
   - com.zaxxer:HikariCP:4.0.3
   - com.h2database:h2:1.4.200
-  - org.mariadb.jdbc:mariadb-java-client:3.0.0-alpha
+  - mysql:mysql-connector-java:8.0.26
+  - org.mariadb.jdbc:mariadb-java-client:2.7.3
   - org.postgresql:postgresql:42.2.23
   - org.mongodb:mongo-java-driver:3.12.7
 

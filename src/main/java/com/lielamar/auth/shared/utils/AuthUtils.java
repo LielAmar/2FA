@@ -33,7 +33,7 @@ public class AuthUtils {
             in.close();
 
             // If the player does not exist, we want to return null
-            if(response.isEmpty())
+            if(response.length() == 0 || response.toString().equals("{}"))
                 return null;
 
             JsonElement json = new JsonParser().parse(response.toString());

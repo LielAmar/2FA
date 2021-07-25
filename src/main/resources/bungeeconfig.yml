@@ -12,8 +12,11 @@
 # Events to disable if a player is not authenticated yet
 # true - will block the event
 # false - will allow the event
+#
+# * Note that plugins such as Skript don't use / for commands, so in order to prevent those, you need to disable chat events :)
 disabled-events:
   commands: true
+  chat: true
   server-switch: true
 
 # If the "commands" event is disabled, you can whitelist specific commands with the below setting

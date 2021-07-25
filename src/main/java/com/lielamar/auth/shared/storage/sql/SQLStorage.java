@@ -61,6 +61,7 @@ public class SQLStorage extends StorageHandler {
         hikari.setConnectionTimeout(this.connectionTimeout);
 
         hikari.setDataSourceClassName(this.driver);
+
         Properties properties = new Properties();
         properties.setProperty("serverName", host);
         properties.setProperty("port", port + "");
@@ -83,7 +84,7 @@ public class SQLStorage extends StorageHandler {
         try {
             connection = hikari.getConnection();
 
-            String sql = "CREATE TABLE IF NOT EXISTS " + this.fullPlayersTableName + " (`uuid` varchar(64), `key` varchar(64), `ip` varchar(64));";
+            String sql = "CREATE TABLE IF NOT EXISTS " + this.fullPlayersTableName + " (`uuid` varchar(64), `key` varchar(64), `ip` varchar(256));";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.executeUpdate();
         } catch(SQLException exception) {

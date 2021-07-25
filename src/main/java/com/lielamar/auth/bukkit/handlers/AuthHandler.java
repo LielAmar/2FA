@@ -271,6 +271,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         player.spigot().sendMessage(component);
     }
 
+    public void sendHoverMessage(Player player, String message, String hoverMessage) {
+        TextComponent component = new TextComponent(message);
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
+        player.spigot().sendMessage(component);
+    }
+
     /**
      * Gives a player a Map item with the QR code if their code
      *
@@ -334,9 +340,13 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         }
                     }
 
-                    sendClickableMessage(player, ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()), url.replaceAll("128x128", "256x256"));
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA);
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.PLEASE_AUTHENTICATE);
+                    sendClickableMessage(player,
+                            ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
+                            url.replaceAll("128x128", "256x256"));
+
+                    sendHoverMessage(player,
+                            ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
+                            ChatColor.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
                 } catch (IOException | NumberFormatException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");

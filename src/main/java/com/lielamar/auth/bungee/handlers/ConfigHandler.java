@@ -15,6 +15,7 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
     private final TwoFactorAuthentication main;
 
     private boolean disableCommands = true;
+    private boolean disableChat = true;
     private boolean disableServerSwitch = true;
 
     public ConfigHandler(TwoFactorAuthentication main) {
@@ -46,6 +47,11 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
             else
                 this.disableCommands = config.getBoolean("disabled-events.commands");
 
+            if(!config.contains("disabled-events.chat"))
+                config.set("disabled-events.chat", this.disableChat);
+            else
+                this.disableChat = config.getBoolean("disabled-events.chat");
+
             if(!config.contains("disabled-events.server-switch"))
                 config.set("disabled-events.server-switch", this.disableServerSwitch);
             else
@@ -69,6 +75,9 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
 
     public boolean isDisableCommands() {
         return this.disableCommands;
+    }
+    public boolean isDisableChat() {
+        return this.disableChat;
     }
     public boolean isDisableServerSwitch() {
         return this.disableServerSwitch;
