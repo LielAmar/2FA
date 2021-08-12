@@ -44,11 +44,12 @@ public class DisableForOthersCommand extends Command {
         if(!hasPermissions(commandSender)) {
             main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
         } else {
-            Bukkit.getScheduler().runTask(main, () -> {
+            Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
                 for(String target : targets) {
                     Player targetPlayer = Bukkit.getPlayer(target);
                     UUID targetUUID;
 
+                    // TODO check that async is working 
                     if(targetPlayer != null)
                         targetUUID = targetPlayer.getUniqueId();
                     else

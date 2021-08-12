@@ -22,6 +22,8 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     @Override
     public void reload() {
+        this.config.reloadConfig();
+
         for(TwoFAMessages message : TwoFAMessages.values()) {
             if(!this.config.contains(message.name()))
                 this.config.set(message.name(), message.getMessage());
