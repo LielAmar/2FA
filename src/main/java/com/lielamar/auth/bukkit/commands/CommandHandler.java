@@ -46,6 +46,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         setupCommand = new SetupCommand("", main);
         commands.add(new EnableCommand(Constants.enableCommand, main));
         commands.add(new DisableCommand(Constants.disableCommand, main));
+        commands.add(new CancelCommand(Constants.cancelCommand, main));
         commands.add(new ReloadCommand(Constants.reloadCommand, main));
         commands.add(new ReportCommand(Constants.reportCommand, main));
         commands.add(new HelpCommand(Constants.helpCommand, main, commands));
@@ -104,7 +105,9 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
                     loginCommand.execute(player, args);
                     return false;
                 } else if(main.getAuthHandler().isPendingSetup(player.getUniqueId())) {
-                    setupCommand.execute(player, args);
+                    Command subCommand = getCommand(args[0]);
+                    if(subCommand instanceof CancelCommand) subCommand.execute(player, args);
+                    else setupCommand.execute(player, args);
                     return false;
                 }
             }

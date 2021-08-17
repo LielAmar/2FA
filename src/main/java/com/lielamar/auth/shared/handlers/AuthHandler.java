@@ -130,6 +130,18 @@ public abstract class AuthHandler {
         getStorageHandler().removeKey(uuid);
     }
 
+    public boolean cancelKey(UUID uuid) {
+        String key = getPendingKey(uuid);
+
+        if(key != null && (authStates.get(uuid).equals(AuthState.PENDING_SETUP) || authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
+            changeState(uuid, AuthState.DISABLED);
+            pendingKeys.remove(uuid);
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Returns a player's key
      *

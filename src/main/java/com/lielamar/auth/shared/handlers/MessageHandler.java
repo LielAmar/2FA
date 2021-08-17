@@ -51,6 +51,8 @@ public abstract class MessageHandler {
         INCORRECT_CODE("&cIncorrect code, please try again"),
         AUTHENTICATED_AUTOMATICALLY("&aYou were authenticated automatically"),
         ALREADY_IN_SETUP_MODE("&cYou are already in the setup mode for 2FA!"),
+        NOT_IN_SETUP_MODE("&cYou are not in the setup mode for 2FA!"),
+        CANCELED_SETUP("&cCanceled 2FA setup!"),
         ALREADY_SETUP("&cYou are already setup with 2FA"),
         RESET_2FA("&aYour 2FA has been reset"),
         NOT_SETUP("&cYou are not setup with 2FA"),
@@ -75,6 +77,7 @@ public abstract class MessageHandler {
         DESCRIPTION_OF_DISABLE_COMMAND("Disables 2FA"),
         DESCRIPTION_OF_DISABLE_OTHERS_COMMAND("Disable 2FA for other users"),
         DESCRIPTION_OF_ENABLE_COMMAND("Enables 2FA"),
+        DESCRIPTION_OF_CANCEL_COMMAND("Cancels 2FA setup"),
         DESCRIPTION_OF_HELP_COMMAND("Shows the Help Menu of the 2FA Plugin"),
         DESCRIPTION_OF_RELOAD_COMMAND("Reloads the Config"),
         DESCRIPTION_OF_PRINT_INFO_COMMAND("Prints useful info about the plugin");
