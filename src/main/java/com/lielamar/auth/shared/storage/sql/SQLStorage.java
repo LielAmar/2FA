@@ -4,6 +4,7 @@ import com.lielamar.auth.shared.storage.StorageHandler;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -84,7 +85,7 @@ public class SQLStorage extends StorageHandler {
         try {
             connection = hikari.getConnection();
 
-            String sql = "CREATE TABLE IF NOT EXISTS " + this.fullPlayersTableName + " (`uuid` varchar(64), `key` varchar(64), `ip` varchar(256));";
+            String sql = "CREATE TABLE IF NOT EXISTS " + this.fullPlayersTableName + " (`uuid` varchar(64), `key` varchar(64), `ip` varchar(256), `enable_date` long);";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.executeUpdate();
         } catch(SQLException exception) {
@@ -119,10 +120,11 @@ public class SQLStorage extends StorageHandler {
                 statement.setString(1, key);
                 statement.setString(2, uuid.toString());
             } else {
-                statement = connection.prepareStatement("INSERT INTO " + this.fullPlayersTableName + "(`uuid`, `key`, `ip`) VALUES (?,?,?);");
+                statement = connection.prepareStatement("INSERT INTO " + this.fullPlayersTableName + "(`uuid`, `key`, `ip`, `enable_date`) VALUES (?,?,?,?);");
                 statement.setString(1, uuid.toString());
                 statement.setString(2, key);
                 statement.setString(3, "");
+                statement.setLong(4, -1);
             }
 
             statement.executeUpdate();
@@ -203,10 +205,11 @@ public class SQLStorage extends StorageHandler {
                 statement.setString(1, ip);
                 statement.setString(2, uuid.toString());
             } else {
-                statement = connection.prepareStatement("INSERT INTO " + this.fullPlayersTableName + "(`uuid`, `key`, `ip`) VALUES (?,?,?);");
+                statement = connection.prepareStatement("INSERT INTO " + this.fullPlayersTableName + "(`uuid`, `key`, `ip`, `enable_date`) VALUES (?,?,?,?);");
                 statement.setString(1, uuid.toString());
                 statement.setString(2, "");
                 statement.setString(3, ip);
+                statement.setLong(4, -1);
             }
 
             statement.executeUpdate();
@@ -260,5 +263,83 @@ public class SQLStorage extends StorageHandler {
     @Override
     public boolean hasIP(UUID uuid) {
         return this.getIP(uuid) != null;
+    }
+
+
+    @Override
+    public long setEnableDate(UUID uuid, long enableDate) {
+        Connection connection = null;
+
+        try {
+            connection = hikari.getConnection();
+            if(connection.isClosed()) return -1;
+
+            PreparedStatement statement;
+            statement = connection.prepareStatement("SELECT * FROM " + this.fullPlayersTableName + " WHERE `uuid` = ?;");
+            statement.setString(1, uuid.toString());
+            ResultSet result = statement.executeQuery();
+
+            if(result.next()) {
+                statement = connection.prepareStatement("UPDATE " + this.fullPlayersTableName + " SET `enable_date` = ? WHERE `uuid` = ?;");
+                statement.setLong(1, enableDate);
+                statement.setString(2, uuid.toString());
+            } else {
+                statement = connection.prepareStatement("INSERT INTO " + this.fullPlayersTableName + "(`uuid`, `key`, `ip`, `enable_date) VALUES (?,?,?,?);");
+                statement.setString(1, uuid.toString());
+                statement.setString(2, "");
+                statement.setString(3, "");
+                statement.setLong(4, enableDate);
+            }
+
+            statement.executeUpdate();
+            return enableDate;
+        } catch(SQLException exception) {
+            exception.printStackTrace();
+        } finally {
+            if(connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public long getEnableDate(UUID uuid) {
+        Connection connection = null;
+
+        try {
+            connection = hikari.getConnection();
+            if(connection.isClosed()) return -1;
+
+            PreparedStatement statement = connection.prepareStatement("SELECT `enable_date` FROM " + this.fullPlayersTableName + " WHERE `uuid` = ?;");
+            statement.setString(1, uuid.toString());
+            ResultSet result = statement.executeQuery();
+
+            if(result.next()) {
+                return result.getLong("enableDate");
+            }
+        } catch(SQLException exception) {
+            exception.printStackTrace();
+        } finally {
+            if(connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public boolean hasEnableDate(UUID uuid) {
+        return getEnableDate(uuid) != -1;
     }
 }

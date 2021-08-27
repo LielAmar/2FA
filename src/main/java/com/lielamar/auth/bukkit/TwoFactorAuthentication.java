@@ -1,14 +1,11 @@
 package com.lielamar.auth.bukkit;
 
+import com.lielamar.auth.bukkit.handlers.*;
 import com.lielamar.auth.bukkit.utils.ServerVersion;
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.lielsutils.bstats.MetricsSpigot;
 import com.lielamar.auth.bukkit.commands.CommandHandler;
-import com.lielamar.auth.bukkit.handlers.AuthHandler;
-import com.lielamar.auth.bukkit.handlers.BungeecordMessageHandler;
-import com.lielamar.auth.bukkit.handlers.ConfigHandler;
-import com.lielamar.auth.bukkit.handlers.MessageHandler;
 import com.lielamar.auth.bukkit.listeners.DisabledEvents;
 import com.lielamar.auth.bukkit.listeners.OnAuthStateChange;
 import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
@@ -42,8 +39,11 @@ public class TwoFactorAuthentication extends JavaPlugin {
         this.setupUpdateChecker();
 
         // Applying 2fa for online players
-        for(Player pl : Bukkit.getOnlinePlayers())
-            this.authHandler.playerJoin(pl.getUniqueId());
+        // We add a 5-tick-delay to ensure the permission plugin is loaded beforehand
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            for(Player pl : Bukkit.getOnlinePlayers())
+                this.authHandler.playerJoin(pl.getUniqueId());
+        }, this.configHandler.getReloadDelay());
     }
 
 
@@ -52,8 +52,11 @@ public class TwoFactorAuthentication extends JavaPlugin {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] Your server version is above or equal to 1.16.5. Using the default spigot dependency loader");
         } else {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] Your server version is below 1.16.5. Using a custom dependency loader");
-            new DependencyManager(this);
+            new DependencyHandler(this);
         }
+
+        if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
+            new TwoFactorAuthenticationPlaceholders(this).register();
     }
 
 

@@ -41,6 +41,7 @@ public class JSONStorage extends StorageHandler {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("key", JSONObject.NULL);
                     jsonObject.put("ip", JSONObject.NULL);
+                    jsonObject.put("enable_date", -1);
                     JSONUtils.write(jsonObject, new FileOutputStream(file));
                 }
             } else {
@@ -52,6 +53,10 @@ public class JSONStorage extends StorageHandler {
                 }
                 if(!jsonObject.has("ip")) {
                     jsonObject.put("ip", JSONObject.NULL);
+                    changed = true;
+                }
+                if(!jsonObject.has("enable_date")) {
+                    jsonObject.put("enable_date", -1);
                     changed = true;
                 }
 
@@ -149,5 +154,45 @@ public class JSONStorage extends StorageHandler {
     @Override
     public boolean hasIP(UUID uuid) {
         return getIP(uuid) != null;
+    }
+
+
+    @Override
+    public long setEnableDate(UUID uuid, long enableDate) {
+        try {
+            File file = getFile(uuid);
+            JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
+
+            if(enableDate == -1) jsonObject.put("enable_date", JSONObject.NULL);
+            else jsonObject.put("enable_date", enableDate);
+
+            JSONUtils.write(jsonObject, new FileOutputStream(file));
+
+            return enableDate;
+        } catch(IOException exception) {
+            exception.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    @Override
+    public long getEnableDate(UUID uuid) {
+        try {
+            File file = getFile(uuid);
+            JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
+
+            if(!jsonObject.has("enable_date")) return -1;
+
+            return jsonObject.getLong("enable_date");
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return -1;
+    }
+
+    @Override
+    public boolean hasEnableDate(UUID uuid) {
+        return getEnableDate(uuid) != -1;
     }
 }

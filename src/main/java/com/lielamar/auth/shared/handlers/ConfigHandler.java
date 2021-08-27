@@ -33,6 +33,8 @@ public abstract class ConfigHandler {
 
     protected String ipHashType = "SHA256";
 
+    protected long reloadDelay = 0;
+
     protected Map<Class<? extends Event>, Boolean> disabledEvents = new HashMap<>();
     protected List<String> whitelistedCommands = new ArrayList<>();
     protected List<String> blacklistedCommands = new ArrayList<>();
@@ -74,6 +76,8 @@ public abstract class ConfigHandler {
     public int[] getMapIDs() { return this.mapIDs; }
 
     public String getIpHashType() { return this.ipHashType; }
+
+    public long getReloadDelay() { return this.reloadDelay; }
 
     public Map<Class<? extends Event>, Boolean> getDisabledEvents() { return this.disabledEvents; }
     public List<String> getWhitelistedCommands() { return this.whitelistedCommands; }

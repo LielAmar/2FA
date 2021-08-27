@@ -7,19 +7,19 @@ public abstract class MessageHandler {
 
     protected final String messagesFileName = "messages.yml";
 
-    public void sendMessage(Object player, TwoFAMessages message, Pair<?, ?>... args) {
-        this.sendMessage(player, true, message, args);
+    public void sendMessage(Object sender, TwoFAMessages message, Pair<?, ?>... args) {
+        this.sendMessage(sender, true, message, args);
     }
 
     /**
      * Sends the value of the provided {TwoFAMessage} object to the given player
      *
-     * @param player    Player to send the message to
+     * @param sender    Sender to send the message to
      * @param prefix    Whether to send the prefix as well
      * @param message   TwoFAMessage object to send its value
      * @param args      Array of pairs of arguments to switch in the message
      */
-    public void sendMessage(Object player, boolean prefix, TwoFAMessages message, Pair<?, ?>... args) {
+    public void sendMessage(Object sender, boolean prefix, TwoFAMessages message, Pair<?, ?>... args) {
         String raw = message.getMessage();
         String rawPrefix = TwoFAMessages.PREFIX.getMessage();
 
@@ -27,7 +27,7 @@ public abstract class MessageHandler {
             for(Pair<?, ?> pair : args)
                 raw = raw.replaceAll(pair.getKey().toString(), pair.getValue().toString());
 
-            this.sendRaw(player, (prefix ? rawPrefix : "") + raw);
+            this.sendRaw(sender, (prefix ? rawPrefix : "") + raw);
         }
     }
 

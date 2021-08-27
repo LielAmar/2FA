@@ -81,6 +81,17 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
         } else
             super.ipHashType = config.getString("ip-hash");
 
+        if(!config.contains("player-reload-delay")) {
+            config.set("player-reload-delay", super.reloadDelay);
+            config.addComments("player-reload-delay", new String[] {
+                    "# How much delay should the plugin apply to loading players when the server reloads",
+                    "# This is useful when you have multiple databases with different latencies",
+                    "# You can use it to ensure your permissions plugin loads before the players are reloaded",
+                    "# * It's best to set the value to 0 if you use the same storage type AND storage (server/file), because you won't have latency differences anyways"
+            });
+        } else
+            super.reloadDelay = config.getInt("player-reload-delay");
+
         ConfigurationSection disabledEventsSection = config.getConfigurationSection("disabled-events");
         try {
             if(disabledEventsSection != null) {

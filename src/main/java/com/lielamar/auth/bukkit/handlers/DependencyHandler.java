@@ -1,5 +1,6 @@
-package com.lielamar.auth.bukkit;
+package com.lielamar.auth.bukkit.handlers;
 
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import net.byteflux.libby.BukkitLibraryManager;
 import net.byteflux.libby.Library;
 import org.bukkit.Bukkit;
@@ -9,9 +10,9 @@ import org.bukkit.plugin.Plugin;
 import java.io.IOException;
 import java.util.Properties;
 
-public class DependencyManager {
+public class DependencyHandler {
 
-    public DependencyManager(Plugin plugin) {
+    public DependencyHandler(Plugin plugin) {
         try {
             Properties properties = new Properties();
             properties.load(TwoFactorAuthentication.class.getClassLoader().getResourceAsStream("project.properties"));

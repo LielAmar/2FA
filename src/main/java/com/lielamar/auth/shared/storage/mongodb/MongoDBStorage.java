@@ -71,6 +71,7 @@ public class MongoDBStorage extends StorageHandler {
             Document insertDocument = new Document("uuid", uuid.toString());
             insertDocument.append("key", key);
             insertDocument.append("ip", null);
+            insertDocument.append("enable_date", -1);
             this.mongoCollection.insertOne(insertDocument);
         } else {
             playerDocument.put("key", key);
@@ -110,6 +111,7 @@ public class MongoDBStorage extends StorageHandler {
             Document insertDocument = new Document("uuid", uuid.toString());
             insertDocument.append("key", null);
             insertDocument.append("ip", ip);
+            insertDocument.append("enable_date", -1);
             this.mongoCollection.insertOne(insertDocument);
         } else {
             playerDocument.put("ip", ip);
@@ -132,5 +134,40 @@ public class MongoDBStorage extends StorageHandler {
     @Override
     public boolean hasIP(UUID uuid) {
         return getIP(uuid) != null;
+    }
+
+
+    @Override
+    public long setEnableDate(UUID uuid, long enableDate) {
+        Document query = new Document("uuid", uuid.toString());
+        Document playerDocument = this.mongoCollection.find(query).first();
+
+        if(playerDocument == null) {
+            Document insertDocument = new Document("uuid", uuid.toString());
+            insertDocument.append("key", null);
+            insertDocument.append("ip", null);
+            insertDocument.append("enable_date", enableDate);
+            this.mongoCollection.insertOne(insertDocument);
+        } else {
+            playerDocument.put("enable_date", enableDate);
+            this.mongoCollection.updateOne(query, new Document("$set", playerDocument));
+        }
+
+        return enableDate;
+    }
+
+    @Override
+    public long getEnableDate(UUID uuid) {
+        Document query = new Document("uuid", uuid.toString());
+        Document playerDocument = this.mongoCollection.find(query).first();
+
+        if(playerDocument != null)
+            return playerDocument.getLong("enable_date");
+        return -1;
+    }
+
+    @Override
+    public boolean hasEnableDate(UUID uuid) {
+        return getEnableDate(uuid) != -1;
     }
 }

@@ -68,6 +68,14 @@ public abstract class StorageHandler {
     public abstract boolean hasIP(UUID uuid);
 
 
+
+    public abstract long setEnableDate(UUID uuid, long enableDate);
+
+    public abstract long getEnableDate(UUID uuid);
+
+    public abstract boolean hasEnableDate(UUID uuid);
+
+
     /**
      * Sets up the Storage connection of the database
      *

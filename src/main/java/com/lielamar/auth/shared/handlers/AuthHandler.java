@@ -3,6 +3,7 @@ package com.lielamar.auth.shared.handlers;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -112,6 +113,7 @@ public abstract class AuthHandler {
         if(key != null && new GoogleAuthenticator().authorize(key, code) && (authStates.get(uuid).equals(AuthState.PENDING_SETUP) || authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
             changeState(uuid, AuthState.AUTHENTICATED);
             getStorageHandler().setKey(uuid, key);
+            getStorageHandler().setEnableDate(uuid, System.currentTimeMillis());
             pendingKeys.remove(uuid);
             authentications++;
             return true;
@@ -128,6 +130,7 @@ public abstract class AuthHandler {
         pendingKeys.remove(uuid);
         changeState(uuid, AuthState.DISABLED);
         getStorageHandler().removeKey(uuid);
+        getStorageHandler().setEnableDate(uuid, -1);
     }
 
     public boolean cancelKey(UUID uuid) {
