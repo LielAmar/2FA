@@ -1,5 +1,7 @@
 # 2 Factor Authentication
 
+![2FA Logo](https://i.imgur.com/8uMIZ4a.png)
+
 [![Release](https://img.shields.io/badge/Latest%20Release-v1.5.0-%232e9aff?style=flat)](https://github.com/LielAmar/2FA/releases/latest)
 [![License](https://img.shields.io/badge/License-MIT-%23ff7057?style=flat)](https://github.com/LielAmar/2FA/blob/master/LICENSE)
 [![Discord](https://img.shields.io/discord/416652224505184276?color=%235865F2&label=Join%20Our%20Discord)](https://discord.gg/NzgBrqR)
