@@ -1,6 +1,11 @@
 # 2 Factor Authentication
 
-[![Discord](https://img.shields.io/discord/416652224505184276?color=%235865F2&label=Join%20My%20Discord)](https://discord.gg/NzgBrqR)
+![2FA Logo](https://i.imgur.com/8uMIZ4a.png)
+
+[![Release](https://img.shields.io/badge/Latest%20Release-v1.5.0-%232e9aff?style=flat)](https://github.com/LielAmar/2FA/releases/latest)
+[![License](https://img.shields.io/badge/License-MIT-%23ff7057?style=flat)](https://github.com/LielAmar/2FA/blob/master/LICENSE)
+[![Discord](https://img.shields.io/discord/416652224505184276?color=%235865F2&label=Join%20Our%20Discord)](https://discord.gg/NzgBrqR)
+[![Issues](https://img.shields.io/github/issues-raw/LielAmar/2FA?logo=github&logoColor=white)](https://github.com/LielAmar/2FA/issues)
 [![Spigot](https://img.shields.io/badge/dynamic/json?color=yellow&label=Check%20it%20on%20Spigot&query=downloads&suffix=%20Downloads&url=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F85594)](https://www.spigotmc.org/resources/85594/)
 
 ## Information
