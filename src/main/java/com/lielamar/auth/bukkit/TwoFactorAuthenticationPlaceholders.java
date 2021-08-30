@@ -35,7 +35,8 @@ public class TwoFactorAuthenticationPlaceholders extends PlaceholderExpansion {
             case "is_enabled":
                 return plugin.getAuthHandler().is2FAEnabled(player.getUniqueId()) ? "Enabled" : "Disabled";
             case "time_since_enabled":
-                return TimeUtils.parseTime(System.currentTimeMillis() - plugin.getAuthHandler().getStorageHandler().getEnableDate(player.getUniqueId()));
+                long enableDate = plugin.getAuthHandler().getStorageHandler().getEnableDate(player.getUniqueId());
+                return enableDate == -1 ? "Not Enabled" : TimeUtils.parseTime(System.currentTimeMillis() - enableDate);
             case "key":
                 return plugin.getAuthHandler().getStorageHandler().getKey(player.getUniqueId());
             case "is_required":

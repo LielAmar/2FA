@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 
 public class DependencyHandler {
@@ -26,6 +26,7 @@ public class DependencyHandler {
         } catch(Exception exception) {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA detected that you are using Java 16 without the --add-opens java.base/java.lang=ALL-UNNAMED flag!");
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] If you want the plugin to support all features, please add this flag to your startup script");
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] Disabling plugin...");
             Bukkit.getPluginManager().disablePlugin(plugin);
         }
     }

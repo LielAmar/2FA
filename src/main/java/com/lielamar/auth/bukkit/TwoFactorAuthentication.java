@@ -1,7 +1,7 @@
 package com.lielamar.auth.bukkit;
 
 import com.lielamar.auth.bukkit.handlers.*;
-import com.lielamar.auth.bukkit.utils.ServerVersion;
+import com.lielamar.auth.bukkit.utils.Version;
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.lielsutils.bstats.MetricsSpigot;
@@ -32,6 +32,7 @@ public class TwoFactorAuthentication extends JavaPlugin {
     @Override
     public void onEnable() {
         this.setupDependencies();
+        if(!Bukkit.getPluginManager().isPluginEnabled(this)) return;
 
         this.setupAuth();
         this.registerListeners();
@@ -48,7 +49,7 @@ public class TwoFactorAuthentication extends JavaPlugin {
 
 
     private void setupDependencies() {
-        if(ServerVersion.getInstance().above(ServerVersion.Version.v1_16_R3)) {
+        if(Version.getInstance().getNMSVersion().above(Version.NMSVersion.v1_16_R3) && Version.getInstance().getServerVersion().above(Version.ServerVersion.v1_16_4)) {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] Your server version is above or equal to 1.16.5. Using the default spigot dependency loader");
         } else {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] Your server version is below 1.16.5. Using a custom dependency loader");
