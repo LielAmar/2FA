@@ -9,6 +9,7 @@ import com.lielamar.auth.shared.utils.hash.Hash;
 import com.lielamar.auth.shared.utils.hash.NoHash;
 import com.lielamar.auth.shared.utils.hash.SHA256;
 import com.lielamar.auth.shared.utils.hash.SHA512;
+import com.lielamar.lielsutils.ColorUtils;
 import com.lielamar.lielsutils.SpigotUtils;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
@@ -341,12 +342,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     }
 
                     sendClickableMessage(player,
-                            ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
+                            ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
                             url.replaceAll("128x128", "256x256"));
 
                     sendHoverMessage(player,
-                            ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
-                            ChatColor.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
+                            ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
+                            ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
                 } catch (IOException | NumberFormatException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
