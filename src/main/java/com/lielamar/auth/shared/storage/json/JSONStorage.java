@@ -163,8 +163,7 @@ public class JSONStorage extends StorageHandler {
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if(enableDate == -1) jsonObject.put("enable_date", JSONObject.NULL);
-            else jsonObject.put("enable_date", enableDate);
+            jsonObject.put("enable_date", enableDate);
 
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
@@ -195,4 +194,7 @@ public class JSONStorage extends StorageHandler {
     public boolean hasEnableDate(UUID uuid) {
         return getEnableDate(uuid) != -1;
     }
+
+    @Override
+    public void unload() {}
 }

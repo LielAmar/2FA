@@ -1,6 +1,7 @@
 package com.lielamar.auth.bungee.handlers;
 
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
+import com.lielamar.lielsutils.ColorUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -27,7 +28,7 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
     @Override
     protected void sendRaw(final Object player, final String message) {
         if(player instanceof ProxiedPlayer)
-            ((ProxiedPlayer)player).sendMessage(ChatMessageType.CHAT, TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
+            ((ProxiedPlayer)player).sendMessage(ChatMessageType.CHAT, TextComponent.fromLegacyText(ColorUtils.translateAlternateColorCodes('&', message)));
     }
 
     @Override

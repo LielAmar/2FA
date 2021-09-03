@@ -24,7 +24,7 @@ public abstract class ConfigHandler {
 
     protected boolean checkForUpdates = true;
 
-    protected String serverName = "MyServer";
+    protected String serverName = "My Minecraft Server";
 
     protected boolean advise2FA = true;
 

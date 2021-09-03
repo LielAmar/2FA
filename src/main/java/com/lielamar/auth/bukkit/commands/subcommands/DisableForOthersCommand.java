@@ -40,34 +40,53 @@ public class DisableForOthersCommand extends Command {
         return ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.DESCRIPTION_OF_DISABLE_OTHERS_COMMAND.getMessage());
     }
 
+    /**
+     * Executes the Disable command for other players
+     *
+     * It checks for permissions and loops over the targets, from there, it has 2 ways it can go:
+     *   1. The current player in the loop is not null (meaning they're online).
+     *      In this case, everything would run on Main Thread (synchronized) since we have access to their UUID directly from the server.
+     *      With this approach, we can also safely call PlayerStateChangeEvent eventually (after resetting the key and changing the player's state)
+     *      since it would run on Main Thread.
+     *   2. The current player in the loop is null (meaning they're offline).
+     *      In this case, everything would run on a separate thread (asynchronized) since we need to fetch Mojang's api to retrieve their UUID if they exist.
+     *      If they do exist, we want to reset their key. When resetting their key, the plugin will try to change the player's state, but since we know
+     *      for a fact the player is offline, it would not call PlayerStateChangeEvent, avoiding the IllegalStateException caused by calling events not in Main Thread.
+     *
+     * TL;DR
+     * this function can either be sync if the player is online (and then call PlayerStateChangeEvent) or run async if they're offline (and then not call the event)
+     */
     @Override
     public void execute(CommandSender commandSender, String[] targets) {
         if(!hasPermissions(commandSender)) {
             main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
         } else {
-            Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
-                for(String target : targets) {
-                    Player targetPlayer = Bukkit.getPlayer(target);
-                    UUID targetUUID;
+            for(String target : targets) {
+                Player targetPlayer = Bukkit.getPlayer(target);
 
-                    // TODO check that async is working 
-                    if(targetPlayer != null)
-                        targetUUID = targetPlayer.getUniqueId();
-                    else
-                        targetUUID = AuthUtils.fetchUUID(target);
+                if(targetPlayer != null) {
+                    UUID targetUUID = targetPlayer.getUniqueId();
+                    reset2FA(commandSender, target, targetUUID);
+                } else {
+                    Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+                        UUID targetUUID = AuthUtils.fetchUUID(target);
 
-                    if(targetUUID == null) {
-                        main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_FOUND, new Pair<>("%name%", target));
-                    } else {
-                        if(main.getAuthHandler().is2FAEnabled(targetUUID)) {
-                            main.getAuthHandler().resetKey(targetUUID);
-                            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.RESET_FOR, new Pair<>("%name%", target));
-                        } else {
-                            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_SETUP, new Pair<>("%name%", target));
-                        }
-                    }
+                        if(targetUUID == null)
+                            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_FOUND, new Pair<>("%name%", target));
+                        else
+                            reset2FA(commandSender, target, targetUUID);
+                    });
                 }
-            });
+            }
+        }
+    }
+
+    private void reset2FA(CommandSender commandSender, String target, UUID targetUUID) {
+        if(main.getAuthHandler().is2FAEnabled(targetUUID)) {
+            main.getAuthHandler().resetKey(targetUUID);
+            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.RESET_FOR, new Pair<>("%name%", target));
+        } else {
+            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_SETUP, new Pair<>("%name%", target));
         }
     }
 

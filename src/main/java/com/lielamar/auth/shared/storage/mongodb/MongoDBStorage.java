@@ -170,4 +170,9 @@ public class MongoDBStorage extends StorageHandler {
     public boolean hasEnableDate(UUID uuid) {
         return getEnableDate(uuid) != -1;
     }
+
+    @Override
+    public void unload() {
+        mongoClient.close();
+    }
 }

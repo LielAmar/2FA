@@ -1,9 +1,9 @@
 package com.lielamar.auth.bukkit.handlers;
 
+import com.lielamar.lielsutils.ColorUtils;
 import com.lielamar.lielsutils.files.FileManager;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -27,7 +27,7 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
             if(PLACEHOLDER_API_ENABLED && sender instanceof Player)
                 message = PlaceholderAPI.setPlaceholders((Player) sender, message);
 
-            ((CommandSender)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            ((CommandSender)sender).sendMessage(ColorUtils.translateAlternateColorCodes('&', message));
         }
     }
 

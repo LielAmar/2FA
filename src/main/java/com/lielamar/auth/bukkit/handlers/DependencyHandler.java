@@ -45,6 +45,7 @@ public class DependencyHandler {
         String mariaDBGroupId = properties.getProperty("group_id_maria_db", "org.mariadb.jdbc");
         String postgresGroupId = properties.getProperty("group_id_postgres", "org.postgresql");
         String mongoDBGroupId = properties.getProperty("group_id_mongo_db", "org.mongodb");
+        String slf4jGroupId = properties.getProperty("group_id_slf4j", "org.slf4j");
 
         String googleAuthArtifactId = properties.getProperty("artifact_id_google_auth", "googleauth");
         String commonsCodecArtifactId = properties.getProperty("artifact_id_commons_codec", "commons-codec");
@@ -54,17 +55,19 @@ public class DependencyHandler {
         String mariaDBArtifactId = properties.getProperty("artifact_id_maria_db", "mariadb-java-client");
         String postgresArtifactId = properties.getProperty("artifact_id_postgres", "postgresql");
         String mongoDBArtifactId = properties.getProperty("artifact_id_mongo_db", "mongo-java-driver");
+        String slf4jArtifactId = properties.getProperty("artifact_id_slf4j", "slf4j-api");
 
-        String googleAuthVersion = properties.getProperty("version_google_auth", "1.4.0");
-        String commonsCodecVersion = properties.getProperty("version_commons_codec", "1.6");
+        String googleAuthVersion = properties.getProperty("version_google_auth", "1.5.0");
+        String commonsCodecVersion = properties.getProperty("version_commons_codec", "1.15");
         String hikariCpVersion = properties.getProperty("version_hikari_cp", "4.0.3");
         String h2Version = properties.getProperty("version_h2", "1.4.200");
         String mysqlVersion = properties.getProperty("version_mysql", "8.0.26");
         String mariaDBVersion = properties.getProperty("version_maria_db", "2.7.3");
         String postgresVersion = properties.getProperty("version_postgres", "42.2.23");
-        String mongoDBVersion = properties.getProperty("version_mongo_db", "3.12.7");
+        String mongoDBVersion = properties.getProperty("version_mongo_db", "3.12.10");
+        String slf4jVersion = properties.getProperty("version_slf4j", "2.0.0-alpha5");
 
-        System.out.println("[2FA] Loaded library Google Auth v" + googleAuthVersion);
+        System.out.println("[2FA] Loading library Google Auth v" + googleAuthVersion);
         Library library = Library.builder()
                 .groupId(googleAuthGroupId)
                 .artifactId(googleAuthArtifactId)
@@ -72,7 +75,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loaded library Commons-Codec v" + commonsCodecVersion);
+        System.out.println("[2FA] Loading library Commons-Codec v" + commonsCodecVersion);
         library = Library.builder()
                 .groupId(commonsCodecGroupId)
                 .artifactId(commonsCodecArtifactId)
@@ -80,7 +83,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loaded library HikariCP v" + hikariCpVersion);
+        System.out.println("[2FA] Loading library HikariCP v" + hikariCpVersion);
         library = Library.builder()
                 .groupId(hikariCpGroupId)
                 .artifactId(hikariCpArtifactId)
@@ -88,7 +91,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loaded library H2 v" + h2Version);
+        System.out.println("[2FA] Loading library H2 v" + h2Version);
         library = Library.builder()
                 .groupId(h2GroupId)
                 .artifactId(h2ArtifactId)
@@ -96,7 +99,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loaded library MySQL v" + mysqlVersion);
+        System.out.println("[2FA] Loading library MySQL v" + mysqlVersion);
         library = Library.builder()
                 .groupId(mysqlGroupId)
                 .artifactId(mysqlArtifactId)
@@ -104,7 +107,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loaded library MariaDB v" + mariaDBVersion);
+        System.out.println("[2FA] Loading library MariaDB v" + mariaDBVersion);
         library = Library.builder()
                 .groupId(mariaDBGroupId)
                 .artifactId(mariaDBArtifactId)
@@ -112,7 +115,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loaded library PostgreSQL v" + postgresVersion);
+        System.out.println("[2FA] Loading library PostgreSQL v" + postgresVersion);
         library = Library.builder()
                 .groupId(postgresGroupId)
                 .artifactId(postgresArtifactId)
@@ -120,11 +123,19 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loaded library MongoDB v" + mongoDBVersion);
+        System.out.println("[2FA] Loading library MongoDB v" + mongoDBVersion);
         library = Library.builder()
                 .groupId(mongoDBGroupId)
                 .artifactId(mongoDBArtifactId)
                 .version(mongoDBVersion)
+                .build();
+        loader.loadLibrary(library);
+
+        System.out.println("[2FA] Loading library Slf4j v" + slf4jVersion);
+        library = Library.builder()
+                .groupId(slf4jGroupId)
+                .artifactId(slf4jArtifactId)
+                .version(slf4jVersion)
                 .build();
         loader.loadLibrary(library);
     }

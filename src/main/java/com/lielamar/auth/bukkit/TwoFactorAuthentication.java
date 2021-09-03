@@ -1,7 +1,6 @@
 package com.lielamar.auth.bukkit;
 
 import com.lielamar.auth.bukkit.handlers.*;
-import com.lielamar.auth.bukkit.utils.Version;
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.lielsutils.bstats.MetricsSpigot;
@@ -31,6 +30,19 @@ public class TwoFactorAuthentication extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "                   ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "  ___  ______      ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + " |__ \\|  ____/\\    ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "    ) | |__ /  \\   " + "    "
+                + ChatColor.DARK_AQUA + "2FA " + ChatColor.AQUA + "v" + getDescription().getVersion());
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "   / /|  __/ /\\ \\  " + "    "
+                + ChatColor.DARK_GRAY + "Made with " + ChatColor.RED + "♥" + ChatColor.DARK_GRAY + " by "
+                + ChatColor.AQUA + getDescription().getAuthors().toString().replaceAll("\\[", "").replace("]", ""));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "  / /_| | / ____ \\ " + "    "
+                + ChatColor.DARK_GRAY + "Time contributed so far " + ChatColor.AQUA + "~175 Hours");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + " |____|_|/_/    \\_\\");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "                   ");
+
         this.setupDependencies();
         if(!Bukkit.getPluginManager().isPluginEnabled(this)) return;
 
@@ -49,10 +61,9 @@ public class TwoFactorAuthentication extends JavaPlugin {
 
 
     private void setupDependencies() {
-        if(Version.getInstance().getNMSVersion().above(Version.NMSVersion.v1_16_R3) && Version.getInstance().getServerVersion().above(Version.ServerVersion.v1_16_4)) {
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] Your server version is above or equal to 1.16.5. Using the default spigot dependency loader");
-        } else {
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] Your server version is below 1.16.5. Using a custom dependency loader");
+        try { Class.forName("com.warrenstrange.googleauth.GoogleAuthenticator"); }
+        catch(ClassNotFoundException exception) {
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] The default spigot dependency loader either does not exist or failed to load dependencies. Falling back to a custom dependency loader");
             new DependencyHandler(this);
         }
 
@@ -99,6 +110,11 @@ public class TwoFactorAuthentication extends JavaPlugin {
         getServer().getMessenger().registerIncomingPluginChannel(this, PluginMessagingHandler.channelName, pluginMessageListener);
     }
 
+
+    @Override
+    public void onDisable() {
+        this.storageHandler.unload();
+    }
 
     public BungeecordMessageHandler getPluginMessageListener() { return this.pluginMessageListener; }
     public FileManager getFileManager() { return this.fileManager; }

@@ -16,7 +16,7 @@ qr-code-service: "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://
 check-for-updates: true
 
 # Your server name. This will be the name of the service displayed in the authenticator app
-server-name: "MyServer"
+server-name: "My Minecraft Server"
 
 # Whether to send a message advising to use 2FA if the player has permissions to use it
 advise-2fa: true

@@ -6,6 +6,7 @@ import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.commands.Command;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -21,20 +22,23 @@ import java.util.stream.Collectors;
 
 public class CommandHandler implements CommandExecutor, TabCompleter {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
     private final Set<Command> commands;
     private Command loginCommand, setupCommand;
 
-    public CommandHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    public CommandHandler(TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
+        this.commands = new HashSet<>();
 
-        PluginCommand pluginCommand = this.main.getCommand(Constants.mainCommand);
+        if(!Bukkit.getPluginManager().isPluginEnabled(plugin)) return;
+
+        PluginCommand pluginCommand = this.plugin.getCommand(Constants.mainCommand);
         if(pluginCommand != null) {
             pluginCommand.setExecutor(this);
             pluginCommand.setTabCompleter(this);
         }
 
-        this.commands = new HashSet<>();
+
         this.setupCommands();
     }
 
@@ -42,14 +46,14 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
      * Sets up all of the sub commands of /2fa
      */
     private void setupCommands() {
-        loginCommand = new LoginCommand("", main);
-        setupCommand = new SetupCommand("", main);
-        commands.add(new EnableCommand(Constants.enableCommand, main));
-        commands.add(new DisableCommand(Constants.disableCommand, main));
-        commands.add(new CancelCommand(Constants.cancelCommand, main));
-        commands.add(new ReloadCommand(Constants.reloadCommand, main));
-        commands.add(new ReportCommand(Constants.reportCommand, main));
-        commands.add(new HelpCommand(Constants.helpCommand, main, commands));
+        loginCommand = new LoginCommand("", plugin);
+        setupCommand = new SetupCommand("", plugin);
+        commands.add(new EnableCommand(Constants.enableCommand, plugin));
+        commands.add(new DisableCommand(Constants.disableCommand, plugin));
+        commands.add(new CancelCommand(Constants.cancelCommand, plugin));
+        commands.add(new ReloadCommand(Constants.reloadCommand, plugin));
+        commands.add(new ReportCommand(Constants.reportCommand, plugin));
+        commands.add(new HelpCommand(Constants.helpCommand, plugin, commands));
     }
 
     /**
@@ -78,33 +82,33 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull org.bukkit.command.Command cmd, @NotNull String cmdLabel, @NotNull String[] args) {
         if(!commandSender.hasPermission("2fa.use")) {
-            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+            plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
             return false;
         }
 
         if(commandSender instanceof Player) {
             Player player = (Player) commandSender;
 
-            if(main.getAuthHandler() == null) {
-                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SOMETHING_WENT_WRONG);
+            if(plugin.getAuthHandler() == null) {
+                plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SOMETHING_WENT_WRONG);
                 return false;
-            } else if(main.getAuthHandler().getAuthState(player.getUniqueId()) == null) {
-                main.getAuthHandler().playerJoin(player.getUniqueId());
+            } else if(plugin.getAuthHandler().getAuthState(player.getUniqueId()) == null) {
+                plugin.getAuthHandler().playerJoin(player.getUniqueId());
             }
 
             // If we don't receive an argument we want to either execute the help command if they have 2fa setup, or execute the setup (enable) command if they don't have it setup.
             if(args.length == 0) {
-                Command subCommand = (main.getAuthHandler().is2FAEnabled(player.getUniqueId()) ? getCommand(Constants.helpCommand) : getCommand(Constants.enableCommand));
+                Command subCommand = (plugin.getAuthHandler().is2FAEnabled(player.getUniqueId()) ? getCommand(Constants.helpCommand) : getCommand(Constants.enableCommand));
                 if(subCommand != null) {
                     subCommand.execute(commandSender, args);
                     return true;
                 }
             // If we received an argument, we want to try to authenticate the user
             } else {
-                if(main.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_LOGIN) {
+                if(plugin.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_LOGIN) {
                     loginCommand.execute(player, args);
                     return false;
-                } else if(main.getAuthHandler().isPendingSetup(player.getUniqueId())) {
+                } else if(plugin.getAuthHandler().isPendingSetup(player.getUniqueId())) {
                     Command subCommand = getCommand(args[0]);
                     if(subCommand instanceof CancelCommand) subCommand.execute(player, args);
                     else setupCommand.execute(player, args);

@@ -68,13 +68,35 @@ public abstract class StorageHandler {
     public abstract boolean hasIP(UUID uuid);
 
 
-
+    /**
+     * Sets the Enable Date of the player who's UUID is uuid
+     *
+     * @param uuid         UUID of the player to set the Enable Date of
+     * @param enableDate   Enable Date to set
+     * @return             The set Enable Date
+     */
     public abstract long setEnableDate(UUID uuid, long enableDate);
 
+    /**
+     * Returns the Enable Date of the player who's UUID is uuid
+     *
+     * @param uuid   UUID of the player to get the Enable Date of
+     * @return       Enable Date of the player
+     */
     public abstract long getEnableDate(UUID uuid);
 
+    /**
+     * Checks whether or not a player who's UUID is uuid has an Enable Date
+     *
+     * @param uuid   UUID of the player to check the Enable Date of
+     * @return       Whether or not the player has an Enable Date
+     */
     public abstract boolean hasEnableDate(UUID uuid);
 
+    /**
+     * Unloads everything related to the storage type
+     */
+    public abstract void unload();
 
     /**
      * Sets up the Storage connection of the database

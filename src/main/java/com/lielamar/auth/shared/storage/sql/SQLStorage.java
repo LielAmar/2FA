@@ -4,7 +4,6 @@ import com.lielamar.auth.shared.storage.StorageHandler;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.*;
-import java.time.Instant;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -88,6 +87,20 @@ public class SQLStorage extends StorageHandler {
             String sql = "CREATE TABLE IF NOT EXISTS " + this.fullPlayersTableName + " (`uuid` varchar(64), `key` varchar(64), `ip` varchar(256), `enable_date` long);";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.executeUpdate();
+
+            // Validating the SQL has the required columns. Ignoring the error because it can only throw an error when the SQL user doesn't have access to information_schema.
+            try {
+                sql = "SELECT column_name FROM information_schema.columns WHERE table_name = '" + this.fullPlayersTableName + "' and column_name = 'enable_date'";
+                stmt = connection.prepareStatement(sql);
+                if(!stmt.executeQuery().next()) {
+                    sql = "ALTER TABLE " + this.fullPlayersTableName + " ADD `enable_date` long DEFAULT -1;";
+                    stmt = connection.prepareStatement(sql);
+                    stmt.executeUpdate();
+                }
+            } catch(Exception ignored) {
+                System.out.println("[2FA] The plugin could not add the 'enable_date' column to your SQL database in table: " + this.fullPlayersTableName + "." +
+                        "Please give your SQL user permissions to information_schema or add the column manually, otherwise the plugin won't work properly!");
+            }
         } catch(SQLException exception) {
             exception.printStackTrace();
         } finally {
@@ -341,5 +354,11 @@ public class SQLStorage extends StorageHandler {
     @Override
     public boolean hasEnableDate(UUID uuid) {
         return getEnableDate(uuid) != -1;
+    }
+
+    @Override
+    public void unload() {
+        if(!hikari.isClosed())
+            hikari.close();
     }
 }

@@ -1,19 +1,20 @@
 name: 2FA
-version: "1.5.1"
-authors: [LielAmar]
+version: "1.5.2"
+authors: [LielAmar, SadGhost]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
 description: Add another layer of protection to your server
 softdepend: [PlaceholderAPI, Vault, PermissionsEX, LuckPerms]
 
 libraries:
-  - com.warrenstrange:googleauth:1.4.0
-  - commons-codec:commons-codec:1.6
+  - com.warrenstrange:googleauth:1.5.0
+  - commons-codec:commons-codec:1.15
   - com.zaxxer:HikariCP:4.0.3
   - com.h2database:h2:1.4.200
   - mysql:mysql-connector-java:8.0.26
   - org.mariadb.jdbc:mariadb-java-client:2.7.3
   - org.postgresql:postgresql:42.2.23
-  - org.mongodb:mongo-java-driver:3.12.7
+  - org.mongodb:mongo-java-driver:3.12.10
+  - org.slf4j:slf4j-api:2.0.0-alpha5
 
 commands:
   2fa:

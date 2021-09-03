@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,6 +24,7 @@
         <group-id.maria-db>org.mariadb.jdbc</group-id.maria-db>
         <group-id.postgres>org.postgresql</group-id.postgres>
         <group-id.mongo-db>org.mongodb</group-id.mongo-db>
+        <group-id.slf4j>org.slf4j</group-id.slf4j>
 
         <artifact-id.googleauth>googleauth</artifact-id.googleauth>
         <artifact-id.commons-codec>commons-codec</artifact-id.commons-codec>
@@ -33,15 +34,17 @@
         <artifact-id.maria-db>mariadb-java-client</artifact-id.maria-db>
         <artifact-id.postgres>postgresql</artifact-id.postgres>
         <artifact-id.mongo-db>mongo-java-driver</artifact-id.mongo-db>
+        <artifact-id.slf4j>slf4j-api</artifact-id.slf4j>
 
-        <version.googleauth>1.4.0</version.googleauth>
-        <version.commons-codec>1.6</version.commons-codec>
+        <version.googleauth>1.5.0</version.googleauth>
+        <version.commons-codec>1.15</version.commons-codec>
         <version.hikari-cp>4.0.3</version.hikari-cp>
         <version.h2>1.4.200</version.h2>
         <version.mysql>8.0.26</version.mysql>
         <version.maria-db>2.7.3</version.maria-db>
         <version.postgres>42.2.23</version.postgres>
-        <version.mongo-db>3.12.7</version.mongo-db>
+        <version.mongo-db>3.12.10</version.mongo-db>
+        <version.slf4j>2.0.0-alpha5</version.slf4j>
 
     </properties>
 
@@ -129,7 +132,7 @@
         <dependency>
             <groupId>com.lielamar</groupId>
             <artifactId>lielsutils</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.3</version>
             <scope>compile</scope>
         </dependency>
 
@@ -238,6 +241,12 @@
             <artifactId>${artifact-id.mongo-db}</artifactId>
             <version>${version.mongo-db}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.slf4j}</groupId>
+            <artifactId>${artifact-id.slf4j}</artifactId>
+            <version>${version.slf4j}</version>
         </dependency>
     </dependencies>
 </project>
