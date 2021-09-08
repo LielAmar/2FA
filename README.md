@@ -27,7 +27,7 @@ This plugin adds another layer of protection to your server, by allowing players
 
 ## Using Liel's 2FA
 You can download 2FA from [Spigot](https://www.spigotmc.org/resources/2-factor-authentication-bungeecord-json-mysql-mongodb.85594/).
-<br>After downloading, simply drug it into your plugins folder and reload the server!
+<br>After downloading, simply drag it into your plugins folder and reload the server!
 <br>* If you use BungeeCord, install the plugin in your BungeeCord/plugins/ folder as well!
 
 ## Contributing
