@@ -2,9 +2,6 @@
 
 ![2FA Logo](https://i.imgur.com/8uMIZ4a.png)
 
-
-<!-- https://api.github.com/repos/lielamar/2fa/releases/latest -->
-
 [![CircleCI](https://circleci.com/gh/LielAmar/2FA.svg?style=shield)](https://circleci.com/gh/LielAmar/2FA.svg?style=shield)
 [![License](https://img.shields.io/badge/License-MIT-%23ff7057?style=flat)](https://github.com/LielAmar/2FA/blob/master/LICENSE)
 [![Release](https://img.shields.io/badge/dynamic/json?color=blue&label=Latest%20Release&query=tag_name&url=https%3A%2F%2Fapi.github.com%2Frepos%2Flielamar%2F2fa%2Freleases%2Flatest)](https://github.com/LielAmar/2FA/releases/latest)
