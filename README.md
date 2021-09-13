@@ -8,6 +8,8 @@
 [![Issues](https://img.shields.io/github/issues-raw/LielAmar/2FA?logo=github&logoColor=white)](https://github.com/LielAmar/2FA/issues)
 [![Spigot](https://img.shields.io/badge/dynamic/json?color=yellow&label=Check%20it%20on%20Spigot&query=downloads&suffix=%20Downloads&url=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F85594)](https://www.spigotmc.org/resources/85594/)
 
+[![CircleCI](https://circleci.com/gh/LielAmar/2FA.svg?style=svg)](https://circleci.com/gh/LielAmar/2FA.svg?style=svg)
+
 ## Information
 2FA is a Spigot/Paper plugin, with BungeeCord support.
 <br>It is a fork of [Connor Linfoot's MC2FA](https://github.com/ConnorLinfoot/MC2FA).
