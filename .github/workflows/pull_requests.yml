@@ -1,4 +1,4 @@
-name: "Pull Requests Test"
+name: "Install, Build & Test"
 
 on:
   pull_request:
@@ -23,10 +23,10 @@ jobs:
         run: mvn clean install
         continue-on-error: false
 
-      - name: Test
-        run: mvn test
-        continue-on-error: false
-
       - name: Package
         run: mvn package
+        continue-on-error: false
+
+      - name: Test
+        run: mvn test
         continue-on-error: false
