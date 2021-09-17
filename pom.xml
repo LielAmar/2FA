@@ -132,7 +132,7 @@
         <dependency>
             <groupId>com.lielamar</groupId>
             <artifactId>lielsutils</artifactId>
-            <version>1.5.3</version>
+            <version>1.5.4</version>
             <scope>compile</scope>
         </dependency>
 
