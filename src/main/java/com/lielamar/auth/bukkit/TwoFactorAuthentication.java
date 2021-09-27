@@ -113,7 +113,8 @@ public class TwoFactorAuthentication extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        this.storageHandler.unload();
+        if(this.storageHandler != null)
+            this.storageHandler.unload();
     }
 
     public BungeecordMessageHandler getPluginMessageListener() { return this.pluginMessageListener; }

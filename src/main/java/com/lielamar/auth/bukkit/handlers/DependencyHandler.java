@@ -24,10 +24,10 @@ public class DependencyHandler {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA failed to load dependencies. The plugin might not support all features!");
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] This has most likely happened because your server doesn't have access to the internet!");
         } catch(Exception exception) {
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA detected that you are using Java 16 without the --add-opens java.base/java.lang=ALL-UNNAMED flag!");
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] If you want the plugin to support all features, please add this flag to your startup script");
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] Disabling plugin...");
-            Bukkit.getPluginManager().disablePlugin(plugin);
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA detected that you are using Java 16 without the --add-opens java.base/java.lang=ALL-UNNAMED or the --add-opens java.base/java.net=ALL-UNNAMED flags!");
+            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] If you want the plugin to support all features, most significantly Remote Databases, please add this flag to your startup script");
+//            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] Disabling plugin...");
+//            Bukkit.getPluginManager().disablePlugin(plugin);
         }
     }
 
