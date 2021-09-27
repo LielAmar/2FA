@@ -1,0 +1,33 @@
+name: "Install, Build & Test"
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test_pull_requests:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '16'
+        continue-on-error: false
+
+      - name: Clean & Install
+        run: mvn clean install
+        continue-on-error: false
+
+      - name: Package
+        run: mvn package
+        continue-on-error: false
+
+      - name: Test
+        run: mvn test
+        continue-on-error: false
