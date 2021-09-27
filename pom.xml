@@ -249,4 +249,12 @@
             <version>${version.slf4j}</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>liels-repo</id>
+            <name>Liel's Repo</name>
+            <url>https://repo.lielamar.com/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 </project>

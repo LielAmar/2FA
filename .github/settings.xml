@@ -10,4 +10,12 @@
             <password>${env.LIELS_REPO_PASSWORD}</password>
         </server>
     </servers>
+
+    <mirrors>
+        <mirror>
+            <id>liels-repo</id>
+            <mirrorOf>com.lielamar</mirrorOf>
+            <url>https://repo.lielamar.com/repository/maven-releases/</url>
+        </mirror>
+    </mirrors>
 </settings>
