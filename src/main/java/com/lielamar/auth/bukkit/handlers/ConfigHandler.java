@@ -2,6 +2,9 @@ package com.lielamar.auth.bukkit.handlers;
 
 import com.lielamar.auth.shared.storage.StorageMethod;
 import com.lielamar.lielsutils.files.FileManager;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Arrays;
@@ -148,6 +151,54 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
             config.addComment("require-when.every-login", "  # On every login");
         } else
             super.requireOnEveryLogin = config.getBoolean("require-when.every-login");
+
+        if(!config.contains("tp-before-auth")) {
+            config.set("tp-before-auth.enable", super.tpBeforeAuth);
+            config.set("tp-before-auth.location.x", 0);
+            config.set("tp-before-auth.location.y", 100);
+            config.set("tp-before-auth.location.z", 0);
+            config.set("tp-before-auth.location.yaw", 0);
+            config.set("tp-before-auth.location.pitch", 0);
+            config.set("tp-before-auth.location.world", "world");
+            config.addComment("tp-before-auth", "# Should the plugin teleport players that need to authenticate to a designated location?");
+        } else {
+            super.tpBeforeAuth = config.getBoolean("tp-before-auth.enable");
+            World world = Bukkit.getWorld(config.getString("tp-before-auth.location.world", "world"));
+
+            if(world != null) {
+                super.tpBeforeAuthLocation = new Location(
+                        world,
+                        config.getDouble("tp-before-auth.location.x"),
+                        config.getDouble("tp-before-auth.location.y"),
+                        config.getDouble("tp-before-auth.location.z"),
+                        (float) config.getDouble("tp-before-auth.location.yaw"),
+                        (float) config.getDouble("tp-before-auth.location.pitch"));
+            }
+        }
+
+        if(!config.contains("tp-after-auth")) {
+            config.set("tp-after-auth.enable", super.tpAfterAuth);
+            config.set("tp-after-auth.location.x", 0);
+            config.set("tp-after-auth.location.y", 100);
+            config.set("tp-after-auth.location.z", 0);
+            config.set("tp-after-auth.location.yaw", 0);
+            config.set("tp-after-auth.location.pitch", 0);
+            config.set("tp-after-auth.location.world", "world");
+            config.addComment("tp-after-auth", "# Should the plugin teleport players to a designated location right after they authenticated?");
+        } else {
+            super.tpAfterAuth = config.getBoolean("tp-after-auth.enable");
+            World world = Bukkit.getWorld(config.getString("tp-after-auth.location.world", "world"));
+
+            if(world != null) {
+                super.tpAfterAuthLocation = new Location(
+                        world,
+                        config.getDouble("tp-after-auth.location.x"),
+                        config.getDouble("tp-after-auth.location.y"),
+                        config.getDouble("tp-after-auth.location.z"),
+                        (float) config.getDouble("tp-after-auth.location.yaw"),
+                        (float) config.getDouble("tp-after-auth.location.pitch"));
+            }
+        }
 
         if(!config.contains("storage-method")) {
             config.set("storage-method", super.storageMethod.toString());
