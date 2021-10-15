@@ -101,7 +101,7 @@ public class TwoFactorAuthentication extends JavaPlugin {
     private void registerListeners() {
         PluginManager pm = Bukkit.getPluginManager();
 
-        pm.registerEvents(new OnAuthStateChange(), this);
+        pm.registerEvents(new OnAuthStateChange(this), this);
         pm.registerEvents(new OnPlayerConnection(this), this);
         pm.registerEvents(new DisabledEvents(this), this);
 

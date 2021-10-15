@@ -131,14 +131,10 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      * @param uuid   UUID of the player to handle
      */
     private void handlePlayerJoin(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
-        if(player != null && player.isOnline()
-                && main.getConfigHandler().shouldTeleportBeforeAuth()
-                && main.getConfigHandler().teleportBeforeAuthLocation() != null)
-            player.teleport(main.getConfigHandler().teleportBeforeAuthLocation());
-
         // The reason there's a 1 tick delay before every message is that if you send a ChannelMessage too fast, sometimes bungeecord doesn't register the message.
         Bukkit.getScheduler().runTaskLater(this.main, () -> {
+            Player player = Bukkit.getPlayer(uuid);
+
             if(player == null || !player.isOnline()) {
                 return;
             }
@@ -193,15 +189,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     @Override
     public void changeState(UUID uuid, AuthState authState) {
         changeState(uuid, authState, true);
-
-        if(authState == null ||
-                authState == AuthState.AUTHENTICATED || authState == AuthState.DISABLED) {
-            Player player = Bukkit.getPlayer(uuid);
-            if(player != null && player.isOnline()
-                    && main.getConfigHandler().shouldTeleportAfterAuth()
-                    && main.getConfigHandler().teleportAfterAuthLocation() != null)
-                    player.teleport(main.getConfigHandler().teleportAfterAuthLocation());
-        }
     }
 
     public void changeState(UUID uuid, AuthState authState, boolean updateBungeecord) {
@@ -210,12 +197,14 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         Player player = Bukkit.getPlayer(uuid);
         if(player != null) {
-            PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authState);
+            PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authStates.get(uuid), authState);
+
             Bukkit.getPluginManager().callEvent(event);
+
             if(event.isCancelled())
                 return;
 
-            authState = event.getAuthState();
+            authState = event.getNewAuthState();
         }
 
         authStates.put(uuid, authState);

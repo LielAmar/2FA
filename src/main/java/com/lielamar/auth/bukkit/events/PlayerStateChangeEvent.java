@@ -16,11 +16,12 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
 
     private final Player player;
     private boolean cancelled = false;
-    private AuthHandler.AuthState authState;
+    private AuthHandler.AuthState oldAuthState, newAuthState;
 
-    public PlayerStateChangeEvent(Player player, AuthHandler.AuthState authState) {
+    public PlayerStateChangeEvent(Player player, AuthHandler.AuthState oldAuthState, AuthHandler.AuthState newAuthState) {
         this.player = player;
-        this.authState = authState;
+        this.oldAuthState = oldAuthState;
+        this.newAuthState = newAuthState;
     }
 
     @Override
@@ -46,11 +47,19 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
         return player;
     }
 
-    public AuthHandler.AuthState getAuthState() {
-        return authState;
+    public AuthHandler.AuthState getOldAuthState() {
+        return oldAuthState;
     }
 
-    public void setAuthState(AuthHandler.AuthState authState) {
-        this.authState = authState;
+    public void setOldAuthState(AuthHandler.AuthState oldAuthState) {
+        this.oldAuthState = oldAuthState;
+    }
+
+    public AuthHandler.AuthState getNewAuthState() {
+        return newAuthState;
+    }
+
+    public void setNewAuthState(AuthHandler.AuthState newAuthState) {
+        this.newAuthState = newAuthState;
     }
 }
