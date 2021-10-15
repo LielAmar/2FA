@@ -8,7 +8,7 @@ public class PlayerStateChangeEventExample implements Listener {
 
     @EventHandler
     public void onStateChange(PlayerStateChangeEvent event) {
-        if(event.getAuthState() == AuthHandler.AuthState.PENDING_LOGIN) {
+        if(event.getNewAuthState() == AuthHandler.AuthState.PENDING_LOGIN) {
             event.getPlayer().sendMessage(ChatColor.GREEN + "We are waiting for you to authenticate!");
         }
     }
