@@ -1,6 +1,7 @@
 package com.lielamar.auth.shared.handlers;
 
 import com.lielamar.auth.shared.storage.StorageMethod;
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -41,6 +42,11 @@ public abstract class ConfigHandler {
 
     protected boolean requireOnIPChange = true;
     protected boolean requireOnEveryLogin = false;
+
+    protected boolean tpBeforeAuth = false;
+    protected Location tpBeforeAuthLocation = null;
+    protected boolean tpAfterAuth = false;
+    protected Location tpAfterAuthLocation = null;
 
     protected StorageMethod storageMethod = StorageMethod.JSON;
 
@@ -89,6 +95,13 @@ public abstract class ConfigHandler {
     public boolean shouldRequiredOnEveryLogin() {
         return this.requireOnEveryLogin;
     }
+
+
+    public boolean shouldTeleportBeforeAuth() { return this.tpBeforeAuth; }
+    public Location teleportBeforeAuthLocation() { return this.tpBeforeAuthLocation; }
+    public boolean shouldTeleportAfterAuth() { return this.tpAfterAuth; }
+    public Location teleportAfterAuthLocation() { return this.tpAfterAuthLocation; }
+
 
     public StorageMethod getStorageMethod() { return this.storageMethod; }
 

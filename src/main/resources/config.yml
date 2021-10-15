@@ -77,6 +77,28 @@ require-when:
   # On every login
   every-login: false
 
+# Should the plugin teleport players that need to authenticate to a designated location?
+tp-before-auth:
+  enable: false
+  location:
+    x: 0
+    y: 100
+    z: 0
+    yaw: 0
+    pitch: 0
+    world: "world"
+
+# Should the plugin teleport players to a designated location right after they authenticated OR if they don't have 2FA enabled?
+tp-after-auth:
+  enable: false
+  location:
+    x: 0
+    y: 100
+    z: 0
+    yaw: 0
+    pitch: 0
+    world: "world"
+
 # Possible methods for the plugin to store data
 #
 # Local

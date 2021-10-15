@@ -134,6 +134,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         // The reason there's a 1 tick delay before every message is that if you send a ChannelMessage too fast, sometimes bungeecord doesn't register the message.
         Bukkit.getScheduler().runTaskLater(this.main, () -> {
             Player player = Bukkit.getPlayer(uuid);
+
             if(player == null || !player.isOnline()) {
                 return;
             }
@@ -196,12 +197,14 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         Player player = Bukkit.getPlayer(uuid);
         if(player != null) {
-            PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authState);
+            PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authStates.get(uuid), authState);
+
             Bukkit.getPluginManager().callEvent(event);
+
             if(event.isCancelled())
                 return;
 
-            authState = event.getAuthState();
+            authState = event.getNewAuthState();
         }
 
         authStates.put(uuid, authState);
