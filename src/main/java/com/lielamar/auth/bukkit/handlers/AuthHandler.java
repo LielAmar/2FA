@@ -12,10 +12,7 @@ import com.lielamar.auth.shared.utils.hash.SHA512;
 import com.lielamar.lielsutils.ColorUtils;
 import com.lielamar.lielsutils.SpigotUtils;
 import net.md_5.bungee.api.chat.*;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -110,23 +107,32 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public void playerJoin(UUID uuid) {
         super.playerJoin(uuid);
 
-        // If no player has joined the server yet, meaning there was no opportunity to check if the server is using bungeecord
-        //   * we check if the server is using bungeecord by sending a message to bungeecord and expecting a response. Once we get a response we know the server is using bungeecord
-        // then we want to firstly send the #loadBungeecord message to bungeecord, and only then load the player.
-        // If bungeecord was already loaded (we know this through loadedBungeecord, which changes to true after the initial load), we only want to load the player because we already know whether
-        // the server is using bungeecord or not.
+        // Loads the player whenever they join the server.
+        //
+        // If bungeecord was not loaded yet, we want to try to load it. What it generally means is - we send a request called
+        // "LOAD_BUNGEECORD" to bungeecord. If we get a response, it means bungeecord exists, and then we set the value of
+        // isBungeecordEnabled to true, so we know to use bungeecord for future requests.
+        // In case bungeecord was loaded successfully, we provide a callback to re-load the joined player, since when we loaded
+        // them, we did so locally on the spigot instance and not in bungeecord.
+        //
+        // This way, if a player was online and then joined a spigot instance that was just booted, it would load their data and ask
+        // them to authenticate, but straight after that, it'd load bungeecord and then re-load the player and auto-authenticate them.
+
+        handlePlayerJoin(uuid);
+
         if(!loadedBungeecord) {
             loadedBungeecord = true;
 
-            Bukkit.getScheduler().runTaskLater(this.main, () -> this.main.getPluginMessageListener().loadBungeecord(uuid, null), 1L);
+            long timeMillis = System.currentTimeMillis();
+            Bukkit.getScheduler().runTaskLater(this.main, () -> this.main.getPluginMessageListener().loadBungeecord(uuid, new Callback() {
+                public void execute() { handlePlayerJoin(uuid); }
+                public long getExecutionStamp() { return timeMillis; }
+            }), 1L);
         }
-
-        // Loading the player, only after the above code is done executing (since it's not async).
-        handlePlayerJoin(uuid);
     }
 
     /**
-     * A util method to handle the player join event. It removes the map copies from their inventory, loads their auth state (from either spigot/bungeecord), etc.
+     * A method to handle the player join event. It removes the map copies from their inventory, loads their auth state (from either spigot/bungeecord), etc.
      *
      * @param uuid   UUID of the player to handle
      */
@@ -135,9 +141,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         Bukkit.getScheduler().runTaskLater(this.main, () -> {
             Player player = Bukkit.getPlayer(uuid);
 
-            if(player == null || !player.isOnline()) {
+            if(player == null || !player.isOnline())
                 return;
-            }
 
             // Removing previous QR codes
             for(ItemStack item : player.getInventory().getContents()) {
@@ -200,7 +205,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authStates.get(uuid), authState);
 
             Bukkit.getPluginManager().callEvent(event);
-
             if(event.isCancelled())
                 return;
 

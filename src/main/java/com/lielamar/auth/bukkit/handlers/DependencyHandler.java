@@ -26,8 +26,6 @@ public class DependencyHandler {
         } catch(Exception exception) {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA detected that you are using Java 16 without the --add-opens java.base/java.lang=ALL-UNNAMED or the --add-opens java.base/java.net=ALL-UNNAMED flags!");
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] If you want the plugin to support all features, most significantly Remote Databases, please add this flag to your startup script");
-//            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] Disabling plugin...");
-//            Bukkit.getPluginManager().disablePlugin(plugin);
         }
     }
 
@@ -63,7 +61,7 @@ public class DependencyHandler {
         String h2Version = properties.getProperty("version_h2", "1.4.200");
         String mysqlVersion = properties.getProperty("version_mysql", "8.0.26");
         String mariaDBVersion = properties.getProperty("version_maria_db", "2.7.3");
-        String postgresVersion = properties.getProperty("version_postgres", "42.2.23");
+        String postgresVersion = properties.getProperty("version_postgres", "42.3.1");
         String mongoDBVersion = properties.getProperty("version_mongo_db", "3.12.10");
         String slf4jVersion = properties.getProperty("version_slf4j", "2.0.0-alpha5");
 
