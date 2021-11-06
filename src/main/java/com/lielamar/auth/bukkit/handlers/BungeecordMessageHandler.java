@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,41 +22,30 @@ import java.util.UUID;
 public class BungeecordMessageHandler extends PluginMessagingHandler implements PluginMessageListener {
 
     private final TwoFactorAuthentication main;
-    private final Map<UUID, Callback> callbackFunctions;
+    private final Map<UUID, Callback> callbacks;
 
     public BungeecordMessageHandler(TwoFactorAuthentication main) {
         this.main = main;
-        this.callbackFunctions = new HashMap<>();
+        this.callbacks = new HashMap<>();
 
-        // Looping over the callbacks, if it's been more than 15 seconds cancel the callback
+        // Removes all callbacks that were set more than 5 seconds ago, since they're most-likely invalid by now
         Bukkit.getScheduler().runTaskTimerAsynchronously(main, () -> {
             long currentTimestamp = System.currentTimeMillis();
-
-            Iterator<UUID> iterator = callbackFunctions.keySet().iterator();
-            UUID key;
-            Callback value;
-            while(iterator.hasNext()) {
-                key = iterator.next();
-                value = callbackFunctions.get(key);
-
-                if(value != null) {
-                    if((currentTimestamp - value.getExecutionStamp())/1000 > 15)
-                        iterator.remove();
-                }
-            }
-        }, 300L, 300L);
+            callbacks.entrySet().removeIf(entry -> (currentTimestamp - entry.getValue().getExecutionStamp())/1000 > 5);
+        }, 100L, 100L);
     }
+
 
     /**
      * Sets the header of a message
      *
-     * @param msg        Message Stream
-     * @param uuid       UUID of the player attached to the message
-     * @param callback   Callback function to call once a response is received
+     * @param msg            Message Stream
+     * @param uuid           UUID of the player attached to the message
+     * @param callbackUUID   UUID of the callback function to call once a response is received
      */
-    public void setMessageHeader(ByteArrayDataOutput msg, UUID uuid, Callback callback) {
+    public void setMessageHeader(ByteArrayDataOutput msg, UUID uuid, UUID callbackUUID) {
         msg.writeUTF(super.subChannelName);                          // Setting the SubChannel of the message
-        msg.writeUTF(attachCallbackFunction(callback).toString());   // Setting the Message UUID
+        msg.writeUTF(callbackUUID.toString());   // Setting the Message UUID
         msg.writeUTF(uuid.toString());                               // Setting the UUID of the player
     }
 
@@ -92,6 +80,20 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
     }
 
     /**
+     * Generates a random UUID for the message and attaches the callback function to call it later when a response is made
+     *
+     * @param callback   Callback function to save
+     * @return           Random generated UUID
+     */
+    public UUID registerCallback(Callback callback) {
+        UUID randomUUID = UUID.randomUUID();
+
+        if(callback != null)
+            this.callbacks.put(randomUUID, callback);
+        return randomUUID;
+    }
+
+    /**
      * Sends the message to bungeecord
      *
      * @param uuid   Player attached to the message
@@ -106,20 +108,6 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
 
 
     /**
-     * Generates a random UUID for the message and attaches the callback function to call it later when a response is made
-     *
-     * @param callback   Callback function to save
-     * @return           Random generated UUID
-     */
-    public UUID attachCallbackFunction(Callback callback) {
-        UUID randomUUID = UUID.randomUUID();
-        if(callback != null)
-            this.callbackFunctions.put(randomUUID, callback);
-        return randomUUID;
-    }
-
-
-    /**
      * Communicates with BungeeCord and sets the player authentication state to {authenticated}
      *
      * @param uuid       UUID of the player to set (un)authenticated
@@ -128,7 +116,7 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
      */
     public void setBungeeCordAuthState(UUID uuid, AuthHandler.AuthState state, Callback callback) {
         ByteArrayDataOutput msg = ByteStreams.newDataOutput();
-        this.setMessageHeader(msg, uuid, callback);
+        this.setMessageHeader(msg, uuid, registerCallback(callback));
 
         ByteArrayOutputStream msgBody = new ByteArrayOutputStream();
         this.setMessageBody(msgBody, MessageAction.SET_STATE, state.name());
@@ -150,7 +138,7 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
      */
     public void getBungeeCordAuthState(UUID uuid, AuthHandler.AuthState defaultState, Callback callback) {
         ByteArrayDataOutput msg = ByteStreams.newDataOutput();
-        this.setMessageHeader(msg, uuid, callback);
+        this.setMessageHeader(msg, uuid, registerCallback(callback));
 
         ByteArrayOutputStream msgBody = new ByteArrayOutputStream();
         this.setMessageBody(msgBody, MessageAction.GET_STATE, defaultState.name());
@@ -163,10 +151,15 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
         this.getBungeeCordAuthState(uuid, defaultState, null);
     }
 
-
+    /**
+     * Loads Bungeecord (checks if bungeecord exists in the server)
+     *
+     * @param uuid       UUID of the player to use to load the bungeecord
+     * @param callback   A callback function to call whenever a response for the message is received
+     */
     public void loadBungeecord(UUID uuid, Callback callback) {
         ByteArrayDataOutput msg = ByteStreams.newDataOutput();
-        this.setMessageHeader(msg, uuid, callback);
+        this.setMessageHeader(msg, uuid, registerCallback(callback));
 
         ByteArrayOutputStream msgBody = new ByteArrayOutputStream();
         this.setMessageBody(msgBody, MessageAction.LOAD_BUNGEECORD);
@@ -213,7 +206,7 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
                     main.getAuthHandler().changeState(playerUUID, state, false);
                 }
 
-                Callback callback = this.callbackFunctions.getOrDefault(messageUUID, null);
+                Callback callback = this.callbacks.getOrDefault(messageUUID, null);
                 if(callback != null) callback.execute();
             } catch (IOException | IllegalArgumentException exception) {
                 exception.printStackTrace();

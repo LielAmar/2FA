@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.5</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,7 +42,7 @@
         <version.h2>1.4.200</version.h2>
         <version.mysql>8.0.26</version.mysql>
         <version.maria-db>2.7.3</version.maria-db>
-        <version.postgres>42.2.23</version.postgres>
+        <version.postgres>42.3.1</version.postgres>
         <version.mongo-db>3.12.10</version.mongo-db>
         <version.slf4j>2.0.0-alpha5</version.slf4j>
 
@@ -153,7 +153,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20200518</version>
+            <version>20210307</version>
             <scope>compile</scope>
         </dependency>
 
@@ -168,7 +168,7 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.16-R0.4-SNAPSHOT</version>
+            <version>1.16-R0.4</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
