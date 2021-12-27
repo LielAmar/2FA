@@ -7,7 +7,7 @@ assignees: LielAmar
 
 ---
 
-**Is your feature request related to a bug/problem? If so, please link to the relavent issue or describe it**
+**Is your feature request related to a bug/problem? If so, please link to the relevant issue or describe it**
 <!-- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] -->
 
 **Describe the solution you'd like**
