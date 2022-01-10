@@ -308,12 +308,18 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     ImageRender renderer = new ImageRender(url);
                     view.addRenderer(renderer);
 
-                    ItemStack mapItem = new ItemStack(Material.MAP);
+                    ItemStack mapItem = null;
+
                     if(version >= 13) {
-                        MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
-                        if(mapMeta != null) {
-                            mapMeta.setMapId(view.getId());
-                            mapItem.setItemMeta(mapMeta);
+                        mapItem = new ItemStack(Material.FILLED_MAP);
+
+                        if(mapItem.getItemMeta() instanceof MapMeta) {
+                            MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
+
+                            if(mapMeta != null) {
+                                mapMeta.setMapId(view.getId());
+                                mapItem.setItemMeta(mapMeta);
+                            }
                         }
                     } else {
                         mapItem = new ItemStack(Material.MAP, 1, SpigotUtils.getMapID(view));

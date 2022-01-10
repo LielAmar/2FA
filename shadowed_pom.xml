@@ -6,7 +6,7 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.5.6</version>
+    <version>1.5.5</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -39,7 +39,7 @@
         <version.googleauth>1.5.0</version.googleauth>
         <version.commons-codec>1.15</version.commons-codec>
         <version.hikari-cp>4.0.3</version.hikari-cp>
-        <version.h2>2.0.204</version.h2>
+        <version.h2>1.4.200</version.h2>
         <version.mysql>8.0.26</version.mysql>
         <version.maria-db>2.7.3</version.maria-db>
         <version.postgres>42.3.1</version.postgres>
@@ -79,6 +79,16 @@
                                     <include>net.byteflux:libby-bukkit**</include>
                                     <include>com.lielamar:lielsutils**</include>
                                     <include>org.json:json**</include>
+
+                                    <include>${group-id.googleauth}:${artifact-id.googleauth}**</include>
+                                    <include>${group-id.commons-codec}:${artifact-id.commons-codec}**</include>
+                                    <include>${group-id.hikari-cp}:${artifact-id.hikari-cp}**</include>
+                                    <include>${group-id.h2}:${artifact-id.h2}**</include>
+                                    <include>${group-id.mysql}:${artifact-id.mysql}**</include>
+                                    <include>${group-id.maria-db}:${artifact-id.maria-db}**</include>
+                                    <include>${group-id.postgres}:${artifact-id.postgres}**</include>
+                                    <include>${group-id.mongo-db}:${artifact-id.mongo-db}**</include>
+                                    <include>${group-id.slf4j}:${artifact-id.slf4j}**</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
@@ -153,9 +163,10 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20211205</version>
+            <version>20210307</version>
             <scope>compile</scope>
         </dependency>
+
 
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -163,13 +174,6 @@
             <version>1.13.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.spigotmc</groupId>-->
-<!--            <artifactId>spigot-api</artifactId>-->
-<!--            <version>1.17.1-R0.1-SNAPSHOT</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>net.md-5</groupId>
@@ -198,61 +202,63 @@
             <groupId>${group-id.googleauth}</groupId>
             <artifactId>${artifact-id.googleauth}</artifactId>
             <version>${version.googleauth}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>${group-id.commons-codec}</groupId>
             <artifactId>${artifact-id.commons-codec}</artifactId>
             <version>${version.commons-codec}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>${group-id.hikari-cp}</groupId>
             <artifactId>${artifact-id.hikari-cp}</artifactId>
             <version>${version.hikari-cp}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>${group-id.h2}</groupId>
             <artifactId>${artifact-id.h2}</artifactId>
             <version>${version.h2}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>${group-id.mysql}</groupId>
             <artifactId>${artifact-id.mysql}</artifactId>
             <version>${version.mysql}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>${group-id.maria-db}</groupId>
             <artifactId>${artifact-id.maria-db}</artifactId>
             <version>${version.maria-db}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>${group-id.postgres}</groupId>
             <artifactId>${artifact-id.postgres}</artifactId>
             <version>${version.postgres}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>${group-id.mongo-db}</groupId>
             <artifactId>${artifact-id.mongo-db}</artifactId>
             <version>${version.mongo-db}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>${group-id.slf4j}</groupId>
             <artifactId>${artifact-id.slf4j}</artifactId>
             <version>${version.slf4j}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
