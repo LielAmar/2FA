@@ -1,19 +1,19 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
+import com.lielamar.auth.bukkit.TwoFactorAuthentication;
+import com.lielamar.auth.shared.handlers.MessageHandler;
+import com.lielamar.auth.shared.utils.AuthUtils;
+import com.lielamar.lielsutils.commands.Command;
+import com.lielamar.lielsutils.modules.Pair;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.lielamar.lielsutils.commands.Command;
-import com.lielamar.lielsutils.modules.Pair;
-import org.bukkit.entity.Player;
-import com.lielamar.auth.shared.utils.AuthUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.ChatColor;
-import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 
 public class DisableForOthersCommand extends Command {
 

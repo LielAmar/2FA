@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.Properties;
 
 public class DependencyHandler {

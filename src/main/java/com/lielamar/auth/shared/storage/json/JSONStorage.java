@@ -3,7 +3,10 @@ package com.lielamar.auth.shared.storage.json;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.UUID;
 
 public class JSONStorage extends StorageHandler {
