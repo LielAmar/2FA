@@ -58,7 +58,7 @@ public class DependencyHandler {
         String googleAuthVersion = properties.getProperty("version_google_auth", "1.5.0");
         String commonsCodecVersion = properties.getProperty("version_commons_codec", "1.15");
         String hikariCpVersion = properties.getProperty("version_hikari_cp", "4.0.3");
-        String h2Version = properties.getProperty("version_h2", "2.0.204");
+        String h2Version = properties.getProperty("version_h2", "2.1.210");
         String mysqlVersion = properties.getProperty("version_mysql", "8.0.26");
         String mariaDBVersion = properties.getProperty("version_maria_db", "2.7.3");
         String postgresVersion = properties.getProperty("version_postgres", "42.3.1");

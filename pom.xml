@@ -39,7 +39,7 @@
         <version.googleauth>1.5.0</version.googleauth>
         <version.commons-codec>1.15</version.commons-codec>
         <version.hikari-cp>4.0.3</version.hikari-cp>
-        <version.h2>2.0.206</version.h2>
+        <version.h2>2.1.210</version.h2>
         <version.mysql>8.0.26</version.mysql>
         <version.maria-db>2.7.3</version.maria-db>
         <version.postgres>42.3.1</version.postgres>
@@ -156,6 +156,13 @@
             <version>20211205</version>
             <scope>compile</scope>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.spigotmc</groupId>-->
+<!--            <artifactId>spigot-api</artifactId>-->
+<!--            <version>1.8.8-R0.1-SNAPSHOT</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.spigotmc</groupId>
