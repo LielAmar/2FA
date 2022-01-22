@@ -354,13 +354,22 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         }
                     }
 
-                    sendClickableMessage(player,
-                            ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
-                            url.replaceAll("128x128", "256x256"));
+                    // If the player's key is not null we want to send him the hover and clickable messages
+                    // with the key and the link to the QR image.
+                    // otherwise, we would want to completely void the player's key data, remove the QRItem and also send him a message about the issue.
+                    if (getPendingKey(player.getUniqueId()) != null) {
+                        sendClickableMessage(player,
+                                ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
+                                url.replaceAll("128x128", "256x256"));
 
-                    sendHoverMessage(player,
-                            ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
-                            ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
+                        sendHoverMessage(player,
+                                ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
+                                ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
+                    } else {
+                        removeQRItem(player);
+                        resetKey(player.getUniqueId());
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
+                    }
                 } catch (IOException | NumberFormatException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
