@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-
 import java.net.URL;
 
 public class ImageRender extends MapRenderer {

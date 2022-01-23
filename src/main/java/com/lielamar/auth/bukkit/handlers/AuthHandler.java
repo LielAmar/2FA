@@ -11,8 +11,14 @@ import com.lielamar.auth.shared.utils.hash.SHA256;
 import com.lielamar.auth.shared.utils.hash.SHA512;
 import com.lielamar.lielsutils.ColorUtils;
 import com.lielamar.lielsutils.SpigotUtils;
-import net.md_5.bungee.api.chat.*;
-import org.bukkit.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,7 +30,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
@@ -354,13 +362,22 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         }
                     }
 
-                    sendClickableMessage(player,
-                            ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
-                            url.replaceAll("128x128", "256x256"));
+                    // If the player's key is not null we want to send him the hover and clickable messages
+                    // with the key and the link to the QR image.
+                    // otherwise, we would want to completely void the player's key data, remove the QRItem and also send him a message about the issue.
+                    if (getPendingKey(player.getUniqueId()) != null) {
+                        sendClickableMessage(player,
+                                ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
+                                url.replaceAll("128x128", "256x256"));
 
-                    sendHoverMessage(player,
-                            ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
-                            ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
+                        sendHoverMessage(player,
+                                ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
+                                ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
+                    } else {
+                        removeQRItem(player);
+                        resetKey(player.getUniqueId());
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
+                    }
                 } catch (IOException | NumberFormatException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");

@@ -48,6 +48,7 @@ public abstract class MessageHandler {
         YOU_ARE_REQUIRED("&6You are required to enable 2FA!"),
         GENERATING_KEY("&aGenerating your 2FA key..."),
         SUCCESSFULLY_AUTHENTICATED("&aYou have successfully authenticated"),
+        NULL_KEY("&cAn error has occurred while generating your key, please contact an administrator."),
         INCORRECT_CODE("&cIncorrect code, please try again"),
         AUTHENTICATED_AUTOMATICALLY("&aYou were authenticated automatically"),
         ALREADY_IN_SETUP_MODE("&cYou are already in the setup mode for 2FA!"),

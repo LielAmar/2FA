@@ -3,7 +3,10 @@ package com.lielamar.auth.shared.storage.sql;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.zaxxer.hikari.HikariDataSource;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Properties;
 import java.util.UUID;
 

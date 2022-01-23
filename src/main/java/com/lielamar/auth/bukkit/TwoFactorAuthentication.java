@@ -1,13 +1,13 @@
 package com.lielamar.auth.bukkit;
 
-import com.lielamar.auth.bukkit.handlers.*;
-import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
-import com.lielamar.auth.shared.storage.StorageHandler;
-import com.lielamar.lielsutils.bstats.MetricsSpigot;
 import com.lielamar.auth.bukkit.commands.CommandHandler;
+import com.lielamar.auth.bukkit.handlers.*;
 import com.lielamar.auth.bukkit.listeners.DisabledEvents;
 import com.lielamar.auth.bukkit.listeners.OnAuthStateChange;
 import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
+import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
+import com.lielamar.auth.shared.storage.StorageHandler;
+import com.lielamar.lielsutils.bstats.MetricsSpigot;
 import com.lielamar.lielsutils.files.FileManager;
 import com.lielamar.lielsutils.update.UpdateChecker;
 import org.bukkit.Bukkit;
