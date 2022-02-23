@@ -42,7 +42,7 @@
         <version.h2>2.1.210</version.h2>
         <version.mysql>8.0.26</version.mysql>
         <version.maria-db>2.7.3</version.maria-db>
-        <version.postgres>42.3.1</version.postgres>
+        <version.postgres>42.3.3</version.postgres>
         <version.mongo-db>3.12.10</version.mongo-db>
         <version.slf4j>2.0.0-alpha5</version.slf4j>
 
