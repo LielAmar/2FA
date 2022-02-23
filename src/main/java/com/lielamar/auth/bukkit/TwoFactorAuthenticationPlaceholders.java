@@ -1,5 +1,6 @@
 package com.lielamar.auth.bukkit;
 
+import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.TimeUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -33,14 +34,16 @@ public class TwoFactorAuthenticationPlaceholders extends PlaceholderExpansion {
     public String onPlaceholderRequest(Player player, String identifier) {
         switch(identifier.toLowerCase()) {
             case "is_enabled":
-                return plugin.getAuthHandler().is2FAEnabled(player.getUniqueId()) ? "Enabled" : "Disabled";
+                return plugin.getAuthHandler().is2FAEnabled(player.getUniqueId()) ?
+                        MessageHandler.TwoFAMessages.KEYWORD_ENABLED.getMessage() : MessageHandler.TwoFAMessages.KEYWORD_DISABLED.getMessage();
             case "time_since_enabled":
                 long enableDate = plugin.getAuthHandler().getStorageHandler().getEnableDate(player.getUniqueId());
                 return enableDate == -1 ? "Not Enabled" : TimeUtils.parseTime(System.currentTimeMillis() - enableDate);
             case "key":
                 return plugin.getAuthHandler().getStorageHandler().getKey(player.getUniqueId());
             case "is_required":
-                return player.hasPermission("2fa.demand") ? "Required" : "Not Required";
+                return player.hasPermission("2fa.demand") ?
+                        MessageHandler.TwoFAMessages.KEYWORD_REQUIRED.getMessage() : MessageHandler.TwoFAMessages.KEYWORD_NOT_REQUIRED.getMessage();
         }
 
         return null;
