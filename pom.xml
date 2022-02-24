@@ -6,14 +6,46 @@
 
     <groupId>com.lielamar</groupId>
     <artifactId>2fa</artifactId>
-    <version>1.3.2</version>
+    <version>1.5.9</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <craftbukkit.path>D:/Build Tool/spigot-1.13.2.jar</craftbukkit.path>
+
+        <repository.maven-central>true</repository.maven-central>
+
+        <group-id.googleauth>com.warrenstrange</group-id.googleauth>
+        <group-id.commons-codec>commons-codec</group-id.commons-codec>
+        <group-id.hikari-cp>com.zaxxer</group-id.hikari-cp>
+        <group-id.h2>com.h2database</group-id.h2>
+        <group-id.mysql>mysql</group-id.mysql>
+        <group-id.maria-db>org.mariadb.jdbc</group-id.maria-db>
+        <group-id.postgres>org.postgresql</group-id.postgres>
+        <group-id.mongo-db>org.mongodb</group-id.mongo-db>
+        <group-id.slf4j>org.slf4j</group-id.slf4j>
+
+        <artifact-id.googleauth>googleauth</artifact-id.googleauth>
+        <artifact-id.commons-codec>commons-codec</artifact-id.commons-codec>
+        <artifact-id.hikari-cp>HikariCP</artifact-id.hikari-cp>
+        <artifact-id.h2>h2</artifact-id.h2>
+        <artifact-id.mysql>mysql-connector-java</artifact-id.mysql>
+        <artifact-id.maria-db>mariadb-java-client</artifact-id.maria-db>
+        <artifact-id.postgres>postgresql</artifact-id.postgres>
+        <artifact-id.mongo-db>mongo-java-driver</artifact-id.mongo-db>
+        <artifact-id.slf4j>slf4j-api</artifact-id.slf4j>
+
+        <version.googleauth>1.5.0</version.googleauth>
+        <version.commons-codec>1.15</version.commons-codec>
+        <version.hikari-cp>4.0.3</version.hikari-cp>
+        <version.h2>2.1.210</version.h2>
+        <version.mysql>8.0.26</version.mysql>
+        <version.maria-db>2.7.3</version.maria-db>
+        <version.postgres>42.3.3</version.postgres>
+        <version.mongo-db>3.12.10</version.mongo-db>
+        <version.slf4j>2.0.0-alpha5</version.slf4j>
+
     </properties>
 
     <build>
@@ -43,42 +75,41 @@
 
                             <artifactSet>
                                 <includes>
+                                    <include>net.byteflux:libby-core**</include>
+                                    <include>net.byteflux:libby-bukkit**</include>
                                     <include>com.lielamar:lielsutils**</include>
                                     <include>org.json:json**</include>
-                                    <include>com.warrenstrange:googleauth**</include>
-                                    <include>commons-codec:commons-codec**</include>
                                 </includes>
                             </artifactSet>
-
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.lielamar.lielsutils</pattern>
-                                    <shadedPattern>com.lielamar.twofa.lib.lielsutils</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.json</pattern>
-                                    <shadedPattern>com.lielamar.twofa.lib.json</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.warrenstrange.googleauth</pattern>
-                                    <shadedPattern>com.lielamar.twofa.lib.googleauth</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.commons.codec</pattern>
-                                    <shadedPattern>com.lielamar.twofa.lib.commons.codec</shadedPattern>
-                                </relocation>
-                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
     <repositories>
         <repository>
-            <id>lielamar-api</id>
+            <id>lielamar-repo</id>
             <url>https://api.lielamar.com/repository/maven-public/</url>
+        </repository>
+
+        <repository>
+            <id>alessio-repo</id>
+            <url>https://repo.alessiodp.com/releases/</url>
+        </repository>
+
+
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
 
         <repository>
@@ -90,28 +121,67 @@
             <id>velocity-repo</id>
             <url>https://repo.velocitypowered.com/snapshots/</url>
         </repository>
+
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>com.lielamar</groupId>
             <artifactId>lielsutils</artifactId>
-            <version>1.3.1</version>
+            <version>1.5.4</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${craftbukkit.path}</systemPath>
+            <groupId>net.byteflux</groupId>
+            <artifactId>libby-core</artifactId>
+            <version>1.1.1</version>
+            <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>net.byteflux</groupId>
+            <artifactId>libby-bukkit</artifactId>
+            <version>1.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20211205</version>
+            <scope>compile</scope>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.spigotmc</groupId>-->
+<!--            <artifactId>spigot-api</artifactId>-->
+<!--            <version>1.8.8-R0.1-SNAPSHOT</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.13.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.spigotmc</groupId>-->
+<!--            <artifactId>spigot-api</artifactId>-->
+<!--            <version>1.17.1-R0.1-SNAPSHOT</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.16-R0.4-SNAPSHOT</version>
+            <version>1.16-R0.4</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
@@ -124,31 +194,80 @@
         </dependency>
 
         <dependency>
-            <groupId>com.warrenstrange</groupId>
-            <artifactId>googleauth</artifactId>
-            <version>1.4.0</version>
-            <scope>compile</scope>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.9.2</version>
+            <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.6</version>
-            <scope>compile</scope>
-        </dependency>
 
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
-            <version>3.12.7</version>
+            <groupId>${group-id.googleauth}</groupId>
+            <artifactId>${artifact-id.googleauth}</artifactId>
+            <version>${version.googleauth}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20200518</version>
-            <scope>compile</scope>
+            <groupId>${group-id.commons-codec}</groupId>
+            <artifactId>${artifact-id.commons-codec}</artifactId>
+            <version>${version.commons-codec}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.hikari-cp}</groupId>
+            <artifactId>${artifact-id.hikari-cp}</artifactId>
+            <version>${version.hikari-cp}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.h2}</groupId>
+            <artifactId>${artifact-id.h2}</artifactId>
+            <version>${version.h2}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.mysql}</groupId>
+            <artifactId>${artifact-id.mysql}</artifactId>
+            <version>${version.mysql}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.maria-db}</groupId>
+            <artifactId>${artifact-id.maria-db}</artifactId>
+            <version>${version.maria-db}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.postgres}</groupId>
+            <artifactId>${artifact-id.postgres}</artifactId>
+            <version>${version.postgres}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.mongo-db}</groupId>
+            <artifactId>${artifact-id.mongo-db}</artifactId>
+            <version>${version.mongo-db}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${group-id.slf4j}</groupId>
+            <artifactId>${artifact-id.slf4j}</artifactId>
+            <version>${version.slf4j}</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>liels-repo</id>
+            <name>Liel's Repo</name>
+            <url>https://repo.lielamar.com/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 </project>

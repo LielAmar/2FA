@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DisableCommand extends Command {
@@ -63,11 +64,11 @@ public class DisableCommand extends Command {
     @Override
     public List<String> onTabComplete(CommandSender commandSender, String[] args) {
         if(!hasPermissions(commandSender))
-            return null;
+            return new ArrayList<>();
 
         if(args.length != 0)
             return disableForOthersCommand.onTabComplete(commandSender, args);
 
-        return null;
+        return new ArrayList<>();
     }
 }

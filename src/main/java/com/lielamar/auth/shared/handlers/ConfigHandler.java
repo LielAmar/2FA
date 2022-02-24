@@ -1,6 +1,7 @@
 package com.lielamar.auth.shared.handlers;
 
-import com.lielamar.auth.shared.storage.StorageType;
+import com.lielamar.auth.shared.storage.StorageMethod;
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -17,48 +18,111 @@ import java.util.Map;
 
 public abstract class ConfigHandler {
 
-    private final String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/";
+    protected final String configFileName = "config.yml";
 
-    protected int amountOfReservedMaps;
-    protected int[] mapIDs;
-    protected String serverName;
-    protected String hashType;
-    protected StorageType storageType;
-    protected boolean requireOnIPChange = true;
-    protected boolean requireOnEveryLogin = false;
-    protected boolean advice2FA = true;
-    protected boolean disableCommands = true;
+
+    protected String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/";
+
+    protected boolean checkForUpdates = true;
+
+    protected String serverName = "My Minecraft Server";
+
+    protected boolean advise2FA = true;
+
+    protected int reservedMaps = 20;
+    protected int[] mapIDs = new int[reservedMaps];
+
+    protected String ipHashType = "SHA256";
+
+    protected long reloadDelay = 0;
+
     protected Map<Class<? extends Event>, Boolean> disabledEvents = new HashMap<>();
     protected List<String> whitelistedCommands = new ArrayList<>();
     protected List<String> blacklistedCommands = new ArrayList<>();
 
-    public int getAmountOfReservedMaps() { return this.amountOfReservedMaps; }
-    public int[] getMapIDs() { return this.mapIDs; }
+    protected boolean requireOnIPChange = true;
+    protected boolean requireOnEveryLogin = false;
+
+    protected boolean tpBeforeAuth = false;
+    protected Location tpBeforeAuthLocation = null;
+    protected boolean tpAfterAuth = false;
+    protected Location tpAfterAuthLocation = null;
+
+    protected StorageMethod storageMethod = StorageMethod.JSON;
+
+    protected String host = "localhost";
+    protected int port = -1;
+    protected String database = "auth";
+    protected String username = "root";
+    protected String password = "password";
+
+    protected String tablePrefix = "2fa_";
+    protected String collectionPrefix = "2fa_";
+
+    protected int maximumPoolSize = 10;
+    protected int minimumIdle = 10;
+    protected int maximumLifetime = 1800000;
+    protected int keepAliveTime = 0;
+    protected int connectionTimeout = 5000;
+
+    protected String mongodbURI = "";
+
+
+
+
     public String getQrCodeURL() { return this.qrCodeURL; }
+
+    public boolean shouldCheckForUpdates() { return this.checkForUpdates; }
+
     public String getServerName() { return this.serverName; }
-    public String getHashType() { return this.hashType; }
-    public StorageType getStorageType() { return this.storageType; }
-    public boolean isRequiredOnIPChange() {
+
+    public boolean shouldAdvise2FA() { return this.advise2FA; }
+
+    public int getAmountOfReservedMaps() { return this.reservedMaps; }
+    public int[] getMapIDs() { return this.mapIDs; }
+
+    public String getIpHashType() { return this.ipHashType; }
+
+    public long getReloadDelay() { return this.reloadDelay; }
+
+    public Map<Class<? extends Event>, Boolean> getDisabledEvents() { return this.disabledEvents; }
+    public List<String> getWhitelistedCommands() { return this.whitelistedCommands; }
+    public List<String> getBlacklistedCommands() { return this.blacklistedCommands; }
+
+    public boolean shouldRequiredOnIPChange() {
         return this.requireOnIPChange;
     }
-    public boolean isRequiredOnEveryLogin() {
+    public boolean shouldRequiredOnEveryLogin() {
         return this.requireOnEveryLogin;
     }
-    public boolean is2FAAdvised() {
-        return this.advice2FA;
-    }
-    public boolean isCommandsDisabled() {
-        return this.disableCommands;
-    }
-    public Map<Class<? extends Event>, Boolean> getDisabledEvents() {
-        return this.disabledEvents;
-    }
-    public List<String> getWhitelistedCommands() {
-        return this.whitelistedCommands;
-    }
-    public List<String> getBlacklistedCommands() {
-        return this.blacklistedCommands;
-    }
+
+
+    public boolean shouldTeleportBeforeAuth() { return this.tpBeforeAuth; }
+    public Location teleportBeforeAuthLocation() { return this.tpBeforeAuthLocation; }
+    public boolean shouldTeleportAfterAuth() { return this.tpAfterAuth; }
+    public Location teleportAfterAuthLocation() { return this.tpAfterAuthLocation; }
+
+
+    public StorageMethod getStorageMethod() { return this.storageMethod; }
+
+    public String getHost() { return this.host; }
+    public int getPort() { return this.port; }
+    public String getDatabase() { return this.database; }
+    public String getUsername() { return this.username; }
+    public String getPassword() { return this.password; }
+
+    public String getTablePrefix() { return this.tablePrefix; }
+    public String getCollectionPrefix() { return this.collectionPrefix; }
+
+    public int getMaximumPoolSize() { return this.maximumPoolSize; }
+    public int getMinimumIdle() { return this.minimumIdle; }
+    public int getMaximumLifetime() { return this.maximumLifetime; }
+    public int getKeepAliveTime() { return this.keepAliveTime; }
+    public int getConnectionTimeout() { return this.connectionTimeout; }
+
+
+    public String getMongodbURI() { return this.mongodbURI; }
+
 
     public abstract void reload();
 

@@ -9,21 +9,22 @@
 # Github: https://github.com/LielAmar/2FA
 # ===========================================================================================
 
-# ==================================================
-#        THIS IS THE BUNGEECORD CONFIGURATION
-# ==================================================
+# Events to disable if a player is not authenticated yet
+# true - will block the event
+# false - will allow the event
+#
+# * Note that plugins such as Skript don't use / for commands, so in order to prevent those, you need to disable chat events :)
+disabled-events:
+  commands: true
+  chat: true
+  server-switch: true
 
-# Disable all bungeecord commands if not yet authenticated (other than 2fa ones)
-Disable Commands: true
-
-# Disable the ability to switch servers if not yet authenticated
-Disable Server Switch: true
-
-# If the above is true you can whitelist commands with the below
-Whitelisted Commands:
+# If the "commands" event is disabled, you can whitelist specific commands with the below setting
+# These commands only will executed successfully. Anything else will be blocked.
+whitelisted-commands:
   - "help"
 
-# If commands are not disabled you can use the below to blacklist specific commands instead
-Blacklisted Commands:
-  - "op"
-  - "spawn"
+# If the "commands" event is not disabled, you can blacklist specific commands with the below setting
+# These commands only will be blacklisted. Anything else will be permitted
+blacklisted-commands:
+  - "server"

@@ -1,7 +1,7 @@
 package com.lielamar.auth.bungee.handlers;
 
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
-import net.md_5.bungee.api.ChatColor;
+import com.lielamar.lielsutils.ColorUtils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -21,17 +21,17 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
     public MessageHandler(TwoFactorAuthentication main) {
         this.main = main;
 
-        loadConfiguration();
+        this.reload();
     }
 
     @Override
     protected void sendRaw(final Object player, final String message) {
         if(player instanceof ProxiedPlayer)
-            ((ProxiedPlayer)player).sendMessage(ChatMessageType.CHAT, TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
+            ((ProxiedPlayer)player).sendMessage(ChatMessageType.CHAT, TextComponent.fromLegacyText(ColorUtils.translateAlternateColorCodes('&', message)));
     }
 
     @Override
-    public void loadConfiguration() {
+    public void reload() {
         if(!main.getDataFolder().exists())
             main.getDataFolder().mkdirs();
 
@@ -44,14 +44,14 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
         try {
             this.config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(this.file);
 
-            for (TwoFAMessages message : TwoFAMessages.values()) {
-                if (!this.config.contains(message.name())) {
+            for(TwoFAMessages message : TwoFAMessages.values()) {
+                if(!this.config.contains(message.name())) {
                     this.config.set(message.name(), message.getMessage());
                 } else {
                     message.setMessage(this.config.getString(message.name()));
                 }
             }
-        } catch (IOException exception) {
+        } catch(IOException exception) {
             exception.printStackTrace();
         }
 

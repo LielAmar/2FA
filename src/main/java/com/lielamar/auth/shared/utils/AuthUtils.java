@@ -32,6 +32,10 @@ public class AuthUtils {
                 response.append(inputLine);
             in.close();
 
+            // If the player does not exist, we want to return null
+            if(response.length() == 0 || response.toString().equals("{}"))
+                return null;
+
             JsonElement json = new JsonParser().parse(response.toString());
             String uuid = json.getAsJsonObject().get("id").getAsString();
 

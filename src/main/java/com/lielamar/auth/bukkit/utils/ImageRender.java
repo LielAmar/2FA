@@ -5,14 +5,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-
 import java.net.URL;
 
 public class ImageRender extends MapRenderer {
@@ -29,7 +28,7 @@ public class ImageRender extends MapRenderer {
     }
 
     @Override
-    public void render(@Nonnull MapView view, @Nonnull MapCanvas canvas, @Nonnull Player player) {
+    public void render(@NotNull MapView view, @NotNull MapCanvas canvas, @NotNull Player player) {
         if(this.hasRendered) return;
 
         view.setScale(MapView.Scale.CLOSEST);
@@ -51,7 +50,7 @@ public class ImageRender extends MapRenderer {
     }
 
     private BufferedImage resize(final URL url, final Dimension size) throws IOException {
-        final BufferedImage image = ImageIO.read(url);
+        final BufferedImage image = ImageIO.read(url.openStream());
         final BufferedImage resized = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         final Graphics2D g = resized.createGraphics();
         g.drawImage(image, 0, 0, size.width, size.height, null);

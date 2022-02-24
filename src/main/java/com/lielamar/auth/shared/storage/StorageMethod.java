@@ -1,11 +1,12 @@
 package com.lielamar.auth.shared.storage;
 
-public enum StorageType {
+public enum StorageMethod {
 
     JSON,
-    FLAT,
+    H2,
     MYSQL,
-    SQLLITE,
+    MARIADB,
+    POSTGRESQL,
     MONGODB
 
 }

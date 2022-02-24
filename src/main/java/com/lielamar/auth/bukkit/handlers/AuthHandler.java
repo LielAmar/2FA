@@ -5,34 +5,34 @@ import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
 import com.lielamar.auth.bukkit.utils.ImageRender;
 import com.lielamar.auth.shared.handlers.Callback;
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.shared.storage.StorageType;
-import com.lielamar.auth.shared.storage.json.JSONStorage;
-import com.lielamar.auth.shared.storage.mongodb.MongoDBStorage;
-import com.lielamar.auth.shared.storage.mysql.MySQLStorage;
 import com.lielamar.auth.shared.utils.hash.Hash;
 import com.lielamar.auth.shared.utils.hash.NoHash;
 import com.lielamar.auth.shared.utils.hash.SHA256;
 import com.lielamar.auth.shared.utils.hash.SHA512;
+import com.lielamar.lielsutils.ColorUtils;
 import com.lielamar.lielsutils.SpigotUtils;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.spigotmc.SpigotConfig;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
@@ -54,6 +54,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     public AuthHandler(TwoFactorAuthentication main) {
         this.main = main;
+        super.storageHandler = this.main.getStorageHandler();
+
         this.extraAuthHandler = new ExtraAuthHandler();
 
         this.isBungeecordEnabled = false;
@@ -65,7 +67,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         this.version = SpigotUtils.getVersion(Bukkit.getVersion().split("MC: 1.")[1]);
 
         loadHashType();
-        loadStorageHandler();
     }
 
     @Override
@@ -114,23 +115,32 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public void playerJoin(UUID uuid) {
         super.playerJoin(uuid);
 
-        // If no player has joined the server yet, meaning there was no opportunity to check if the server is using bungeecord
-        //   * we check if the server is using bungeecord by sending a message to bungeecord and expecting a response. Once we get a response we know the server is using bungeecord
-        // then we want to firstly send the #loadBungeecord message to bungeecord, and only then load the player.
-        // If bungeecord was already loaded (we know this through loadedBungeecord, which changes to true after the initial load), we only want to load the player because we already know whether
-        // the server is using bungeecord or not.
-        if(SpigotConfig.bungee && !loadedBungeecord) {
+        // Loads the player whenever they join the server.
+        //
+        // If bungeecord was not loaded yet, we want to try to load it. What it generally means is - we send a request called
+        // "LOAD_BUNGEECORD" to bungeecord. If we get a response, it means bungeecord exists, and then we set the value of
+        // isBungeecordEnabled to true, so we know to use bungeecord for future requests.
+        // In case bungeecord was loaded successfully, we provide a callback to re-load the joined player, since when we loaded
+        // them, we did so locally on the spigot instance and not in bungeecord.
+        //
+        // This way, if a player was online and then joined a spigot instance that was just booted, it would load their data and ask
+        // them to authenticate, but straight after that, it'd load bungeecord and then re-load the player and auto-authenticate them.
+
+        handlePlayerJoin(uuid);
+
+        if(!loadedBungeecord) {
             loadedBungeecord = true;
 
-            Bukkit.getScheduler().runTaskLater(this.main, () -> this.main.getPluginMessageListener().loadBungeecord(uuid, null), 1L);
+            long timeMillis = System.currentTimeMillis();
+            Bukkit.getScheduler().runTaskLater(this.main, () -> this.main.getPluginMessageListener().loadBungeecord(uuid, new Callback() {
+                public void execute() { handlePlayerJoin(uuid); }
+                public long getExecutionStamp() { return timeMillis; }
+            }), 1L);
         }
-
-        // Loading the player, only after the above code is done executing (since it's not async).
-        handlePlayerJoin(uuid);
     }
 
     /**
-     * A util method to handle the player join event. It removes the map copies from their inventory, loads their auth state (from either spigot/bungeecord), etc.
+     * A method to handle the player join event. It removes the map copies from their inventory, loads their auth state (from either spigot/bungeecord), etc.
      *
      * @param uuid   UUID of the player to handle
      */
@@ -138,9 +148,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         // The reason there's a 1 tick delay before every message is that if you send a ChannelMessage too fast, sometimes bungeecord doesn't register the message.
         Bukkit.getScheduler().runTaskLater(this.main, () -> {
             Player player = Bukkit.getPlayer(uuid);
-            if(player == null || !player.isOnline()) {
+
+            if(player == null || !player.isOnline())
                 return;
-            }
 
             // Removing previous QR codes
             for(ItemStack item : player.getInventory().getContents()) {
@@ -173,7 +183,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                             createKey(player.getUniqueId());
                             changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
                         } else {
-                            if(main.getConfigHandler().is2FAAdvised()) {
+                            if(main.getConfigHandler().shouldAdvise2FA()) {
                                 main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
                                 main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
                             }
@@ -200,12 +210,13 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         Player player = Bukkit.getPlayer(uuid);
         if(player != null) {
-            PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authState);
+            PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authStates.get(uuid), authState);
+
             Bukkit.getPluginManager().callEvent(event);
             if(event.isCancelled())
                 return;
 
-            authState = event.getAuthState();
+            authState = event.getNewAuthState();
         }
 
         authStates.put(uuid, authState);
@@ -236,7 +247,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      * Loads the hash type (SHA-256, SHA-512, No Hash)
      */
     private void loadHashType() {
-        String hashType = main.getConfigHandler().getHashType();
+        String hashType = main.getConfigHandler().getIpHashType();
 
         switch (hashType.toUpperCase()) {
             case "SHA256":
@@ -250,46 +261,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 break;
         }
     }
-
-    /**
-     * Loads the storage handler (JSON, MySQL, MongoDB)
-     */
-    private void loadStorageHandler() {
-        StorageType storageType = main.getConfigHandler().getStorageType();
-
-        if(storageType == StorageType.MYSQL) {
-            ConfigurationSection mysql = main.getConfig().getConfigurationSection("MySQL");
-
-            if(mysql != null) {
-                String host = mysql.getString("credentials.host");
-                String database = mysql.getString("credentials.database");
-                String username = mysql.getString("credentials.auth.username");
-                String password = mysql.getString("credentials.auth.password");
-                int port = mysql.getInt("credentials.port");
-
-                this.storageHandler = new MySQLStorage(host, database, username, password, port);
-            }
-        } else if(storageType == StorageType.MONGODB) {
-            ConfigurationSection mongodb = main.getConfig().getConfigurationSection("MongoDB");
-
-            if(mongodb != null) {
-                String uri = mongodb.getString("credentials.uri");
-                String host = mongodb.getString("credentials.host");
-                String database = mongodb.getString("credentials.database");
-                String username = mongodb.getString("credentials.auth.username");
-                String password = mongodb.getString("credentials.auth.password");
-                int port = mongodb.getInt("credentials.port");
-                boolean requiredAuth = mongodb.getBoolean("credentials.auth.required");
-
-                this.storageHandler = new MongoDBStorage(uri, host, database, username, password, port, requiredAuth);
-            }
-        }
-
-        if(this.storageHandler == null) {
-            this.storageHandler = new JSONStorage(this.main.getDataFolder().getAbsolutePath());
-        }
-    }
-
 
     /**
      * Updates a player's ip in the database
@@ -316,6 +287,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         player.spigot().sendMessage(component);
     }
 
+    public void sendHoverMessage(Player player, String message, String hoverMessage) {
+        TextComponent component = new TextComponent(message);
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
+        player.spigot().sendMessage(component);
+    }
+
     /**
      * Gives a player a Map item with the QR code if their code
      *
@@ -339,12 +316,18 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     ImageRender renderer = new ImageRender(url);
                     view.addRenderer(renderer);
 
-                    ItemStack mapItem = new ItemStack(Material.MAP);
+                    ItemStack mapItem;
+
                     if(version >= 13) {
-                        MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
-                        if(mapMeta != null) {
-                            mapMeta.setMapId(view.getId());
-                            mapItem.setItemMeta(mapMeta);
+                        mapItem = new ItemStack(Material.FILLED_MAP);
+
+                        if(mapItem.getItemMeta() instanceof MapMeta) {
+                            MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
+
+                            if(mapMeta != null) {
+                                mapMeta.setMapId(view.getId());
+                                mapItem.setItemMeta(mapMeta);
+                            }
                         }
                     } else {
                         mapItem = new ItemStack(Material.MAP, 1, SpigotUtils.getMapID(view));
@@ -356,22 +339,47 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         mapItem.setItemMeta(meta);
                     }
 
-                    // If inventory is not full
-                    if(player.getInventory().firstEmpty() != -1) {
-                        ItemStack oldItem = null;
+                    // If the inventory is full we don't want to remove any of the player's items, but rather tell them to use the clickable message
+                    // to authenticate
+                    // otherwise, we want to add the map with the qr code to their first available hotbar slot and move the item in that slot.
+                    if(player.getInventory().firstEmpty() == -1) {
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVENTORY_FULL_USE_CLICKABLE_MESSAGE);
+                    } else {
+                        int availableFirstSlot = player.getInventory().firstEmpty();
 
-                        if(player.getInventory().firstEmpty() > 9)
-                            oldItem = player.getInventory().getItem(0);
-                        player.getInventory().setItem(0, mapItem);
+                        if(availableFirstSlot > 8) {
+                            ItemStack oldItem = player.getInventory().firstEmpty() != 0 ? player.getInventory().getItem(0) : null;
 
-                        if(oldItem != null)
-                            player.getInventory().addItem(oldItem);
-                        player.getInventory().setHeldItemSlot(0);
+                            player.getInventory().setItem(0, mapItem);
+
+                            if(oldItem != null)
+                                player.getInventory().addItem(oldItem);
+
+                            player.getInventory().setHeldItemSlot(0);
+                        } else {
+                            player.getInventory().setItem(availableFirstSlot, mapItem);
+                            player.getInventory().setHeldItemSlot(availableFirstSlot);
+                        }
                     }
 
-                    sendClickableMessage(player, ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()), url.replaceAll("128x128", "256x256"));
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA);
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.PLEASE_AUTHENTICATE);
+                    // If the player's key is not null we want to send him the hover and clickable messages
+                    // with the key and the link to the QR image.
+                    // otherwise, we would want to completely void the player's key data, remove the QRItem and also send him a message about the issue.
+                    if (getPendingKey(player.getUniqueId()) != null) {
+                        if(!MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage().isEmpty())
+                            sendClickableMessage(player,
+                                    ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
+                                    url.replaceAll("128x128", "256x256"));
+
+                        if(!MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage().isEmpty())
+                            sendHoverMessage(player,
+                                    ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
+                                    ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
+                    } else {
+                        removeQRItem(player);
+                        resetKey(player.getUniqueId());
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
+                    }
                 } catch (IOException | NumberFormatException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
@@ -393,7 +401,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         if(lastMapIdUse.size() < main.getConfigHandler().getAmountOfReservedMaps()) {
             mapView = Bukkit.createMap(world);
-            main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add((version >= 13) ? mapView.getId() : SpigotUtils.getMapID(mapView)));
+            main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add((int) SpigotUtils.getMapID(mapView)));
         } else {
             int mapIdWithLongestTime = -1;
             long currentTimeMillis = System.currentTimeMillis();
@@ -403,12 +411,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     mapIdWithLongestTime = i;
             }
 
-            mapView = Bukkit.getMap(mapIdWithLongestTime);
+            mapView = Bukkit.getMap((short) mapIdWithLongestTime);
         }
 
         if(mapView == null) return null;
 
-        lastMapIdUse.put((version >= 13) ? mapView.getId() : SpigotUtils.getMapID(mapView), System.currentTimeMillis());
+        lastMapIdUse.put((int) SpigotUtils.getMapID(mapView), System.currentTimeMillis());
 
         return mapView;
     }
@@ -497,8 +505,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 boolean hasIPChanged = getStorageHandler().getIP(player.getUniqueId()) == null
                         || !getStorageHandler().getIP(player.getUniqueId()).equalsIgnoreCase(ip);
 
-                boolean isRequiredDueToIPChange = main.getConfigHandler().isRequiredOnIPChange() && hasIPChanged;
-                boolean isRequiredOnEveryJoin = main.getConfigHandler().isRequiredOnEveryLogin();
+                boolean isRequiredDueToIPChange = main.getConfigHandler().shouldRequiredOnIPChange() && hasIPChanged;
+                boolean isRequiredOnEveryJoin = main.getConfigHandler().shouldRequiredOnEveryLogin();
 
                 if(!isRequiredDueToIPChange && !isRequiredOnEveryJoin) {
                     changeState(player.getUniqueId(), AuthState.AUTHENTICATED);

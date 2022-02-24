@@ -1,0 +1,21 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <servers>
+        <server>
+            <id>liels-repo</id>
+            <username>${env.LIELS_REPO_USERNAME}</username>
+            <password>${env.LIELS_REPO_PASSWORD}</password>
+        </server>
+    </servers>
+
+    <mirrors>
+        <mirror>
+            <id>liels-repo</id>
+            <mirrorOf>com.lielamar</mirrorOf>
+            <url>https://repo.lielamar.com/repository/maven-releases/</url>
+        </mirror>
+    </mirrors>
+</settings>

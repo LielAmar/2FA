@@ -12,11 +12,11 @@ import java.nio.file.Files;
 
 public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandler {
 
-    private final String configName = "config.yml";
-
     private final TwoFactorAuthentication main;
 
-    private boolean disableServerSwitch;
+    private boolean disableCommands = true;
+    private boolean disableChat = true;
+    private boolean disableServerSwitch = true;
 
     public ConfigHandler(TwoFactorAuthentication main) {
         this.main = main;
@@ -29,7 +29,7 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
         if(!main.getDataFolder().exists())
             main.getDataFolder().mkdir();
 
-        File file = new File(main.getDataFolder(), configName);
+        File file = new File(main.getDataFolder(), super.configFileName);
 
         if(!file.exists()) {
             try(InputStream in = main.getResourceAsStream("bungeeconfig.yml")) {
@@ -42,15 +42,43 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
         try {
             Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
 
-            this.disableCommands = config.getBoolean("Disable Commands");
-            this.disableServerSwitch = config.getBoolean("Disable Server Switch");
-            this.whitelistedCommands = config.getStringList("Whitelisted Commands");
-            this.blacklistedCommands = config.getStringList("Blacklisted Commands");
+            if(!config.contains("disabled-events.commands"))
+                config.set("disabled-events.commands", this.disableCommands);
+            else
+                this.disableCommands = config.getBoolean("disabled-events.commands");
+
+            if(!config.contains("disabled-events.chat"))
+                config.set("disabled-events.chat", this.disableChat);
+            else
+                this.disableChat = config.getBoolean("disabled-events.chat");
+
+            if(!config.contains("disabled-events.server-switch"))
+                config.set("disabled-events.server-switch", this.disableServerSwitch);
+            else
+                this.disableServerSwitch = config.getBoolean("disabled-events.server-switch");
+
+            if(!config.contains("whitelisted-commands"))
+                config.set("whitelisted-commands", this.whitelistedCommands);
+            else
+                super.whitelistedCommands = config.getStringList("whitelisted-commands");
+
+            if(!config.contains("blacklisted-commands"))
+                config.set("blacklisted-commands", this.blacklistedCommands);
+            else
+                super.blacklistedCommands = config.getStringList("blacklisted-commands");
+
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
         } catch(IOException exception) {
             exception.printStackTrace();
         }
     }
 
+    public boolean isDisableCommands() {
+        return this.disableCommands;
+    }
+    public boolean isDisableChat() {
+        return this.disableChat;
+    }
     public boolean isDisableServerSwitch() {
         return this.disableServerSwitch;
     }
