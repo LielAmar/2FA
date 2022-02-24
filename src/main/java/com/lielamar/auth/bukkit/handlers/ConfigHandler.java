@@ -110,7 +110,7 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
             }
         } catch(IllegalArgumentException exception) {
             exception.printStackTrace();
-            System.out.println("[2FA] The plugin detected that your configuration is having some incompatible Events in the \"disabled-events\" section." +
+            Bukkit.getServer().getLogger().severe("The plugin detected that your configuration is having some incompatible Events in the \"disabled-events\" section." +
                     "Please re-check your configuration and make sure the Disabled Events names are correct!");
         }
 

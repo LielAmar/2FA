@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.5.8"
+version: "1.5.9"
 api-version: 1.13
 authors: [LielAmar, SadGhost]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication

@@ -4,6 +4,7 @@ import com.lielamar.auth.shared.handlers.ConfigHandler;
 import com.lielamar.auth.shared.storage.json.JSONStorage;
 import com.lielamar.auth.shared.storage.mongodb.MongoDBStorage;
 import com.lielamar.auth.shared.storage.sql.SQLStorage;
+import org.bukkit.Bukkit;
 
 import java.util.UUID;
 
@@ -136,7 +137,7 @@ public abstract class StorageHandler {
             }
         } catch(Exception exception) {
             exception.printStackTrace();
-            System.out.println("Couldn't load the Database you specified for the above reason. Defaulting to JSON!");
+            Bukkit.getServer().getLogger().severe("Couldn't load the Database you specified for the above reason. Defaulting to JSON!");
             return new JSONStorage(absolutePath);
         }
     }

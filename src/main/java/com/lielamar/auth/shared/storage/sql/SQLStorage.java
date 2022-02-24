@@ -2,6 +2,7 @@ package com.lielamar.auth.shared.storage.sql;
 
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.Bukkit;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,11 +58,17 @@ public class SQLStorage extends StorageHandler {
      */
     private void setupHikari() {
         hikari = new HikariDataSource();
-        hikari.setMaximumPoolSize(this.maximumPoolSize);
-        hikari.setMinimumIdle(this.minimumIdle);
-        hikari.setMaxLifetime(this.maximumLifetime);
-        hikari.setKeepaliveTime(this.keepAliveTime);
-        hikari.setConnectionTimeout(this.connectionTimeout);
+
+        try {
+            hikari.setMaximumPoolSize(this.maximumPoolSize);
+            hikari.setMinimumIdle(this.minimumIdle);
+            hikari.setMaxLifetime(this.maximumLifetime);
+            hikari.setKeepaliveTime(this.keepAliveTime);
+            hikari.setConnectionTimeout(this.connectionTimeout);
+        } catch(NoSuchMethodError exception) {
+            Bukkit.getServer().getLogger().severe("Something went wrong when setting up HikariCP. If something does not work"
+                    + " correctly, please report it to the 2FA team");
+        }
 
         hikari.setDataSourceClassName(this.driver);
 
@@ -73,7 +80,6 @@ public class SQLStorage extends StorageHandler {
         if(password.length() > 0)
             properties.setProperty("password", password);
         hikari.setDataSourceProperties(properties);
-
 
         this.createTables();
     }
@@ -101,7 +107,7 @@ public class SQLStorage extends StorageHandler {
                     stmt.executeUpdate();
                 }
             } catch(Exception ignored) {
-                System.out.println("[2FA] The plugin could not add the 'enable_date' column to your SQL database in table: " + this.fullPlayersTableName + "." +
+                Bukkit.getServer().getLogger().severe("The plugin could not add the 'enable_date' column to your SQL database in table: " + this.fullPlayersTableName + "." +
                         "Please give your SQL user permissions to information_schema or add the column manually, otherwise the plugin won't work properly!");
             }
         } catch(SQLException exception) {

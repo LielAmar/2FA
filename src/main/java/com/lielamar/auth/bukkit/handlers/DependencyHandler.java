@@ -65,7 +65,7 @@ public class DependencyHandler {
         String mongoDBVersion = properties.getProperty("version_mongo_db", "3.12.10");
         String slf4jVersion = properties.getProperty("version_slf4j", "2.0.0-alpha5");
 
-        System.out.println("[2FA] Loading library Google Auth v" + googleAuthVersion);
+        Bukkit.getServer().getLogger().info("Loading library Google Auth v" + googleAuthVersion);
         Library library = Library.builder()
                 .groupId(googleAuthGroupId)
                 .artifactId(googleAuthArtifactId)
@@ -73,7 +73,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loading library Commons-Codec v" + commonsCodecVersion);
+        Bukkit.getServer().getLogger().info("Loading library Commons-Codec v" + commonsCodecVersion);
         library = Library.builder()
                 .groupId(commonsCodecGroupId)
                 .artifactId(commonsCodecArtifactId)
@@ -81,7 +81,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loading library HikariCP v" + hikariCpVersion);
+        Bukkit.getServer().getLogger().info("Loading library HikariCP v" + hikariCpVersion);
         library = Library.builder()
                 .groupId(hikariCpGroupId)
                 .artifactId(hikariCpArtifactId)
@@ -89,7 +89,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loading library H2 v" + h2Version);
+        Bukkit.getServer().getLogger().info("Loading library H2 v" + h2Version);
         library = Library.builder()
                 .groupId(h2GroupId)
                 .artifactId(h2ArtifactId)
@@ -97,7 +97,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loading library MySQL v" + mysqlVersion);
+        Bukkit.getServer().getLogger().info("Loading library MySQL v" + mysqlVersion);
         library = Library.builder()
                 .groupId(mysqlGroupId)
                 .artifactId(mysqlArtifactId)
@@ -105,7 +105,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loading library MariaDB v" + mariaDBVersion);
+        Bukkit.getServer().getLogger().info("Loading library MariaDB v" + mariaDBVersion);
         library = Library.builder()
                 .groupId(mariaDBGroupId)
                 .artifactId(mariaDBArtifactId)
@@ -113,7 +113,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loading library PostgreSQL v" + postgresVersion);
+        Bukkit.getServer().getLogger().info("Loading library PostgreSQL v" + postgresVersion);
         library = Library.builder()
                 .groupId(postgresGroupId)
                 .artifactId(postgresArtifactId)
@@ -121,7 +121,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loading library MongoDB v" + mongoDBVersion);
+        Bukkit.getServer().getLogger().info("Loading library MongoDB v" + mongoDBVersion);
         library = Library.builder()
                 .groupId(mongoDBGroupId)
                 .artifactId(mongoDBArtifactId)
@@ -129,7 +129,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        System.out.println("[2FA] Loading library Slf4j v" + slf4jVersion);
+        Bukkit.getServer().getLogger().info("Loading library Slf4j v" + slf4jVersion);
         library = Library.builder()
                 .groupId(slf4jGroupId)
                 .artifactId(slf4jArtifactId)
