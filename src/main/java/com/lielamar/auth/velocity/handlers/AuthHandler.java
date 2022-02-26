@@ -21,6 +21,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return;
 
         Optional<Player> optionalPlayer = main.getProxy().getPlayer(uuid);
+        
         if(optionalPlayer.isPresent()) {
             Player player = optionalPlayer.get();
 

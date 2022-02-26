@@ -175,9 +175,13 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     // If the player has a key, wait for an authentication, otherwise, set them as 2fa disabled
                     changeState(uuid, (getStorageHandler().getKey(uuid) == null ? AuthState.DISABLED : AuthState.PENDING_LOGIN));
 
+                    System.out.println("player state at this point in time: " + getAuthState(uuid));
+
                     // we want to check whether the player needs to authenticate or not (if they have a key or not).
                     // If not, we want to either advise them or demand from them to setup 2fa.
                     if(!needsToAuthenticate(player.getUniqueId())) {
+                        System.out.println("a");
+
                         if(player.hasPermission("2fa.demand")) {
                             main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
                             createKey(player.getUniqueId());
@@ -190,6 +194,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         }
                         // Else, we will try to auto authenticate them
                     } else {
+                        System.out.println("b");
+
                         extraAuthHandler.autoAuthenticate(player);
                     }
                 }
@@ -482,16 +488,27 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
          * @param player   Player to auto authenticate
          */
         public void autoAuthenticate(Player player) {
-            if(isBungeecordEnabled) bungeecordAutoAuthenticate(player);
-            else spigotAutoAuthenticate(player);
+            System.out.println("c");
+
+            if(isBungeecordEnabled) {
+                bungeecordAutoAuthenticate(player);
+                System.out.println("d");
+            } else {
+                spigotAutoAuthenticate(player);
+                System.out.println("e");
+            }
         }
 
         private void bungeecordAutoAuthenticate(Player player) {
             if(!needsToAuthenticate(player.getUniqueId())) return;
 
             final long currentTimestamp = System.currentTimeMillis();
+            System.out.println("requesting player's bungeecord auth state");
             main.getPluginMessageListener().getBungeeCordAuthState(player.getUniqueId(), getAuthState(player.getUniqueId()), new Callback() {
-                public void execute() { spigotAutoAuthenticate(player); }
+                public void execute() {
+                    System.out.println("proxy returned an answer. New value: " + getAuthState(player.getUniqueId()));
+                    spigotAutoAuthenticate(player);
+                }
                 public long getExecutionStamp() { return currentTimestamp; }
             });
         }

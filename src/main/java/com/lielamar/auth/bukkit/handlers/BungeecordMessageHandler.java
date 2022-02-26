@@ -177,14 +177,18 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
      */
     @Override
     public void onPluginMessageReceived(String channel, @NotNull Player player, @NotNull byte[] message) {
+        System.out.println("got response from velocity. " + channel);
         // If the Channel name is not the 2FA's Channel name we want to return
         if(!channel.equals(channelName)) return;
 
         ByteArrayDataInput response = ByteStreams.newDataInput(message);
         String subChannel = response.readUTF();
+        System.out.println("got response from velocity. " + subChannel);
 
         UUID messageUUID = UUID.fromString(response.readUTF());
         UUID playerUUID = UUID.fromString(response.readUTF());
+
+        System.out.println("got response from velocity. " + playerUUID.toString());
 
         // If the SubChannel name is the 2FA's SubChannel name
         if(subChannel.equals(super.subChannelName)) {
@@ -196,6 +200,8 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
             try {
                 MessageAction action = MessageAction.valueOf(msgBodyData.readUTF());
 
+                System.out.println("got response from velocity. For action: " + action);
+
                 // If the Bungeecord server sends us a "Load Bungeecord" message, we set bungeecord to true.
                 if(action == MessageAction.LOAD_BUNGEECORD)
                     this.main.getAuthHandler().isBungeecordEnabled = true;
@@ -203,7 +209,11 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
                 if(action == MessageAction.GET_STATE) {
                     AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
                     main.getAuthHandler().changeState(playerUUID, state, false);
+
+                    System.out.println("got response from velocity. Got state: " + state);
                 }
+
+                System.out.println("Please new state: " + main.getAuthHandler().getAuthState(playerUUID));
 
                 Callback callback = this.callbacks.getOrDefault(messageUUID, null);
                 if(callback != null) callback.execute();
