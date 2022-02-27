@@ -1,7 +1,7 @@
 package com.lielamar.auth.bungee.handlers;
 
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
-import com.lielamar.lielsutils.ColorUtils;
+import com.lielamar.lielsutils.bukkit.color.ColorUtils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

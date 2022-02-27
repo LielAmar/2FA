@@ -1,6 +1,6 @@
 package com.lielamar.auth.shared.handlers;
 
-import com.lielamar.lielsutils.modules.Pair;
+import com.lielamar.lielsutils.groups.Pair;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class MessageHandler {
@@ -10,6 +10,7 @@ public abstract class MessageHandler {
     public void sendMessage(Object sender, TwoFAMessages message, Pair<?, ?>... args) {
         this.sendMessage(sender, true, message, args);
     }
+
 
     /**
      * Sends the value of the provided {TwoFAMessage} object to the given player
@@ -25,7 +26,7 @@ public abstract class MessageHandler {
 
         if(raw != null && raw.length() > 0) {
             for(Pair<?, ?> pair : args)
-                raw = raw.replaceAll(pair.getKey().toString(), pair.getValue().toString());
+                raw = raw.replaceAll(pair.getA().toString(), pair.getB().toString());
 
             this.sendRaw(sender, (prefix ? rawPrefix : "") + raw);
         }

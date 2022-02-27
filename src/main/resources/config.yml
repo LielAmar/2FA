@@ -74,6 +74,7 @@ blacklisted-commands:
 require-when:
   # When the player's IP address changes
   ip-changes: true
+
   # On every login
   every-login: false
 

@@ -5,7 +5,7 @@ import com.lielamar.auth.bukkit.commands.subcommands.*;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
-import com.lielamar.lielsutils.commands.Command;
+import com.lielamar.lielsutils.bukkit.commands.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,7 +38,6 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
             pluginCommand.setTabCompleter(this);
         }
 
-
         this.setupCommands();
     }
 
@@ -48,6 +47,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
     private void setupCommands() {
         loginCommand = new LoginCommand("", plugin);
         setupCommand = new SetupCommand("", plugin);
+
         commands.add(new EnableCommand(Constants.enableCommand, plugin));
         commands.add(new DisableCommand(Constants.disableCommand, plugin));
         commands.add(new CancelCommand(Constants.cancelCommand, plugin));
@@ -57,7 +57,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * Returns a {@link com.lielamar.lielsutils.commands.Command} object related to the given name
+     * Returns a {@link com.lielamar.lielsutils.bukkit.commands.Command} object related to the given name
      *
      * @param name   Name/Alias of the command to return
      * @return       The command object from the commands set
@@ -147,7 +147,6 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         // and their name/one of their aliases contains the given argument value.
         // Example: if the input is "dis" we want to return the list: [disable] if the sender has permissions for this command
         if(subCommand == null) {
-
             return commands.stream()
                     // Filtering only the commands the sender has permissions to
                     .filter(subCmd -> subCmd.hasPermissions(commandSender))

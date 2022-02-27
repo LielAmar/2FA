@@ -1,7 +1,7 @@
 package com.lielamar.auth.bukkit.handlers;
 
 import com.lielamar.auth.shared.storage.StorageMethod;
-import com.lielamar.lielsutils.files.FileManager;
+import com.lielamar.lielsutils.bukkit.files.FileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;

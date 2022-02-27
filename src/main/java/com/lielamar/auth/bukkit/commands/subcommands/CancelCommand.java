@@ -43,9 +43,10 @@ public class CancelCommand extends Command {
                 Player player = (Player) commandSender;
 
                 if(main.getAuthHandler().isPendingSetup(player.getUniqueId())) {
-                    main.getAuthHandler().cancelKey(player.getUniqueId());
+                    if(main.getAuthHandler().cancelKey(player.getUniqueId()))
+                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.CANCELED_SETUP);
+
                     main.getAuthHandler().removeQRItem(player);
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.CANCELED_SETUP);
                 } else {
                     main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NOT_IN_SETUP_MODE);
                 }

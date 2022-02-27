@@ -83,7 +83,7 @@ public class ReportCommand extends Command {
                 print.println("NMSVersion: " + Version.getInstance().getNMSVersion().getVersionName());
                 print.println("");
                 print.println("Using bungeecord: " + Class.forName("org.spigotmc.SpigotConfig").getField("bungee").getBoolean(null));
-                print.println("Loaded bungeecord: " + this.main.getAuthHandler().isBungeecordEnabled);
+                print.println("Loaded proxy: " + this.main.getAuthHandler().isProxyLoaded);
                 print.println("");
                 print.println("Send this on Github Issue Tracker: https://github.com/LielAmar/2FA/issues");
                 print.println("Or create a Ticket in the discord server: https://discord.com/invite/NzgBrqR");

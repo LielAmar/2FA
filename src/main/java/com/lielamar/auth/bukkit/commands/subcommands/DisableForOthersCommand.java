@@ -2,7 +2,6 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.shared.utils.AuthUtils;
 import com.lielamar.lielsutils.commands.Command;
 import com.lielamar.lielsutils.modules.Pair;
 import org.bukkit.Bukkit;

@@ -1,7 +1,8 @@
 package com.lielamar.auth.bukkit;
 
+import com.lielamar.lielsutils.time.TimeUtils;
+
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.shared.utils.TimeUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 

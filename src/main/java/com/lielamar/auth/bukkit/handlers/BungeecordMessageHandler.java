@@ -204,11 +204,11 @@ public class BungeecordMessageHandler extends PluginMessagingHandler implements 
 
                 // If the Bungeecord server sends us a "Load Bungeecord" message, we set bungeecord to true.
                 if(action == MessageAction.LOAD_BUNGEECORD)
-                    this.main.getAuthHandler().isBungeecordEnabled = true;
+                    this.main.getAuthHandler().isProxyLoaded = true;
 
                 if(action == MessageAction.GET_STATE) {
                     AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
-                    main.getAuthHandler().changeState(playerUUID, state, false);
+                    main.getAuthHandler().changeState(playerUUID, state);
 
                     System.out.println("got response from velocity. Got state: " + state);
                 }

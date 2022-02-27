@@ -16,14 +16,16 @@ public class OnPlayerConnection implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        Player player = e.getPlayer();
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
         this.main.getAuthHandler().playerJoin(player.getUniqueId());
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        Player player = e.getPlayer();
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+
         this.main.getAuthHandler().playerQuit(player.getUniqueId());
     }
 }

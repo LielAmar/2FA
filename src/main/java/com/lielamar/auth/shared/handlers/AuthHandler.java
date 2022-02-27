@@ -3,6 +3,8 @@ package com.lielamar.auth.shared.handlers;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,29 +12,45 @@ import java.util.UUID;
 
 public abstract class AuthHandler {
 
-    /**
-     * This class was originally written by Connor Linfoot (https://github.com/ConnorLinfoot/MC2FA).
-     * This class was edited by Liel Amar to add Bungeecord, JSON, MySQL, and MongoDB support.
-     */
-
-    protected StorageHandler storageHandler;
-    protected HashMap<UUID, AuthState> authStates = new HashMap<>();
-    protected int authentications;
-
     private final HashMap<UUID, String> pendingKeys = new HashMap<>();
     private final Map<UUID, Integer> failedAttempts = new HashMap<>();
 
-    public enum AuthState {
-        DISABLED, PENDING_SETUP, DEMAND_SETUP, PENDING_LOGIN, AUTHENTICATED
+    protected StorageHandler storageHandler;
+    protected HashMap<UUID, AuthState> authStates = new HashMap<>();
+
+
+    public @Nullable StorageHandler getStorageHandler() { return storageHandler; }
+
+
+    /**
+     * Returns a player's key
+     *
+     * @param uuid   UUID of the player to get the key of
+     * @return       Player's key
+     */
+    protected @Nullable String getKey(@NotNull UUID uuid) {
+        if(this.getStorageHandler() == null)
+            return null;
+
+        if(!this.is2FAEnabled(uuid))
+            return null;
+
+        return this.getStorageHandler().getKey(uuid);
     }
 
-    public int getAuthentications() {
-        return this.authentications;
+    /**
+     * Returns a player's pending key (if they have one)
+     *
+     * @param uuid   UUID of the player to get the pending key of
+     * @return       Player's pending key
+     */
+    protected @Nullable String getPendingKey(@NotNull UUID uuid) {
+        if(!this.isPendingSetup(uuid))
+            return null;
+
+        return this.pendingKeys.get(uuid);
     }
 
-    public void resetAuthentications() {
-        this.authentications = 0;
-    }
 
     /**
      * Returns a Player's Auth State
@@ -40,9 +58,10 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to get the Auth State of
      * @return       Auth State
      */
-    public AuthState getAuthState(UUID uuid) {
-        if(authStates.containsKey(uuid))
-            return authStates.get(uuid);
+    public @Nullable AuthState getAuthState(@NotNull UUID uuid) {
+        if(this.authStates.containsKey(uuid))
+            return this.authStates.get(uuid);
+
         return null;
     }
 
@@ -52,10 +71,12 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to check
      * @return       Whether or not the player has a Secret Key
      */
-    public boolean is2FAEnabled(UUID uuid) {
-        if(!authStates.containsKey(uuid))
+    public boolean is2FAEnabled(@NotNull UUID uuid) {
+        if(!this.authStates.containsKey(uuid))
             return false;
-        return authStates.get(uuid).equals(AuthState.DEMAND_SETUP) || authStates.get(uuid).equals(AuthState.PENDING_LOGIN) || authStates.get(uuid).equals(AuthState.AUTHENTICATED);
+
+        return this.authStates.get(uuid).equals(AuthState.DEMAND_SETUP) ||
+                this.authStates.get(uuid).equals(AuthState.PENDING_LOGIN) || this.authStates.get(uuid).equals(AuthState.AUTHENTICATED);
     }
 
     /**
@@ -64,8 +85,9 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to check
      * @return       Whether or not the player is pending setup
      */
-    public boolean isPendingSetup(UUID uuid) {
-        return authStates.get(uuid).equals(AuthState.PENDING_SETUP) || authStates.get(uuid).equals(AuthState.DEMAND_SETUP);
+    public boolean isPendingSetup(@NotNull UUID uuid) {
+        return this.authStates.get(uuid).equals(AuthState.PENDING_SETUP) ||
+                this.authStates.get(uuid).equals(AuthState.DEMAND_SETUP);
     }
 
     /**
@@ -74,12 +96,12 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to create the Secret Key for
      * @return       Created Key
      */
-    public String createKey(UUID uuid) {
+    public @NotNull String createKey(@NotNull UUID uuid) {
         GoogleAuthenticator authenticator = new GoogleAuthenticator();
         GoogleAuthenticatorKey key = authenticator.createCredentials();
 
-        changeState(uuid, AuthState.PENDING_SETUP);
-        pendingKeys.put(uuid, key.getKey());
+        this.changeState(uuid, AuthState.PENDING_SETUP);
+        this.pendingKeys.put(uuid, key.getKey());
         return key.getKey();
     }
 
@@ -90,13 +112,14 @@ public abstract class AuthHandler {
      * @param code   Inserted code
      * @return       Whether or not the code is valid
      */
-    public boolean validateKey(UUID uuid, Integer code) {
-        String key = getKey(uuid);
-        if(key != null && new GoogleAuthenticator().authorize(key, code) && authStates.get(uuid).equals(AuthState.PENDING_LOGIN)) {
-            changeState(uuid, AuthState.AUTHENTICATED);
-            authentications++;
+    public boolean validateKey(@NotNull UUID uuid, @NotNull Integer code) {
+        String key = this.getKey(uuid);
+
+        if(key != null && new GoogleAuthenticator().authorize(key, code) && this.authStates.get(uuid).equals(AuthState.PENDING_LOGIN)) {
+            this.changeState(uuid, AuthState.AUTHENTICATED);
             return true;
         }
+
         return false;
     }
 
@@ -107,14 +130,20 @@ public abstract class AuthHandler {
      * @param code   Inserted code
      * @return       Whether or not the code is valid
      */
-    public boolean approveKey(UUID uuid, Integer code) {
-        String key = getPendingKey(uuid);
-        if(key != null && new GoogleAuthenticator().authorize(key, code) && (authStates.get(uuid).equals(AuthState.PENDING_SETUP) || authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
-            changeState(uuid, AuthState.AUTHENTICATED);
-            getStorageHandler().setKey(uuid, key);
-            getStorageHandler().setEnableDate(uuid, System.currentTimeMillis());
-            pendingKeys.remove(uuid);
-            authentications++;
+    public boolean approveKey(@NotNull UUID uuid, @NotNull Integer code) {
+        if(this.getStorageHandler() == null)
+            return false;
+
+        String key = this.getPendingKey(uuid);
+
+        if(key != null && new GoogleAuthenticator().authorize(key, code) &&
+                (this.authStates.get(uuid).equals(AuthState.PENDING_SETUP) || this.authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
+            this.changeState(uuid, AuthState.AUTHENTICATED);
+
+            this.getStorageHandler().setKey(uuid, key);
+            this.getStorageHandler().setEnableDate(uuid, System.currentTimeMillis());
+            this.pendingKeys.remove(uuid);
+
             return true;
         }
         return false;
@@ -125,47 +154,36 @@ public abstract class AuthHandler {
      *
      * @param uuid   UUID of the player to reset the key of
      */
-    public void resetKey(UUID uuid) {
-        pendingKeys.remove(uuid);
-        changeState(uuid, AuthState.DISABLED);
-        getStorageHandler().removeKey(uuid);
-        getStorageHandler().setEnableDate(uuid, -1);
+    public void resetKey(@NotNull UUID uuid) {
+        if(this.getStorageHandler() == null)
+            return;
+
+        this.changeState(uuid, AuthState.DISABLED);
+
+        this.getStorageHandler().removeKey(uuid);
+        this.getStorageHandler().setEnableDate(uuid, -1);
+
+        this.pendingKeys.remove(uuid);
     }
 
-    public boolean cancelKey(UUID uuid) {
+    /**
+     * Cancels a player's key
+     *
+     * @param uuid   UUID of the player to reset the key of
+     * @return       Whether cancellation was successful
+     */
+    public boolean cancelKey(@NotNull UUID uuid) {
         String key = getPendingKey(uuid);
 
-        if(key != null && (authStates.get(uuid).equals(AuthState.PENDING_SETUP) || authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
-            changeState(uuid, AuthState.DISABLED);
-            pendingKeys.remove(uuid);
+        if(key != null && (this.authStates.get(uuid).equals(AuthState.PENDING_SETUP) ||
+                this.authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
+            this.changeState(uuid, AuthState.DISABLED);
+
+            this.pendingKeys.remove(uuid);
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * Returns a player's key
-     *
-     * @param uuid   UUID of the player to get the key of
-     * @return       Player's key
-     */
-    private String getKey(UUID uuid) {
-        if(!is2FAEnabled(uuid))
-            return null;
-        return getStorageHandler().getKey(uuid);
-    }
-
-    /**
-     * Returns a player's pending key (if they have one)
-     *
-     * @param uuid   UUID of the player to get the pending key of
-     * @return       Player's pending key
-     */
-    protected String getPendingKey(UUID uuid) {
-        if(!isPendingSetup(uuid))
-            return null;
-        return pendingKeys.get(uuid);
     }
 
     /**
@@ -174,8 +192,8 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to check
      * @return       Whether or not the player needs to authenticate
      */
-    public boolean needsToAuthenticate(UUID uuid) {
-        return is2FAEnabled(uuid) && !authStates.get(uuid).equals(AuthState.AUTHENTICATED);
+    public boolean needsToAuthenticate(@NotNull UUID uuid) {
+        return this.is2FAEnabled(uuid) && !this.authStates.get(uuid).equals(AuthState.AUTHENTICATED);
     }
 
     /**
@@ -184,38 +202,29 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to check
      * @return       Amount of fails
      */
-    public int increaseFailedAttempts(UUID uuid, int amount) {
-        if(!failedAttempts.containsKey(uuid)) {
-            failedAttempts.put(uuid, amount);
+    public int increaseFailedAttempts(@NotNull UUID uuid, int amount) {
+        if(!this.failedAttempts.containsKey(uuid)) {
+            this.failedAttempts.put(uuid, amount);
+
             return amount;
         } else {
-            int playerFailedAttempts = failedAttempts.get(uuid) + amount;
-            failedAttempts.put(uuid, playerFailedAttempts);
+            int playerFailedAttempts = this.failedAttempts.get(uuid) + amount;
+            this.failedAttempts.put(uuid, playerFailedAttempts);
+
             return playerFailedAttempts;
         }
     }
 
-    /**
-     * Returns a QR Code URL based on a player's key
-     *
-     * @param urlTemplate   Base URL of the QR Code
-     * @param uuid          UUID of the player to get the key of
-     * @return              URL of the QR Code
-     */
-    public String getQRCodeURL(String urlTemplate, UUID uuid) {
-        return null;
-    }
 
-    public void playerJoin(UUID uuid) {}
-
-    public void playerQuit(UUID uuid) {
+    public void playerQuit(@NotNull UUID uuid) {
         pendingKeys.remove(uuid);
         authStates.remove(uuid);
     }
 
-    public StorageHandler getStorageHandler() {
-        return storageHandler;
-    }
+    public abstract void changeState(@NotNull UUID uuid, @NotNull AuthState authState);
 
-    public abstract void changeState(UUID uuid, AuthState authState);
+
+    public enum AuthState {
+        DISABLED, WAITING_FOR_ANSWER, PENDING_SETUP, DEMAND_SETUP, PENDING_LOGIN, AUTHENTICATED
+    }
 }
