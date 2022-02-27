@@ -39,7 +39,7 @@ public class TwoFactorAuthentication extends JavaPlugin {
                 + ChatColor.DARK_GRAY + "Made with " + ChatColor.RED + "♥" + ChatColor.DARK_GRAY + " by "
                 + ChatColor.AQUA + getDescription().getAuthors().toString().replaceAll("\\[", "").replace("]", ""));
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "  / /_| | / ____ \\ " + "    "
-                + ChatColor.DARK_GRAY + "Time contributed so far " + ChatColor.AQUA + "~175 Hours");
+                + ChatColor.DARK_GRAY + "Time contributed so far " + ChatColor.AQUA + "~200 Hours");
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + " |____|_|/_/    \\_\\");
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "                   ");
 
