@@ -1,7 +1,7 @@
 package com.lielamar.auth.velocity.handlers;
 
 import com.lielamar.auth.velocity.TwoFactorAuthentication;
-import com.lielamar.lielsutils.modules.Pair;
+import com.lielamar.lielsutils.groups.Pair;
 import com.moandjiezana.toml.Toml;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.audience.Audience;
@@ -15,16 +15,29 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.List;
 
-public class MessageHandler {
+public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
     private final TwoFactorAuthentication main;
-    private File file;
 
     public MessageHandler(TwoFactorAuthentication main) {
         this.main = main;
 
         this.reload();
     }
+
+
+    @Override
+    protected void sendRaw(Object player, String message) {
+        this.sendRaw(player, message, TextColor.fromHexString("#ffffff"));
+    }
+
+    protected void sendRaw(final Object player, final String message, TextColor color) {
+        if(player instanceof Player)
+            Audience.audience((Player) player).sendMessage(
+                    Component.text().content(message).color(color).build(),
+                    MessageType.CHAT);
+    }
+
 
     public void sendMessage(Object sender, TwoFAMessages message) {
         this.sendMessage(sender, (TwoFAMessages.PREFIX.getMessage().length() > 0), message);
@@ -36,20 +49,13 @@ public class MessageHandler {
 
         if(raw != null && raw.length() > 0) {
             for(Pair<?, ?> pair : args)
-                raw = raw.replaceAll(pair.getKey().toString(), pair.getValue().toString());
+                raw = raw.replaceAll(pair.getA().toString(), pair.getB().toString());
 
             this.sendRaw(sender, (prefix ? rawPrefix : "") + raw, message.getColor());
         }
     }
 
-    protected void sendRaw(final Object player, final String message, TextColor color) {
-        if(player instanceof Player)
-            Audience.audience((Player) player).sendMessage(
-                    Component.text().content(message).color(color).build(),
-                    MessageType.CHAT);
-    }
-
-
+    @Override
     public void reload() {
         if(!main.getDataDirectory().toFile().exists())
             main.getDataDirectory().toFile().mkdir();
@@ -82,6 +88,9 @@ public class MessageHandler {
             }
         }
     }
+
+    @Override
+    public void saveConfiguration() {}
 
 
     public enum TwoFAMessages {

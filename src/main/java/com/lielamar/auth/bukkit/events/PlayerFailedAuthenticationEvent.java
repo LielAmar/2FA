@@ -3,10 +3,11 @@ package com.lielamar.auth.bukkit.events;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerFailedAuthenticationEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList HANDLERS = new HandlerList();
 
     private final Player player;
     private final int failedAttempts;
@@ -16,14 +17,6 @@ public class PlayerFailedAuthenticationEvent extends Event {
         this.failedAttempts = failedAttempts;
     }
 
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
 
     public Player getPlayer() {
         return player;
@@ -31,5 +24,15 @@ public class PlayerFailedAuthenticationEvent extends Event {
 
     public int getFailedAttempts() {
         return this.failedAttempts;
+    }
+
+
+    @Override
+    public @NotNull HandlerList getHandlers() {
+        return HANDLERS;
+    }
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 }

@@ -3,6 +3,7 @@ package com.lielamar.auth.velocity.handlers;
 import com.lielamar.auth.velocity.TwoFactorAuthentication;
 import com.lielamar.auth.velocity.events.PlayerStateChangeEvent;
 import com.velocitypowered.api.proxy.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +17,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     }
 
     @Override
-    public void changeState(UUID uuid, AuthState authState) {
+    public void changeState(@NotNull UUID uuid, @NotNull AuthState authState) {
         if(authState == getAuthState(uuid))
             return;
 

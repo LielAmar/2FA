@@ -1,6 +1,7 @@
 package com.lielamar.auth.bungee;
 
 import com.lielamar.auth.bungee.listeners.OnAuthStateChange;
+import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
 import com.lielamar.auth.shared.utils.AuthTracker;
 import com.lielamar.auth.bungee.handlers.AuthHandler;
 import com.lielamar.auth.bungee.handlers.ConfigHandler;
@@ -13,7 +14,7 @@ import com.lielamar.lielsutils.bukkit.bstats.BungeeMetrics;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 
-public class TwoFactorAuthentication extends Plugin {
+public class TwoFactorAuthentication extends Plugin implements TwoFactorAuthenticationPlugin {
 
     private MessageHandler messageHandler;
     private ConfigHandler configHandler;
@@ -23,9 +24,14 @@ public class TwoFactorAuthentication extends Plugin {
     @Override
     public void onEnable() {
         this.setupAuth();
-        this.setupBStats();
         this.setupListeners();
+
+        this.setupBStats();
     }
+
+    @Override
+    public void onDisable() {}
+
 
     public void setupAuth() {
         this.messageHandler = new MessageHandler(this);
@@ -33,17 +39,6 @@ public class TwoFactorAuthentication extends Plugin {
         this.authHandler = new AuthHandler();
 
         this.authTracker = new AuthTracker();
-    }
-
-    public void setupBStats() {
-        int pluginId = 9355;
-        BungeeMetrics metrics = new BungeeMetrics(this, pluginId);
-
-        metrics.addCustomChart(new BungeeMetrics.SingleLineChart("authentications", () -> {
-            int value = this.authTracker.getAuthentications();
-            this.authTracker.setAuthentications(0);
-            return value;
-        }));
     }
 
     public void setupListeners() {
@@ -55,6 +50,19 @@ public class TwoFactorAuthentication extends Plugin {
 
         getProxy().registerChannel(PluginMessagingHandler.channelName);
     }
+
+
+    private void setupBStats() {
+        int pluginId = 9355;
+        BungeeMetrics metrics = new BungeeMetrics(this, pluginId);
+
+        metrics.addCustomChart(new BungeeMetrics.SingleLineChart("authentications", () -> {
+            int value = this.authTracker.getAuthentications();
+            this.authTracker.setAuthentications(0);
+            return value;
+        }));
+    }
+
 
     public MessageHandler getMessageHandler() { return this.messageHandler; }
     public ConfigHandler getConfigHandler() { return this.configHandler; }

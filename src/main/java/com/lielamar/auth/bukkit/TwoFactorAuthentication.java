@@ -1,15 +1,15 @@
 package com.lielamar.auth.bukkit;
 
+import com.lielamar.auth.bukkit.commands.TwoFactorAuthenticationCommand;
+import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
 import com.lielamar.lielsutils.bukkit.updater.SpigotUpdateChecker;
-import com.lielamar.lielsutils.bukkit.bstats.SpigotMetrics;
+import com.lielamar.lielsutils.bukkit.bstats.BukkitMetrics;
 import com.lielamar.lielsutils.bukkit.files.FileManager;
 
-import com.lielamar.auth.bukkit.commands.CommandHandler;
 import com.lielamar.auth.bukkit.handlers.*;
 import com.lielamar.auth.bukkit.listeners.DisabledEvents;
 import com.lielamar.auth.bukkit.listeners.OnAuthStateChange;
 import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
-import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.AuthTracker;
 
@@ -18,17 +18,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class TwoFactorAuthentication extends JavaPlugin {
-
-    private BungeecordMessageHandler pluginMessageListener;
-
-    private FileManager fileManager;
+public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuthenticationPlugin {
 
     private MessageHandler messageHandler;
     private ConfigHandler configHandler;
     private StorageHandler storageHandler;
     private AuthHandler authHandler;
-    private CommandHandler commandHandler;
     private AuthTracker authTracker;
 
     @Override
@@ -42,6 +37,8 @@ public class TwoFactorAuthentication extends JavaPlugin {
 
         this.setupAuth();
         this.registerListeners();
+        this.registerCommands();
+
         this.setupBStats();
         this.setupUpdateChecker();
     }
@@ -81,30 +78,18 @@ public class TwoFactorAuthentication extends JavaPlugin {
 
 
     public void setupAuth() {
-        this.fileManager = new FileManager(this);
+        FileManager fileManager = new FileManager(this);
+
         this.messageHandler = new MessageHandler(fileManager);
         this.configHandler = new ConfigHandler(fileManager);
         this.storageHandler = StorageHandler.loadStorageHandler(this.configHandler, getDataFolder().getAbsolutePath());
+
         this.authHandler = new AuthHandler(this);
-        this.commandHandler = new CommandHandler(this);
         this.authTracker = new AuthTracker();
-    }
 
-    private void setupBStats() {
-        int pluginId = 9355;
-        SpigotMetrics metrics = new SpigotMetrics(this, pluginId);
-
-        metrics.addCustomChart(new SpigotMetrics.SingleLineChart("authentications", () -> {
-            int value = this.authTracker.getAuthentications();
-            this.authTracker.setAuthentications(0);
-            return value;
-        }));
-    }
-
-    private void setupUpdateChecker() {
-        // Whether the plugin should check for updates
-        if(this.configHandler.shouldCheckForUpdates())
-            new SpigotUpdateChecker(this, 85594).checkForUpdates();
+//        pluginMessageListener = new BungeecordMessageHandler(this);
+//        getServer().getMessenger().registerOutgoingPluginChannel(this, PluginMessagingHandler.channelName);
+//        getServer().getMessenger().registerIncomingPluginChannel(this, PluginMessagingHandler.channelName, pluginMessageListener);
     }
 
     private void registerListeners() {
@@ -113,19 +98,33 @@ public class TwoFactorAuthentication extends JavaPlugin {
         pm.registerEvents(new OnAuthStateChange(this), this);
         pm.registerEvents(new OnPlayerConnection(this), this);
         pm.registerEvents(new DisabledEvents(this), this);
+    }
 
-        pluginMessageListener = new BungeecordMessageHandler(this);
-        getServer().getMessenger().registerOutgoingPluginChannel(this, PluginMessagingHandler.channelName);
-        getServer().getMessenger().registerIncomingPluginChannel(this, PluginMessagingHandler.channelName, pluginMessageListener);
+    private void registerCommands() {
+        new TwoFactorAuthenticationCommand(this).registerCommand(this);
     }
 
 
-    public BungeecordMessageHandler getPluginMessageListener() { return this.pluginMessageListener; }
-    public FileManager getFileManager() { return this.fileManager; }
+    private void setupBStats() {
+        int pluginId = 9355;
+        BukkitMetrics metrics = new BukkitMetrics(this, pluginId);
+
+        metrics.addCustomChart(new BukkitMetrics.SingleLineChart("authentications", () -> {
+            int value = this.authTracker.getAuthentications();
+            this.authTracker.setAuthentications(0);
+            return value;
+        }));
+    }
+
+    private void setupUpdateChecker() {
+        if(this.configHandler.shouldCheckForUpdates())
+            new SpigotUpdateChecker(this, 85594).checkForUpdates();
+    }
+
+
     public MessageHandler getMessageHandler() { return this.messageHandler; }
     public ConfigHandler getConfigHandler() { return this.configHandler; }
     public StorageHandler getStorageHandler() { return this.storageHandler; }
     public AuthHandler getAuthHandler() { return this.authHandler; }
-    public CommandHandler getCommandHandler() { return this.commandHandler; }
     public AuthTracker getAuthTracker() { return this.authTracker; }
 }

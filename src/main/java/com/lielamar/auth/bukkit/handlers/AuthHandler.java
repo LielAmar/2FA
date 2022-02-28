@@ -2,13 +2,13 @@ package com.lielamar.auth.bukkit.handlers;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
-import com.lielamar.auth.bukkit.utils.ImageRender;
-import com.lielamar.auth.bukkit.utils.Version;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.lielsutils.bukkit.color.ColorUtils;
 
+import com.lielamar.lielsutils.bukkit.map.ImageRender;
 import com.lielamar.lielsutils.bukkit.map.MapUtils;
 
+import com.lielamar.lielsutils.bukkit.version.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -34,7 +34,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     protected final TwoFactorAuthentication main;
 
-    protected Map<Integer, Long> lastMapIdUse;
+    protected Map<Integer, Long> lastUsedMapIds;
     protected Version.ServerVersion version;
 
     public AuthHandler(TwoFactorAuthentication main) {
@@ -42,9 +42,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         super.storageHandler = this.main.getStorageHandler();
 
-        this.lastMapIdUse = new HashMap<>();
+        this.lastUsedMapIds = new HashMap<>();
         for(int i : main.getConfigHandler().getMapIDs())
-            lastMapIdUse.put(i, -1L);
+            lastUsedMapIds.put(i, -1L);
 
         this.version = Version.getInstance().getServerVersion();
 
@@ -53,7 +53,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         Bukkit.getScheduler().runTaskLater(this.main, () -> Bukkit.getOnlinePlayers()
                 .forEach(player -> this.playerJoin(player.getUniqueId())), Math.min(1, this.main.getConfigHandler().getReloadDelay()));
     }
-
 
     @Override
     public @NotNull String createKey(@NotNull UUID uuid) {
@@ -269,25 +268,25 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public MapView getMap(World world) {
         MapView mapView;
 
-        if(lastMapIdUse.size() < main.getConfigHandler().getAmountOfReservedMaps()) {
+        if(lastUsedMapIds.size() < main.getConfigHandler().getAmountOfReservedMaps()) {
             mapView = Bukkit.createMap(world);
             main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add((int) MapUtils.getMapID(mapView)));
         } else {
             int mapIdWithLongestTime = -1;
             long currentTimeMillis = System.currentTimeMillis();
 
-            for(int i : lastMapIdUse.keySet()) {
-                if(mapIdWithLongestTime == -1 || (currentTimeMillis-lastMapIdUse.get(mapIdWithLongestTime)) < currentTimeMillis-lastMapIdUse.get(i))
+            for(int i : lastUsedMapIds.keySet()) {
+                if(mapIdWithLongestTime == -1 || (currentTimeMillis - lastUsedMapIds.get(mapIdWithLongestTime)) < currentTimeMillis - lastUsedMapIds.get(i))
                     mapIdWithLongestTime = i;
             }
 
             mapView = Bukkit.getMap((short) mapIdWithLongestTime);
         }
 
-        if(mapView == null) return null;
+        if(mapView == null)
+            return null;
 
-        lastMapIdUse.put((int) MapUtils.getMapID(mapView), System.currentTimeMillis());
-
+        lastUsedMapIds.put((int) MapUtils.getMapID(mapView), System.currentTimeMillis());
         return mapView;
     }
 

@@ -1,6 +1,7 @@
 package com.lielamar.auth.velocity;
 
 import com.google.inject.Inject;
+import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.velocity.handlers.AuthHandler;
 import com.lielamar.auth.velocity.handlers.ConfigHandler;
@@ -20,7 +21,7 @@ import org.slf4j.Logger;
 import java.nio.file.Path;
 
 @Plugin(id = "twofa", name = "2FA", version = "1.6.0", description = "Add another layer of protection to your server", authors = { "Liel Amar", "SadGhost"})
-public class TwoFactorAuthentication {
+public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
 
     private final ProxyServer proxy;
     private final Logger logger;

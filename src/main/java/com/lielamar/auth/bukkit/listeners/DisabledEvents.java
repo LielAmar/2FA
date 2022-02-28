@@ -147,7 +147,7 @@ public class DisabledEvents implements Listener {
             if(this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) {
                 if(args.length > 0) {
                     String command = args[0];
-                    if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.equalsIgnoreCase(command)) {
+                    if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.getA().equalsIgnoreCase(command)) {
                         event.setCancelled(true);
                         main.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }

@@ -11,9 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerStateChangeEvent extends Event implements Cancellable {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList HANDLERS = new HandlerList();
 
     private final Player player;
+
     private boolean cancelled = false;
     private AuthHandler.AuthState oldAuthState, newAuthState;
 
@@ -23,14 +24,6 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
         this.newAuthState = newAuthState;
     }
 
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
 
     @Override
     public boolean isCancelled() {
@@ -42,7 +35,7 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
         this.cancelled = cancelled;
     }
 
-    public Player getPlayer() {
+    public @NotNull Player getPlayer() {
         return player;
     }
 
@@ -50,7 +43,7 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
         return oldAuthState;
     }
 
-    public void setOldAuthState(@NotNull AuthHandler.AuthState oldAuthState) {
+    public void setOldAuthState(@Nullable AuthHandler.AuthState oldAuthState) {
         this.oldAuthState = oldAuthState;
     }
 
@@ -60,5 +53,15 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
 
     public void setNewAuthState(@NotNull AuthHandler.AuthState newAuthState) {
         this.newAuthState = newAuthState;
+    }
+
+
+    @Override
+    public @NotNull HandlerList getHandlers() {
+        return HANDLERS;
+    }
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 }
