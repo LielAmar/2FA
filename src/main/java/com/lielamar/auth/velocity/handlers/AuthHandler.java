@@ -10,10 +10,10 @@ import java.util.UUID;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
 
-    public AuthHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    public AuthHandler(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -21,13 +21,13 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         if(authState == getAuthState(uuid))
             return;
 
-        Optional<Player> optionalPlayer = main.getProxy().getPlayer(uuid);
+        Optional<Player> optionalPlayer = this.plugin.getProxy().getPlayer(uuid);
         
         if(optionalPlayer.isPresent()) {
             Player player = optionalPlayer.get();
 
             PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authState);
-            main.getProxy().getEventManager().fire(event);
+            this.plugin.getProxy().getEventManager().fire(event);
 
             if(event.getResult() == PlayerStateChangeEvent.StateResult.denied())
                 return;

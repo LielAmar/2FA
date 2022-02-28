@@ -6,26 +6,27 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class OnPlayerConnection implements Listener {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
 
-    public OnPlayerConnection(TwoFactorAuthentication main) {
-        this.main = main;
+    public OnPlayerConnection(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        this.main.getAuthHandler().playerJoin(player.getUniqueId());
+        this.plugin.getAuthHandler().playerJoin(player.getUniqueId());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        this.main.getAuthHandler().playerQuit(player.getUniqueId());
+        this.plugin.getAuthHandler().playerQuit(player.getUniqueId());
     }
 }

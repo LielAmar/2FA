@@ -5,6 +5,7 @@ import com.lielamar.auth.bukkit.events.PlayerFailedAuthenticationEvent;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,11 +17,13 @@ import java.util.List;
 public class LoginCommand extends StandaloneCommand {
 
     private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
 
-    public LoginCommand(TwoFactorAuthentication plugin) {
+    public LoginCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
         super(Constants.loginCommand.getA(), Constants.loginCommand.getB());
 
         this.plugin = plugin;
+        this.parent = parent;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class LoginCommand extends StandaloneCommand {
 
     @Override
     public void noPermissionEvent(@NotNull CommandSender commandSender) {
-        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+        this.parent.noPermissionEvent(commandSender);
     }
 
     @Override

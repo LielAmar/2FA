@@ -1,8 +1,15 @@
 package com.lielamar.auth.bukkit.handlers;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
+import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
+import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
+import com.lielamar.auth.shared.storage.StorageHandler;
+import com.lielamar.auth.shared.utils.hash.Hash;
+import com.lielamar.auth.shared.utils.hash.NoHash;
+import com.lielamar.auth.shared.utils.hash.SHA256;
+import com.lielamar.auth.shared.utils.hash.SHA512;
 import com.lielamar.lielsutils.bukkit.color.ColorUtils;
 
 import com.lielamar.lielsutils.bukkit.map.ImageRender;
@@ -26,32 +33,41 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
-    protected final TwoFactorAuthentication main;
+    protected final TwoFactorAuthentication plugin;
 
     protected Map<Integer, Long> lastUsedMapIds;
     protected Version.ServerVersion version;
 
-    public AuthHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    protected Hash hash;
 
-        super.storageHandler = this.main.getStorageHandler();
+    public AuthHandler(@NotNull TwoFactorAuthentication plugin, @Nullable StorageHandler storageHandler,
+                       @Nullable AuthCommunicationHandler authCommunicationHandler) {
+        super(storageHandler, authCommunicationHandler);
+
+        this.plugin = plugin;
 
         this.lastUsedMapIds = new HashMap<>();
-        for(int i : main.getConfigHandler().getMapIDs())
-            lastUsedMapIds.put(i, -1L);
+        Arrays.stream(plugin.getConfigHandler().getMapIDs()).forEach(i -> lastUsedMapIds.put(i, -1L));
 
         this.version = Version.getInstance().getServerVersion();
 
+        String hashType = this.plugin.getConfigHandler().getIpHashType().toUpperCase();
+        if(hashType.equalsIgnoreCase("SHA256"))      this.hash = new SHA256();
+        else if(hashType.equalsIgnoreCase("SHA512")) this.hash = new SHA512();
+        else                                                    this.hash = new NoHash();
+
         // Applying 2fa for online players
-        // We add a delay to ensure the permission plugin is loaded beforehand
-        Bukkit.getScheduler().runTaskLater(this.main, () -> Bukkit.getOnlinePlayers()
-                .forEach(player -> this.playerJoin(player.getUniqueId())), Math.min(1, this.main.getConfigHandler().getReloadDelay()));
+        // We add at least 1 tick delay, ensuring the permission plugin is loaded beforehand
+        Bukkit.getScheduler().runTaskLater(this.plugin,
+                () -> Bukkit.getOnlinePlayers().forEach(player -> this.playerJoin(player.getUniqueId())),
+                Math.min(1, this.plugin.getConfigHandler().getReloadDelay()));
     }
 
     @Override
@@ -113,28 +129,14 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
 
     public void playerJoin(@NotNull UUID uuid) {
-//        // Loads the player whenever they join the server.
-//        //
-//        // If bungeecord was not loaded yet, we want to try to load it. What it generally means is - we send a request called
-//        // "LOAD_BUNGEECORD" to bungeecord. If we get a response, it means bungeecord exists, and then we set the value of
-//        // isBungeecordEnabled to true, so we know to use bungeecord for future requests.
-//        // In case bungeecord was loaded successfully, we provide a callback to re-load the joined player, since when we loaded
-//        // them, we did so locally on the spigot instance and not in bungeecord.
-//        //
-//        // This way, if a player was online and then joined a spigot instance that was just booted, it would load their data and ask
-//        // them to authenticate, but straight after that, it'd load bungeecord and then re-load the player and auto-authenticate them.
-//
-//        handlePlayerJoin(uuid);
-//
-//        if(!isProxyLoaded) {
-//            isProxyLoaded = true;
-//
-//            long timeMillis = System.currentTimeMillis();
-//            Bukkit.getScheduler().runTaskLater(this.main, () -> this.main.getPluginMessageListener().loadBungeecord(uuid, new Callback() {
-//                public void execute() { handlePlayerJoin(uuid); }
-//                public long getExecutionStamp() { return timeMillis; }
-//            }), 1L);
-//        }
+        if(super.authCommunicationHandler == null)
+            super.authCommunicationHandler = new BasicAuthCommunication(this.plugin);
+
+        // Setting the initial state so players can't abuse the brief moment without 2fa protection
+        changeState(uuid, AuthState.PENDING_LOGIN);
+
+        // Asking communication handler to load the player state and execute LoadAuthCallback when a result is given
+        super.authCommunicationHandler.loadPlayerState(uuid, new LoadAuthCallback(uuid));
     }
 
 
@@ -144,7 +146,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         Player player = Bukkit.getPlayer(uuid);
 
         String label = (player == null) ? "player" : player.getName();
-        String title = this.main.getConfigHandler().getServerName();
+        String title = this.plugin.getConfigHandler().getServerName();
         String key = super.getPendingKey(uuid);
 
         if(key == null)
@@ -159,11 +161,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
     }
 
-
-
-
-
-
     /**
      * Gives a player a Map item with the QR code if their code
      *
@@ -171,7 +168,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
     @SuppressWarnings("deprecation")
     public void giveQRCodeItem(@NotNull Player player) {
-        String url = this.getQRCodeURL(main.getConfigHandler().getQrCodeURL(), player.getUniqueId());
+        String url = this.getQRCodeURL(this.plugin.getConfigHandler().getQrCodeURL(), player.getUniqueId());
 
         if(url == null)
             return;
@@ -214,7 +211,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     // to authenticate
                     // otherwise, we want to add the map with the qr code to their first available hotbar slot and move the item in that slot.
                     if(player.getInventory().firstEmpty() == -1) {
-                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVENTORY_FULL_USE_CLICKABLE_MESSAGE);
+                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVENTORY_FULL_USE_CLICKABLE_MESSAGE);
                     } else {
                         int availableFirstSlot = player.getInventory().firstEmpty();
 
@@ -238,23 +235,23 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     // otherwise, we would want to completely void the player's key data, remove the QRItem and also send him a message about the issue.
                     if(getPendingKey(player.getUniqueId()) != null) {
                         if(!MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage().isEmpty())
-                            main.getMessageHandler().sendClickableMessage(player, MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR,
+                            plugin.getMessageHandler().sendClickableMessage(player, MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR,
                                     url.replaceAll("128x128", "256x256"));
 
                         if(!MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage().isEmpty())
-                            main.getMessageHandler().sendHoverMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA,
+                            plugin.getMessageHandler().sendHoverMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA,
                                     ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
                     } else {
                         removeQRItem(player);
                         resetKey(player.getUniqueId());
-                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
+                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
                     }
                 } catch (IOException | NumberFormatException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
                 }
             }
-        }.runTaskAsynchronously(main);
+        }.runTaskAsynchronously(this.plugin);
     }
 
     /**
@@ -268,9 +265,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public MapView getMap(World world) {
         MapView mapView;
 
-        if(lastUsedMapIds.size() < main.getConfigHandler().getAmountOfReservedMaps()) {
+        if(lastUsedMapIds.size() < this.plugin.getConfigHandler().getAmountOfReservedMaps()) {
             mapView = Bukkit.createMap(world);
-            main.getConfig().set("Map IDs", main.getConfig().getIntegerList("Map IDs").add((int) MapUtils.getMapID(mapView)));
+            this.plugin.getConfig().set("Map IDs", this.plugin.getConfig().getIntegerList("Map IDs").add((int) MapUtils.getMapID(mapView)));
         } else {
             int mapIdWithLongestTime = -1;
             long currentTimeMillis = System.currentTimeMillis();
@@ -311,5 +308,100 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public boolean isQRCodeItem(ItemStack item) {
         return item != null && item.getType() != Material.AIR && item.hasItemMeta() && item.getItemMeta() != null && item.getItemMeta().hasDisplayName()
                 && item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GRAY + "QR Code");
+    }
+
+
+    private class LoadAuthCallback implements AuthCommunicationHandler.AuthCommunicationCallback {
+
+        private final UUID playerUUID;
+        private final long timeMillis;
+
+        public LoadAuthCallback(@NotNull UUID playerUUID) {
+            this.playerUUID = playerUUID;
+            this.timeMillis = System.currentTimeMillis();
+        }
+
+        @Override
+        public void execute(AuthState authState) {
+            Player player = Bukkit.getPlayer(this.getPlayerUUID());
+
+            if(player == null || !player.isOnline())
+                return;
+
+            if(!player.hasPermission("2fa.use")) {
+                changeState(playerUUID, AuthState.DISABLED);
+                return;
+            }
+
+            if(getStorageHandler() == null)
+                return;
+
+            // If AuthCommunication's result returned that the player is already authenticated, we don't need to continue
+            if(getAuthState(player.getUniqueId()) == AuthState.AUTHENTICATED)
+                return;
+
+            // Otherwise, we either want to disable their 2fa if they don't have it set up, or wait for them to log in.
+            changeState(playerUUID, (getStorageHandler().getKey(playerUUID) == null ? AuthState.DISABLED : AuthState.PENDING_LOGIN));
+
+            if(!needsToAuthenticate(player.getUniqueId())) {
+                if(player.hasPermission("2fa.demand")) {
+                    createKey(player.getUniqueId());
+                    changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
+
+                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
+                } else {
+                    if(plugin.getConfigHandler().shouldAdvise2FA()) {
+                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
+                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
+                    }
+                }
+            } else
+                tryToAutoAuthenticate(player);
+        }
+
+        @Override
+        public void onTimeout() {
+            execute(AuthState.NONE);
+        }
+
+        @Override
+        public long getExecutionStamp() {
+            return this.timeMillis;
+        }
+
+        @Override
+        public UUID getPlayerUUID() {
+            return playerUUID;
+        }
+
+        private void tryToAutoAuthenticate(Player player) {
+            if(!needsToAuthenticate(player.getUniqueId()))
+                return;
+
+            if(getStorageHandler() == null)
+                return;
+
+            if(player.getAddress() != null && player.getAddress().getAddress() != null) {
+                String ip = hash.hash(player.getAddress().getAddress().getHostAddress());
+
+                boolean hasIPChanged = getStorageHandler().getIP(player.getUniqueId()) == null
+                        || !getStorageHandler().getIP(player.getUniqueId()).equalsIgnoreCase(ip);
+
+                boolean isRequiredDueToIPChange = plugin.getConfigHandler().shouldRequiredOnIPChange() && hasIPChanged;
+                boolean isRequiredOnEveryJoin = plugin.getConfigHandler().shouldRequiredOnEveryLogin();
+
+                if(!isRequiredDueToIPChange && !isRequiredOnEveryJoin) {
+                    changeState(player.getUniqueId(), AuthState.AUTHENTICATED);
+                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.AUTHENTICATED_AUTOMATICALLY);
+                    return;
+                }
+            }
+
+            player.setWalkSpeed(0);
+            player.setFlySpeed(0);
+
+            plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.TWOFA_IS_ENABLED);
+            plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.PLEASE_AUTHENTICATE);
+        }
     }
 }

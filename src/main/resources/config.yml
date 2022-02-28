@@ -102,14 +102,16 @@ tp-after-auth:
 
 # Possible methods for the plugin to communicate between servers
 #
+# - NONE (use if you only have a single server)
 # - PROXY
 # - REDIS (NOT SUPPORTED YET)
 # - RABBITMQ (NOT SUPPORTED YET)
-communication-method: PROXY
+communication-method: NONE
 
 communication-data:
-  # How long should the plugin wait before timing out communication messages
-  timeout: 5000
+  # How long (in ticks) should the plugin wait before timing out communication messages
+  # 1 second = 20 ticks
+  timeout: 100
 
 # Possible methods for the plugin to store data
 #

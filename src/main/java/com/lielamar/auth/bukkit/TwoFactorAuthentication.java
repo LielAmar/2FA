@@ -1,7 +1,13 @@
 package com.lielamar.auth.bukkit;
 
 import com.lielamar.auth.bukkit.commands.TwoFactorAuthenticationCommand;
+import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
+import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
+import com.lielamar.auth.bukkit.listeners.OnMapDrop;
 import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
+import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
+import com.lielamar.auth.shared.communication.CommunicationMethod;
+import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.updater.SpigotUpdateChecker;
 import com.lielamar.lielsutils.bukkit.bstats.BukkitMetrics;
 import com.lielamar.lielsutils.bukkit.files.FileManager;
@@ -17,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 
 public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuthenticationPlugin {
 
@@ -84,12 +91,23 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
         this.configHandler = new ConfigHandler(fileManager);
         this.storageHandler = StorageHandler.loadStorageHandler(this.configHandler, getDataFolder().getAbsolutePath());
 
-        this.authHandler = new AuthHandler(this);
+        AuthCommunicationHandler authCommunicationHandler;
+        {
+            if(this.configHandler.getCommunicationMethod() == CommunicationMethod.PROXY) {
+                authCommunicationHandler = new ProxyAuthCommunication(this);
+
+                getServer().getMessenger().registerOutgoingPluginChannel(this, Constants.PROXY_CHANNEL_NAME);
+                getServer().getMessenger().registerIncomingPluginChannel(this, Constants.PROXY_CHANNEL_NAME,
+                        (PluginMessageListener) authCommunicationHandler);
+            } else {
+                authCommunicationHandler = new BasicAuthCommunication(this);
+            }
+        }
+
+        this.authHandler = new AuthHandler(this, storageHandler, authCommunicationHandler);
         this.authTracker = new AuthTracker();
 
-//        pluginMessageListener = new BungeecordMessageHandler(this);
-//        getServer().getMessenger().registerOutgoingPluginChannel(this, PluginMessagingHandler.channelName);
-//        getServer().getMessenger().registerIncomingPluginChannel(this, PluginMessagingHandler.channelName, pluginMessageListener);
+
     }
 
     private void registerListeners() {
@@ -98,6 +116,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
         pm.registerEvents(new OnAuthStateChange(this), this);
         pm.registerEvents(new OnPlayerConnection(this), this);
         pm.registerEvents(new DisabledEvents(this), this);
+        pm.registerEvents(new OnMapDrop(this), this);
     }
 
     private void registerCommands() {

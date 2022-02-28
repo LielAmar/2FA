@@ -8,6 +8,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +18,10 @@ import java.util.List;
 
 public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
 
-    public MessageHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    public MessageHandler(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
 
         this.reload();
     }
@@ -57,10 +58,10 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     @Override
     public void reload() {
-        if(!main.getDataDirectory().toFile().exists())
-            main.getDataDirectory().toFile().mkdir();
+        if(!this.plugin.getDataDirectory().toFile().exists())
+            this.plugin.getDataDirectory().toFile().mkdir();
 
-        File file = new File(main.getDataDirectory().toFile(), "messages.toml");
+        File file = new File(this.plugin.getDataDirectory().toFile(), "messages.toml");
 
         if(!file.getParentFile().exists())
             file.getParentFile().mkdirs();

@@ -5,6 +5,7 @@ import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import com.lielamar.lielsutils.bukkit.commands.TabOptionsBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -16,11 +17,13 @@ import java.util.List;
 public class EnableCommand extends StandaloneCommand {
 
     private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
 
-    public EnableCommand(TwoFactorAuthentication plugin) {
+    public EnableCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
         super(Constants.enableCommand.getA(), Constants.enableCommand.getB());
 
         this.plugin = plugin;
+        this.parent = parent;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class EnableCommand extends StandaloneCommand {
 
     @Override
     public void noPermissionEvent(@NotNull CommandSender commandSender) {
-        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+        this.parent.noPermissionEvent(commandSender);
     }
 
     @Override

@@ -8,18 +8,19 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 
 public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
     private Configuration config;
     private File file;
 
-    public MessageHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    public MessageHandler(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
 
         this.reload();
     }
@@ -32,10 +33,10 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     @Override
     public void reload() {
-        if(!main.getDataFolder().exists())
-            main.getDataFolder().mkdirs();
+        if(!this.plugin.getDataFolder().exists())
+            this.plugin.getDataFolder().mkdirs();
 
-        this.file = new File(main.getDataFolder(), super.messagesFileName);
+        this.file = new File(this.plugin.getDataFolder(), super.messagesFileName);
 
         if(!this.file.exists()) {
             try { this.file.createNewFile(); } catch (IOException exception) { exception.printStackTrace(); }

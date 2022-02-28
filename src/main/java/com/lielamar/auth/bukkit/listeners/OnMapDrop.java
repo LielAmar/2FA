@@ -6,16 +6,17 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OnMapDrop implements Listener {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
 
-    public OnMapDrop(TwoFactorAuthentication main) {
-        this.main = main;
+    public OnMapDrop(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler (priority = EventPriority.LOWEST)
@@ -23,7 +24,7 @@ public class OnMapDrop implements Listener {
         List<ItemStack> toRemove = new ArrayList<>();
 
         for(ItemStack item : event.getDrops()) {
-            if(main.getAuthHandler().isQRCodeItem(item))
+            if(this.plugin.getAuthHandler().isQRCodeItem(item))
                 toRemove.add(item);
         }
 

@@ -1,5 +1,6 @@
 package com.lielamar.auth.shared.handlers;
 
+import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
@@ -12,15 +13,31 @@ import java.util.UUID;
 
 public abstract class AuthHandler {
 
-    private final HashMap<UUID, String> pendingKeys = new HashMap<>();
-    private final Map<UUID, Integer> failedAttempts = new HashMap<>();
+    private final HashMap<UUID, String> pendingKeys;
+    private final Map<UUID, Integer> failedAttempts;
 
     protected StorageHandler storageHandler;
-    protected HashMap<UUID, AuthState> authStates = new HashMap<>();
+    protected AuthCommunicationHandler authCommunicationHandler;
+    protected HashMap<UUID, AuthState> authStates;
 
 
-    public @Nullable StorageHandler getStorageHandler() { return storageHandler; }
+    public AuthHandler() {
+        this(null, null);
+    }
 
+    public AuthHandler(@Nullable StorageHandler storageHandler, @Nullable AuthCommunicationHandler authCommunicationHandler) {
+        this.pendingKeys = new HashMap<>();
+        this.failedAttempts = new HashMap<>();
+
+        this.storageHandler = storageHandler;
+        this.authCommunicationHandler = authCommunicationHandler;
+
+        this.authStates = new HashMap<>();
+    }
+
+
+    public @Nullable StorageHandler getStorageHandler() { return this.storageHandler; }
+    public @Nullable AuthCommunicationHandler getAuthCommunicationHandler() { return this.authCommunicationHandler; }
 
     /**
      * Returns a player's key
@@ -58,11 +75,11 @@ public abstract class AuthHandler {
      * @param uuid   UUID of the player to get the Auth State of
      * @return       Auth State
      */
-    public @Nullable AuthState getAuthState(@NotNull UUID uuid) {
+    public @NotNull AuthState getAuthState(@NotNull UUID uuid) {
         if(this.authStates.containsKey(uuid))
             return this.authStates.get(uuid);
 
-        return null;
+        return AuthState.NONE;
     }
 
     /**
@@ -225,6 +242,6 @@ public abstract class AuthHandler {
 
 
     public enum AuthState {
-        DISABLED, WAITING_FOR_ANSWER, PENDING_SETUP, DEMAND_SETUP, PENDING_LOGIN, AUTHENTICATED
+        NONE, DISABLED, PENDING_SETUP, DEMAND_SETUP, PENDING_LOGIN, AUTHENTICATED
     }
 }

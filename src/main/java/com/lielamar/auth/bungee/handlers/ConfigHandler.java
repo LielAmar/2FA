@@ -4,6 +4,7 @@ import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,27 +13,27 @@ import java.nio.file.Files;
 
 public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandler {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
 
     private boolean disableCommands = true;
     private boolean disableChat = true;
     private boolean disableServerSwitch = true;
 
-    public ConfigHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    public ConfigHandler(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
 
         reload();
     }
 
     @Override
     public void reload() {
-        if(!main.getDataFolder().exists())
-            main.getDataFolder().mkdir();
+        if(!this.plugin.getDataFolder().exists())
+            this.plugin.getDataFolder().mkdir();
 
-        File file = new File(main.getDataFolder(), super.configFileName);
+        File file = new File(this.plugin.getDataFolder(), super.configFileName);
 
         if(!file.exists()) {
-            try(InputStream in = main.getResourceAsStream("bungeeconfig.yml")) {
+            try(InputStream in = this.plugin.getResourceAsStream("bungeeconfig.yml")) {
                 Files.copy(in, file.toPath());
             } catch(IOException exception) {
                 exception.printStackTrace();

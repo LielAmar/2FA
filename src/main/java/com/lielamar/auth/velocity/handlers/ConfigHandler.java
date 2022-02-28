@@ -2,6 +2,7 @@ package com.lielamar.auth.velocity.handlers;
 
 import com.lielamar.auth.velocity.TwoFactorAuthentication;
 import com.moandjiezana.toml.Toml;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,22 +11,22 @@ import java.nio.file.Files;
 
 public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandler {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
 
     private boolean disableCommands = true;
     private boolean disableChat = true;
     private boolean disableServerSwitch = true;
 
-    public ConfigHandler(TwoFactorAuthentication main) {
-        this.main = main;
+    public ConfigHandler(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
     }
 
     @Override
     public void reload() {
-        if(!main.getDataDirectory().toFile().exists())
-            main.getDataDirectory().toFile().mkdir();
+        if(!this.plugin.getDataDirectory().toFile().exists())
+            this.plugin.getDataDirectory().toFile().mkdir();
 
-        File file = new File(main.getDataDirectory().toFile(), super.configFileName);
+        File file = new File(this.plugin.getDataDirectory().toFile(), super.configFileName);
 
         if(!file.getParentFile().exists())
             file.getParentFile().mkdirs();

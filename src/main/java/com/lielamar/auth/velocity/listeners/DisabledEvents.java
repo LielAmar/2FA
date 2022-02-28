@@ -8,15 +8,16 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
 public class DisabledEvents {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
 
-    public DisabledEvents(TwoFactorAuthentication main) {
-        this.main = main;
+    public DisabledEvents(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
     }
 
     @Subscribe
@@ -31,27 +32,28 @@ public class DisabledEvents {
 
         Player player = (Player) source;
 
-        if(this.main.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
+        if(this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
             String command = event.getCommand();
             System.out.println("3");
 
-            if(this.main.getConfigHandler().isDisableCommands()) {
+            if(this.plugin.getConfigHandler().isDisableCommands()) {
                 System.out.println("4");
 
-                if(!this.main.getConfigHandler().getWhitelistedCommands().contains(command) && !command.toLowerCase(Locale.ROOT).startsWith(Constants.mainCommand.toLowerCase(Locale.ROOT))) {
+                if(!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !command.toLowerCase(Locale.ROOT)
+                        .startsWith(Constants.mainCommand.getA().toLowerCase(Locale.ROOT))) {
                     System.out.println("5");
 
                     event.setResult(CommandExecuteEvent.CommandResult.denied());
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                    this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }
             } else {
                 System.out.println("6");
 
-                if(this.main.getConfigHandler().getBlacklistedCommands().contains(command)) {
+                if(this.plugin.getConfigHandler().getBlacklistedCommands().contains(command)) {
                     System.out.println("7");
 
                     event.setResult(CommandExecuteEvent.CommandResult.denied());
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                    this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }
             }
         }
@@ -61,10 +63,10 @@ public class DisabledEvents {
     public void onServerConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
 
-        if(this.main.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
-            if(this.main.getConfigHandler().isDisableServerSwitch()) {
+        if(this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
+            if(this.plugin.getConfigHandler().isDisableServerSwitch()) {
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
-                main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
             }
         }
     }

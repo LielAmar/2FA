@@ -4,6 +4,7 @@ import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -14,11 +15,13 @@ import java.util.List;
 public class SetupCommand extends StandaloneCommand {
 
     private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
 
-    public SetupCommand(TwoFactorAuthentication plugin) {
+    public SetupCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
         super(Constants.setupCommand.getA(), Constants.setupCommand.getB());
 
         this.plugin = plugin;
+        this.parent = parent;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class SetupCommand extends StandaloneCommand {
 
     @Override
     public void noPermissionEvent(@NotNull CommandSender commandSender) {
-        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+        this.parent.noPermissionEvent(commandSender);
     }
 
     @Override

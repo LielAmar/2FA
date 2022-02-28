@@ -24,7 +24,7 @@ public class TwoFactorAuthentication extends Plugin implements TwoFactorAuthenti
     @Override
     public void onEnable() {
         this.setupAuth();
-        this.setupListeners();
+        this.registerListeners();
 
         this.setupBStats();
     }
@@ -41,7 +41,7 @@ public class TwoFactorAuthentication extends Plugin implements TwoFactorAuthenti
         this.authTracker = new AuthTracker();
     }
 
-    public void setupListeners() {
+    public void registerListeners() {
         PluginManager pm = getProxy().getPluginManager();
         pm.registerListener(this, new OnPluginMessage(this));
         pm.registerListener(this, new OnBungeePlayerConnections(this));

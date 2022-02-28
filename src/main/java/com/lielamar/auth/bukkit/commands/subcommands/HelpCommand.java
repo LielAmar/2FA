@@ -17,20 +17,20 @@ import java.util.List;
 public class HelpCommand extends StandaloneCommand {
 
     private final TwoFactorAuthentication plugin;
-    private final SuperCommand parentCommand;
+    private final SuperCommand parent;
 
-    public HelpCommand(TwoFactorAuthentication plugin, SuperCommand parentCommand) {
+    public HelpCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
         super(Constants.helpCommand.getA(), Constants.helpCommand.getB());
 
         this.plugin = plugin;
-        this.parentCommand = parentCommand;
+        this.parent = parent;
     }
 
     @Override
     public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] strings) {
         this.plugin.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_HEADER);
 
-        Arrays.stream(this.parentCommand.getSubCommands()).forEach(cmd -> {
+        Arrays.stream(this.parent.getSubCommands()).forEach(cmd -> {
             if(cmd.getPermission() == null || commandSender.hasPermission(cmd.getPermission())) {
                 this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.HELP_COMMAND,
                         new Pair<>("%command%", "/2FA " + cmd.getCommandName()),
@@ -51,7 +51,7 @@ public class HelpCommand extends StandaloneCommand {
 
     @Override
     public void noPermissionEvent(@NotNull CommandSender commandSender) {
-        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+        this.parent.noPermissionEvent(commandSender);
     }
 
     @Override

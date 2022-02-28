@@ -45,7 +45,7 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        this.setupListeners();
+        this.registerListeners();
     }
 
 
@@ -55,7 +55,7 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         this.authHandler = new AuthHandler(this);
     }
 
-    public void setupListeners() {
+    public void registerListeners() {
         EventManager eventManager = this.proxy.getEventManager();
         eventManager.register(this, new OnPluginMessage(this));
         eventManager.register(this, new OnVelocityPlayerConnections(this));
@@ -64,6 +64,7 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         this.proxy.getChannelRegistrar().register(INCOMING = MinecraftChannelIdentifier.create(PluginMessagingHandler.channelName.split(":")[0], PluginMessagingHandler.channelName.split(":")[1]));
         this.proxy.getChannelRegistrar().register(OUTGOING = MinecraftChannelIdentifier.create(PluginMessagingHandler.channelName.split(":")[0], PluginMessagingHandler.channelName.split(":")[1]));
     }
+
 
     public ProxyServer getProxy() { return this.proxy; }
     public Path getDataDirectory() { return this.dataDirectory; }

@@ -4,6 +4,7 @@ import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import com.lielamar.lielsutils.bukkit.commands.TabOptionsBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -15,13 +16,17 @@ import java.util.List;
 public class DisableCommand extends StandaloneCommand {
 
     private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
+
     private final DisableForOthersCommand disableForOthersCommand;
 
-    public DisableCommand(TwoFactorAuthentication plugin) {
+    public DisableCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
         super(Constants.disableCommand.getA(), Constants.disableCommand.getB());
 
         this.plugin = plugin;
-        this.disableForOthersCommand = new DisableForOthersCommand(plugin);
+        this.parent = parent;
+
+        this.disableForOthersCommand = new DisableForOthersCommand(plugin, parent);
     }
 
     @Override
@@ -55,7 +60,7 @@ public class DisableCommand extends StandaloneCommand {
 
     @Override
     public void noPermissionEvent(@NotNull CommandSender commandSender) {
-        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+        this.parent.noPermissionEvent(commandSender);
     }
 
     @Override

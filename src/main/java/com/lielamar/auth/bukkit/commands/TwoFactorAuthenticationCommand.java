@@ -26,13 +26,13 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
         this.plugin = plugin;
 
         this.commands = new Command[] {
-                new LoginCommand(plugin),
-                new SetupCommand(plugin),
-                new EnableCommand(plugin),
-                new DisableCommand(plugin),
-                new CancelCommand(plugin),
-                new ReloadCommand(plugin),
-                new ReportCommand(plugin),
+                new LoginCommand(plugin, this),
+                new SetupCommand(plugin, this),
+                new EnableCommand(plugin, this),
+                new DisableCommand(plugin, this),
+                new CancelCommand(plugin, this),
+                new ReloadCommand(plugin, this),
+                new ReportCommand(plugin, this),
                 new HelpCommand(plugin, this)
         };
 
@@ -52,7 +52,7 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
                 return false;
             }
 
-            if(plugin.getAuthHandler().getAuthState(player.getUniqueId()) == null)
+            if(plugin.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.NONE)
                 plugin.getAuthHandler().playerJoin(player.getUniqueId());
 
             // If we don't receive an argument we want to either execute the help command if they have 2fa setup, or execute the setup (enable) command if they don't have it setup.
@@ -70,12 +70,10 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
             } else if(plugin.getAuthHandler().isPendingSetup(player.getUniqueId())) {
                 Command subCommand = super.getSubCommand(args[0]);
 
-                if(subCommand != null && subCommand instanceof CancelCommand) {
+                if(subCommand instanceof CancelCommand)
                     subCommand.runCommand(player, args);
-                } else {
-                    if(this.setupCommand != null)
-                        this.setupCommand.runCommand(player, args);
-                }
+                else if(this.setupCommand != null)
+                    this.setupCommand.runCommand(player, args);
             }
 
             return false;
@@ -103,6 +101,7 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
     public @NotNull Command[] getSubCommands() {
         return this.commands;
     }
+
 
     @Override
     public @NotNull String getUsage() {

@@ -5,26 +5,20 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.proxy.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class OnVelocityPlayerConnections {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
 
-    public OnVelocityPlayerConnections(TwoFactorAuthentication main) {
-        this.main = main;
-    }
-
-    @Subscribe
-    public void onJoin(LoginEvent event) {
-        Player player = event.getPlayer();
-
-        main.getAuthHandler().playerJoin(player.getUniqueId());
+    public OnVelocityPlayerConnections(@NotNull TwoFactorAuthentication plugin) {
+        this.plugin = plugin;
     }
 
     @Subscribe
     public void onQuit(DisconnectEvent event) {
         Player player = event.getPlayer();
 
-        main.getAuthHandler().playerQuit(player.getUniqueId());
+        this.plugin.getAuthHandler().playerQuit(player.getUniqueId());
     }
 }

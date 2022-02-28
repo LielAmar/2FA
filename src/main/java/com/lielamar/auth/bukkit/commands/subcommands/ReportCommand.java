@@ -1,10 +1,11 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
-import com.lielamar.auth.bukkit.utils.Version;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
+import com.lielamar.lielsutils.bukkit.version.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -25,18 +26,18 @@ public class ReportCommand extends StandaloneCommand {
     private static final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
     private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
 
-    private Date now;
-
-    public ReportCommand(TwoFactorAuthentication plugin) {
+    public ReportCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
         super(Constants.reportCommand.getA(), Constants.reportCommand.getB());
 
         this.plugin = plugin;
+        this.parent = parent;
     }
 
     @Override
     public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] strings) {
-        now = new Date();
+        Date now = new Date();
 
         commandSender.sendMessage(ChatColor.GREEN + "Creating a Bug Report file...");
 
@@ -95,7 +96,7 @@ public class ReportCommand extends StandaloneCommand {
 
     @Override
     public void noPermissionEvent(@NotNull CommandSender commandSender) {
-        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+        this.parent.noPermissionEvent(commandSender);
     }
 
     @Override

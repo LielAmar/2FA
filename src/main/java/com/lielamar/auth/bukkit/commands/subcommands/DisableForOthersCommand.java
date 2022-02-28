@@ -4,6 +4,7 @@ import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import com.lielamar.lielsutils.bukkit.commands.TabOptionsBuilder;
 import com.lielamar.lielsutils.exceptions.UUIDNotFoundException;
 import com.lielamar.lielsutils.groups.Pair;
@@ -20,11 +21,13 @@ import java.util.UUID;
 public class DisableForOthersCommand extends StandaloneCommand {
 
     private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
 
-    public DisableForOthersCommand(TwoFactorAuthentication plugin) {
+    public DisableForOthersCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
         super(Constants.disableForOthersCommand.getA(), Constants.disableForOthersCommand.getB());
 
         this.plugin = plugin;
+        this.parent = parent;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class DisableForOthersCommand extends StandaloneCommand {
 
     @Override
     public void noPermissionEvent(@NotNull CommandSender commandSender) {
-        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
+        this.parent.noPermissionEvent(commandSender);
     }
 
     @Override

@@ -1,10 +1,10 @@
-package com.lielamar.auth.bukkit.handlers.communication;
+package com.lielamar.auth.bukkit.communication;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
-import com.lielamar.auth.shared.handlers.AuthCommunicationHandler;
+import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.Bukkit;
@@ -17,19 +17,27 @@ import java.io.*;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class BungeecordAuthCommunication extends AuthCommunicationHandler implements PluginMessageListener {
+public class ProxyAuthCommunication extends AuthCommunicationHandler implements PluginMessageListener {
 
     private final TwoFactorAuthentication plugin;
 
-    public BungeecordAuthCommunication(TwoFactorAuthentication plugin) {
+    public ProxyAuthCommunication(TwoFactorAuthentication plugin) {
         this.plugin = plugin;
 
-        //  TODO get timeout and stuff from config
-        // Removes all callbacks that were set more than 5 seconds ago, since they're most-likely invalid by now
+        long timeout = this.plugin.getConfigHandler().getCommunicationTimeout();
+
+        // Timeouts all callbacks that were set more than ${timeout} seconds ago using #onTimeout
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             long currentTimestamp = System.currentTimeMillis();
-            super.callbacks.entrySet().removeIf(entry -> (currentTimestamp - entry.getValue().getExecutionStamp())/1000 > 5);
-        }, 100L, 100L);
+
+            super.callbacks.entrySet().removeIf(entry -> {
+                if(((currentTimestamp - entry.getValue().getExecutionStamp()) / 1000) > (timeout / 20)) {
+                    entry.getValue().onTimeout();
+                    return true;
+                }
+                return false;
+            });
+        }, timeout, timeout);
     }
 
 
@@ -90,10 +98,10 @@ public class BungeecordAuthCommunication extends AuthCommunicationHandler implem
         DataInputStream msgBodyData = new DataInputStream(new ByteArrayInputStream(msgBody));
 
         try {
-            msgBodyData.readUTF();
+            MessageType messageType = MessageType.valueOf(msgBodyData.readUTF());
             AuthHandler.AuthState authState = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
 
-            super.onResponse(playerUUID, messageUUID, authState);
+            super.onResponse(playerUUID, messageUUID, messageType, authState);
         } catch (IOException | IllegalArgumentException exception) {
             exception.printStackTrace();
         }
