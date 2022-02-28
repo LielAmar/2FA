@@ -29,12 +29,9 @@ public class ReloadCommand extends StandaloneCommand {
     @Override
     public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] strings) {
         Map<UUID, AuthHandler.AuthState> states = new HashMap<>();
-        AuthHandler.AuthState state;
 
-        for(Player pl : Bukkit.getOnlinePlayers()) {
-            state = this.plugin.getAuthHandler().getAuthState(pl.getUniqueId());
-            if(state != null) states.put(pl.getUniqueId(), state);
-        }
+        for(Player pl : Bukkit.getOnlinePlayers())
+            states.put(pl.getUniqueId(), this.plugin.getAuthHandler().getAuthState(pl.getUniqueId()));
 
         this.plugin.reloadConfig();
         this.plugin.getMessageHandler().reload();

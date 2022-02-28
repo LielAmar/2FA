@@ -37,8 +37,8 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
         };
 
         this.helpCommand = super.getSubCommand("help");
-        this.loginCommand = super.getSubCommand("");
-        this.setupCommand = super.getSubCommand("");
+        this.loginCommand = super.getSubCommand("login");
+        this.setupCommand = super.getSubCommand("setup");
     }
 
 

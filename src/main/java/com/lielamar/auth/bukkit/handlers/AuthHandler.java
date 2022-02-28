@@ -62,7 +62,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         if(hashType.equalsIgnoreCase("SHA256"))      this.hash = new SHA256();
         else if(hashType.equalsIgnoreCase("SHA512")) this.hash = new SHA512();
         else                                                    this.hash = new NoHash();
+    }
 
+    public void reloadOnlinePlayers() {
         // Applying 2fa for online players
         // We add at least 1 tick delay, ensuring the permission plugin is loaded beforehand
         Bukkit.getScheduler().runTaskLater(this.plugin,
@@ -124,6 +126,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             authState = event.getNewAuthState();
         }
 
+        System.out.println("setting " + uuid + " state to " + authState.name());
         authStates.put(uuid, authState);
     }
 

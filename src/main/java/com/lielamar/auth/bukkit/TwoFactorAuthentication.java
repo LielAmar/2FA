@@ -43,6 +43,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
         this.sendStartupMessage();
 
         this.setupAuth();
+        this.authHandler.reloadOnlinePlayers();
         this.registerListeners();
         this.registerCommands();
 
@@ -106,8 +107,6 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
 
         this.authHandler = new AuthHandler(this, storageHandler, authCommunicationHandler);
         this.authTracker = new AuthTracker();
-
-
     }
 
     private void registerListeners() {
