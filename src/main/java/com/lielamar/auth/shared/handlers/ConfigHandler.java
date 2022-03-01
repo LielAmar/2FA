@@ -7,6 +7,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.*;
@@ -140,7 +141,8 @@ public abstract class ConfigHandler {
         CHANGE_SLOT(PlayerItemHeldEvent.class),
         COMMANDS(PlayerCommandPreprocessEvent.class),
         MOVE_ITEM(InventoryMoveItemEvent.class),
-        INTERACT_WITH_FRAMES(PlayerInteractEntityEvent.class);
+        INTERACT_WITH_FRAMES(PlayerInteractEntityEvent.class),
+        DEATH(PlayerDeathEvent.class);
 
         private final Class<? extends Event> matchingEvent;
 

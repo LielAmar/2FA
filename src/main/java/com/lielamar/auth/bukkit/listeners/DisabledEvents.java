@@ -188,6 +188,8 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onDeath(PlayerDeathEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
         if(!this.main.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) return;
 
         // Don't drop items if the player needs to authenticate.

@@ -56,6 +56,7 @@ disabled-events:
   commands: true
   move-item: true
   interact-with-frames: true
+  death: true
 
 # If the "commands" event is disabled, you can whitelist specific commands with the below setting
 # These commands only will executed successfully. Anything else will be blocked.
