@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -183,5 +184,13 @@ public class DisabledEvents implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onDeath(PlayerDeathEvent event) {
+        if(!this.main.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) return;
+
+        // Don't drop items if the player needs to authenticate.
+        event.getDrops().clear();
     }
 }
