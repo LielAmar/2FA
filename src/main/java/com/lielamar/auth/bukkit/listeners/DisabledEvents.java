@@ -12,10 +12,12 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 
 public class DisabledEvents implements Listener {
 
@@ -183,5 +185,15 @@ public class DisabledEvents implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onDeath(PlayerDeathEvent event) {
+        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
+        if(!this.main.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) return;
+
+        // Don't drop the QR Code item if the player needs to authenticate.
+        event.getDrops().removeIf(item -> this.main.getAuthHandler().isQRCodeItem(item));
     }
 }
