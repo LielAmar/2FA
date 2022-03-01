@@ -32,6 +32,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
@@ -366,9 +367,11 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     // with the key and the link to the QR image.
                     // otherwise, we would want to completely void the player's key data, remove the QRItem and also send him a message about the issue.
                     if (getPendingKey(player.getUniqueId()) != null) {
-                        sendClickableMessage(player,
-                                ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
-                                url.replaceAll("128x128", "256x256"));
+                        if (!Objects.equals(MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage(), "")) {
+                            sendClickableMessage(player,
+                                    ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage()),
+                                    url.replaceAll("128x128", "256x256"));
+                        }
 
                         sendHoverMessage(player,
                                 ColorUtils.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.PREFIX.getMessage() + MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage()),
