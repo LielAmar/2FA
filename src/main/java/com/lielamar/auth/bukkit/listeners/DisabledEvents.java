@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 
 public class DisabledEvents implements Listener {
 
@@ -192,7 +193,7 @@ public class DisabledEvents implements Listener {
 
         if(!this.main.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) return;
 
-        // Don't drop items if the player needs to authenticate.
-        event.getDrops().clear();
+        // Don't drop the QR Code item if the player needs to authenticate.
+        event.getDrops().removeIf(item -> this.main.getAuthHandler().isQRCodeItem(item));
     }
 }
