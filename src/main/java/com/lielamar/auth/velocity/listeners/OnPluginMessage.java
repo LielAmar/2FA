@@ -12,8 +12,6 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;

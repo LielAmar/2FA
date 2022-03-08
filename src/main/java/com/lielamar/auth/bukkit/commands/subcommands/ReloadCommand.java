@@ -6,6 +6,7 @@ import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
 import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
+import com.lielamar.lielsutils.bukkit.files.FileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -33,7 +34,9 @@ public class ReloadCommand extends StandaloneCommand {
         for(Player pl : Bukkit.getOnlinePlayers())
             states.put(pl.getUniqueId(), this.plugin.getAuthHandler().getAuthState(pl.getUniqueId()));
 
-        this.plugin.reloadConfig();
+        FileManager.Config config = this.plugin.getFileManager().getConfig("config");
+        if(config != null) config.reloadConfig();
+
         this.plugin.getMessageHandler().reload();
         this.plugin.setupAuth();
 

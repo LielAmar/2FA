@@ -27,6 +27,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 
 public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuthenticationPlugin {
 
+    private FileManager fileManager;
     private MessageHandler messageHandler;
     private ConfigHandler configHandler;
     private StorageHandler storageHandler;
@@ -86,7 +87,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
 
 
     public void setupAuth() {
-        FileManager fileManager = new FileManager(this);
+        this.fileManager = new FileManager(this);
 
         this.messageHandler = new MessageHandler(fileManager);
         this.configHandler = new ConfigHandler(fileManager);
@@ -140,6 +141,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
     }
 
 
+    public FileManager getFileManager() { return fileManager; }
     public MessageHandler getMessageHandler() { return this.messageHandler; }
     public ConfigHandler getConfigHandler() { return this.configHandler; }
     public StorageHandler getStorageHandler() { return this.storageHandler; }

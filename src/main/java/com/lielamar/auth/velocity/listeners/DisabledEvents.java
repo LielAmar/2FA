@@ -24,34 +24,22 @@ public class DisabledEvents {
     public void onMessage(CommandExecuteEvent event) {
         CommandSource source = event.getCommandSource();
 
-        System.out.println("1");
-
         if(!(source instanceof Player))
             return;
-        System.out.println("2");
 
         Player player = (Player) source;
 
         if(this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
             String command = event.getCommand();
-            System.out.println("3");
 
             if(this.plugin.getConfigHandler().isDisableCommands()) {
-                System.out.println("4");
-
                 if(!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !command.toLowerCase(Locale.ROOT)
                         .startsWith(Constants.mainCommand.getA().toLowerCase(Locale.ROOT))) {
-                    System.out.println("5");
-
                     event.setResult(CommandExecuteEvent.CommandResult.denied());
                     this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }
             } else {
-                System.out.println("6");
-
                 if(this.plugin.getConfigHandler().getBlacklistedCommands().contains(command)) {
-                    System.out.println("7");
-
                     event.setResult(CommandExecuteEvent.CommandResult.denied());
                     this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }

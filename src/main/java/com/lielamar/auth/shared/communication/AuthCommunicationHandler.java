@@ -37,6 +37,8 @@ public abstract class AuthCommunicationHandler {
         if(callback != null)
             callback.execute(authState);
 
+        this.callbacks.remove(messageUUID);
+
         if(messageType == MessageType.CHECK_COMMUNICATION)
             this.connected = true;
     }

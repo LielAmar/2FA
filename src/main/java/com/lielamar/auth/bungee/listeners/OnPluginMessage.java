@@ -6,7 +6,6 @@ import com.google.common.io.ByteStreams;
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.handlers.AuthHandler;
-import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

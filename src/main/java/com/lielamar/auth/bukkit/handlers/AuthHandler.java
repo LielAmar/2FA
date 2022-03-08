@@ -126,8 +126,11 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             authState = event.getNewAuthState();
         }
 
-        System.out.println("setting " + uuid + " state to " + authState.name());
         authStates.put(uuid, authState);
+
+        // If the PlayerStateChangeEvent was not cancelled we wanna update the auth communication handler
+        if(player != null && authState == AuthState.AUTHENTICATED)
+            this.authCommunicationHandler.setPlayerState(uuid, authState);
     }
 
 
@@ -340,8 +343,10 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 return;
 
             // If AuthCommunication's result returned that the player is already authenticated, we don't need to continue
-            if(getAuthState(player.getUniqueId()) == AuthState.AUTHENTICATED)
+            if(authState == AuthState.AUTHENTICATED) {
+                changeState(this.playerUUID, authState);
                 return;
+            }
 
             // Otherwise, we either want to disable their 2fa if they don't have it set up, or wait for them to log in.
             changeState(playerUUID, (getStorageHandler().getKey(playerUUID) == null ? AuthState.DISABLED : AuthState.PENDING_LOGIN));

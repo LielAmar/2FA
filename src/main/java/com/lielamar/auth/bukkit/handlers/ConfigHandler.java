@@ -50,7 +50,7 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
     protected boolean tpAfterAuth = false;
     protected Location tpAfterAuthLocation = null;
 
-    protected CommunicationMethod communicationMethod = CommunicationMethod.NONE;
+    protected CommunicationMethod communicationMethod = CommunicationMethod.PROXY;
     protected int communicationTimeout = 100;
 
 
@@ -375,13 +375,13 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
             config.addComments("communication-method", new String[] {
                     "# Possible methods for the plugin to communicate between servers",
                     "#",
-                    "# - NONE (use if you only have a single server)",
+//                    "# - NONE (use if you only have a single server)",
                     "# - PROXY",
                     "# - REDIS (NOT SUPPORTED YET)",
                     "# - RABBITMQ (NOT SUPPORTED YET)"
             });
         } else
-            this.communicationMethod = CommunicationMethod.valueOf(config.getString("communication-method", "NONE").toUpperCase());
+            this.communicationMethod = CommunicationMethod.valueOf(config.getString("communication-method", "PROXY").toUpperCase());
 
         if(!config.contains("communication-data.timeout")) {
             config.set("communication-data.timeout", this.communicationTimeout);
