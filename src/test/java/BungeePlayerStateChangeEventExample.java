@@ -9,8 +9,7 @@ public class BungeePlayerStateChangeEventExample implements Listener {
 
     @EventHandler
     public void onStateChange(PlayerStateChangeEvent event) {
-        if(event.getAuthState() == AuthHandler.AuthState.AUTHENTICATED) {
+        if(event.getNewAuthState() == AuthHandler.AuthState.AUTHENTICATED)
             event.getPlayer().connect(ProxyServer.getInstance().getServerInfo("lobby"), ServerConnectEvent.Reason.PLUGIN);
-        }
     }
 }

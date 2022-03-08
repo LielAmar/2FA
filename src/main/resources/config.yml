@@ -75,6 +75,7 @@ blacklisted-commands:
 require-when:
   # When the player's IP address changes
   ip-changes: true
+
   # On every login
   every-login: false
 
@@ -99,6 +100,18 @@ tp-after-auth:
     yaw: 0
     pitch: 0
     world: "world"
+
+# Possible methods for the plugin to communicate between servers
+#
+# - PROXY
+# - REDIS (NOT SUPPORTED YET)
+# - RABBITMQ (NOT SUPPORTED YET)
+communication-method: PROXY
+
+communication-data:
+  # How long (in ticks) should the plugin wait before timing out communication messages
+  # 1 second = 20 ticks
+  timeout: 100
 
 # Possible methods for the plugin to store data
 #

@@ -3,69 +3,74 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.events.PlayerFailedAuthenticationEvent;
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.lielsutils.commands.Command;
+import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-public class LoginCommand extends Command {
+import java.util.ArrayList;
+import java.util.List;
 
-    private final TwoFactorAuthentication main;
+public class LoginCommand extends StandaloneCommand {
 
-    public LoginCommand(String name, TwoFactorAuthentication main) {
-        super(name);
+    private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
 
-        this.main = main;
+    public LoginCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
+        super(Constants.loginCommand.getA(), Constants.loginCommand.getB());
+
+        this.plugin = plugin;
+        this.parent = parent;
+    }
+
+    @Override
+    public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] args) {
+        if(!(commandSender instanceof Player)) {
+            this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.MUST_BE_A_PLAYER);
+            return false;
+        }
+
+        Player player = (Player) commandSender;
+
+        StringBuilder code = new StringBuilder();
+
+        for(String arg : args)
+            code.append(arg);
+
+        try {
+            boolean isValid = this.plugin.getAuthHandler().validateKey(player.getUniqueId(), Integer.valueOf(code.toString()));
+
+            if(isValid)
+                this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SUCCESSFULLY_AUTHENTICATED);
+            else {
+                this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INCORRECT_CODE);
+
+                PlayerFailedAuthenticationEvent event = new PlayerFailedAuthenticationEvent(player,
+                        this.plugin.getAuthHandler().increaseFailedAttempts(player.getUniqueId(), 1));
+                Bukkit.getPluginManager().callEvent(event);
+            }
+        } catch (NumberFormatException exception) {
+            this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVALID_CODE);
+        }
+
+        return false;
+    }
+
+    @Override
+    public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] strings) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void noPermissionEvent(@NotNull CommandSender commandSender) {
+        this.parent.noPermissionEvent(commandSender);
     }
 
     @Override
     public String[] getAliases() {
         return new String[0];
-    }
-
-    @Override
-    public String[] getPermissions() {
-        return new String[] { "2fa.use" };
-    }
-
-    @Override
-    public String getDescription() {
-        return "";
-    }
-
-    @Override
-    public void execute(CommandSender commandSender, String[] args) {
-        if(!hasPermissions(commandSender)) {
-            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
-        } else {
-            if(!(commandSender instanceof Player)) {
-                main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.MUST_BE_A_PLAYER);
-            } else {
-                Player player = (Player) commandSender;
-
-                try {
-                    StringBuilder code = new StringBuilder();
-
-                    for(String arg : args)
-                        code.append(arg);
-
-                    boolean isValid = main.getAuthHandler().validateKey(player.getUniqueId(), Integer.valueOf(code.toString()));
-                    if(isValid) {
-                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SUCCESSFULLY_AUTHENTICATED);
-                    } else {
-                        main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INCORRECT_CODE);
-                        callFailEvent(player);
-                    }
-                } catch (Exception exception) {
-                    main.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVALID_CODE);
-                    callFailEvent(player);
-                }
-            }
-        }
-    }
-
-    private void callFailEvent(Player player) {
-        PlayerFailedAuthenticationEvent event = new PlayerFailedAuthenticationEvent(player, main.getAuthHandler().increaseFailedAttempts(player.getUniqueId(), 1));
-        Bukkit.getPluginManager().callEvent(event);
     }
 }

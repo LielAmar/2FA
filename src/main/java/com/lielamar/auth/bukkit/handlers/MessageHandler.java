@@ -1,8 +1,12 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.lielsutils.ColorUtils;
-import com.lielamar.lielsutils.files.FileManager;
+import com.lielamar.lielsutils.bukkit.color.ColorUtils;
+import com.lielamar.lielsutils.bukkit.files.FileManager;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,6 +34,30 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
             ((CommandSender)sender).sendMessage(ColorUtils.translateAlternateColorCodes('&', message));
         }
     }
+
+
+    public void sendClickableMessage(Player player, TwoFAMessages message, String clickAction) {
+        String rawMessage = message.getMessage();
+        String rawPrefix = TwoFAMessages.PREFIX.getMessage();
+
+        String finalMessage = ColorUtils.translateAlternateColorCodes('&', rawPrefix + rawMessage);
+
+        TextComponent component = new TextComponent(finalMessage);
+        component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, clickAction));
+        player.spigot().sendMessage(component);
+    }
+
+    public void sendHoverMessage(Player player, TwoFAMessages message, String hoverAction) {
+        String rawMessage = message.getMessage();
+        String rawPrefix = TwoFAMessages.PREFIX.getMessage();
+
+        String finalMessage = ColorUtils.translateAlternateColorCodes('&', rawPrefix + rawMessage);
+
+        TextComponent component = new TextComponent(finalMessage);
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverAction).create()));
+        player.spigot().sendMessage(component);
+    }
+
 
     @Override
     public void reload() {

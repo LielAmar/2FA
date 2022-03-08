@@ -1,34 +1,35 @@
-package com.lielamar.auth.bungee.listeners;
+package com.lielamar.auth.velocity.listeners;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.handlers.AuthHandler;
+import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.shared.utils.Constants;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
+import com.lielamar.auth.velocity.TwoFactorAuthentication;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
-public class OnPluginMessage implements Listener {
+public class OnPluginMessage extends PluginMessagingHandler {
 
     private final TwoFactorAuthentication plugin;
 
-    public OnPluginMessage(TwoFactorAuthentication plugin) {
+    public OnPluginMessage(@NotNull TwoFactorAuthentication plugin) {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
-        // If the Channel name is not the 2FA's Channel name we want to return
-        if(!event.getTag().equals(Constants.PROXY_CHANNEL_NAME))
+        if(event.getIdentifier() != this.plugin.getOUTGOING())
             return;
 
         ByteArrayDataInput msg = ByteStreams.newDataInput(event.getData());
@@ -39,7 +40,12 @@ public class OnPluginMessage implements Listener {
             UUID messageUUID = UUID.fromString(msg.readUTF());
             UUID playerUUID = UUID.fromString(msg.readUTF());
 
-            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
+            Optional<Player> optionalPlayer = this.plugin.getProxy().getPlayer(playerUUID);
+
+            if(!optionalPlayer.isPresent())
+                return;
+
+            Player player = optionalPlayer.get();
 
             short bodyLength = msg.readShort();
             byte[] msgBody = new byte[bodyLength];
@@ -62,7 +68,7 @@ public class OnPluginMessage implements Listener {
         }
     }
 
-    public void sendResponse(UUID messageUUID, ProxiedPlayer player, AuthCommunicationHandler.MessageType messageType) {
+    public void sendResponse(UUID messageUUID, Player player, AuthCommunicationHandler.MessageType messageType) {
         AuthHandler.AuthState authState = this.plugin.getAuthHandler().getAuthState(player.getUniqueId());
 
         ByteArrayDataOutput response = ByteStreams.newDataOutput();
@@ -82,6 +88,7 @@ public class OnPluginMessage implements Listener {
         response.writeShort(msgBody.toByteArray().length);
         response.write(msgBody.toByteArray());
 
-        player.getServer().getInfo().sendData(Constants.PROXY_CHANNEL_NAME, response.toByteArray());
+        Optional<ServerConnection> optionalServer = player.getCurrentServer();
+        optionalServer.ifPresent(serverConnection -> serverConnection.sendPluginMessage(this.plugin.getOUTGOING(), response.toByteArray()));
     }
 }

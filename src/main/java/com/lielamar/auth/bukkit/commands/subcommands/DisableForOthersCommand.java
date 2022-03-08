@@ -2,99 +2,77 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.shared.utils.AuthUtils;
-import com.lielamar.lielsutils.commands.Command;
-import com.lielamar.lielsutils.modules.Pair;
+import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
+import com.lielamar.lielsutils.bukkit.commands.TabOptionsBuilder;
+import com.lielamar.lielsutils.exceptions.UUIDNotFoundException;
+import com.lielamar.lielsutils.groups.Pair;
+import com.lielamar.lielsutils.uuid.UUIDUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-public class DisableForOthersCommand extends Command {
+public class DisableForOthersCommand extends StandaloneCommand {
 
-    private final TwoFactorAuthentication main;
+    private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
 
-    public DisableForOthersCommand(String name, TwoFactorAuthentication main) {
-        super(name);
+    public DisableForOthersCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
+        super(Constants.disableForOthersCommand.getA(), Constants.disableForOthersCommand.getB());
 
-        this.main = main;
+        this.plugin = plugin;
+        this.parent = parent;
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[] { "remove", "disable", "reset", "off", "deactivate", "false" };
+    public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] targets) {
+        for(String target : targets) {
+            Player targetPlayer = Bukkit.getPlayer(target);
+
+            if(targetPlayer != null) {
+                UUID targetUUID = targetPlayer.getUniqueId();
+                reset2FA(commandSender, target, targetUUID);
+            } else {
+                UUIDUtils.fetchUUIDFromMojang(target)
+                                .exceptionally((exception) -> {
+                                    if(exception.getCause() instanceof UUIDNotFoundException)
+                                        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_FOUND,
+                                                new Pair<>("%name%", target));
+                                    return null;
+                                })
+                        .thenAccept((uuid) -> reset2FA(commandSender, target, uuid));
+            }
+        }
+
+        return false;
     }
 
     @Override
-    public String[] getPermissions() {
-        return new String[] { "2fa.remove.others" };
+    public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] strings) {
+        return new TabOptionsBuilder().player().build(new String[0]);
     }
 
     @Override
-    public String getDescription() {
+    public void noPermissionEvent(@NotNull CommandSender commandSender) {
+        this.parent.noPermissionEvent(commandSender);
+    }
+
+    @Override
+    public @NotNull String getDescription() {
         return ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.DESCRIPTION_OF_DISABLE_OTHERS_COMMAND.getMessage());
     }
 
-    /**
-     * Executes the Disable command for other players
-     *
-     * It checks for permissions and loops over the targets, from there, it has 2 ways it can go:
-     *   1. The current player in the loop is not null (meaning they're online).
-     *      In this case, everything would run on Main Thread (synchronized) since we have access to their UUID directly from the server.
-     *      With this approach, we can also safely call PlayerStateChangeEvent eventually (after resetting the key and changing the player's state)
-     *      since it would run on Main Thread.
-     *   2. The current player in the loop is null (meaning they're offline).
-     *      In this case, everything would run on a separate thread (asynchronized) since we need to fetch Mojang's api to retrieve their UUID if they exist.
-     *      If they do exist, we want to reset their key. When resetting their key, the plugin will try to change the player's state, but since we know
-     *      for a fact the player is offline, it would not call PlayerStateChangeEvent, avoiding the IllegalStateException caused by calling events not in Main Thread.
-     *
-     * TL;DR
-     * this function can either be sync if the player is online (and then call PlayerStateChangeEvent) or run async if they're offline (and then not call the event)
-     */
-    @Override
-    public void execute(CommandSender commandSender, String[] targets) {
-        if(!hasPermissions(commandSender)) {
-            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
-        } else {
-            for(String target : targets) {
-                Player targetPlayer = Bukkit.getPlayer(target);
-
-                if(targetPlayer != null) {
-                    UUID targetUUID = targetPlayer.getUniqueId();
-                    reset2FA(commandSender, target, targetUUID);
-                } else {
-                    Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
-                        UUID targetUUID = AuthUtils.fetchUUID(target);
-
-                        if(targetUUID == null)
-                            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_FOUND, new Pair<>("%name%", target));
-                        else
-                            reset2FA(commandSender, target, targetUUID);
-                    });
-                }
-            }
-        }
-    }
-
     private void reset2FA(CommandSender commandSender, String target, UUID targetUUID) {
-        if(main.getAuthHandler().is2FAEnabled(targetUUID)) {
-            main.getAuthHandler().resetKey(targetUUID);
-            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.RESET_FOR, new Pair<>("%name%", target));
-        } else {
-            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_SETUP, new Pair<>("%name%", target));
-        }
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender commandSender, String[] args) {
-        if(!hasPermissions(commandSender))
-            return new ArrayList<>();
-
-        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+        if(this.plugin.getAuthHandler().is2FAEnabled(targetUUID)) {
+            this.plugin.getAuthHandler().resetKey(targetUUID);
+            this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.RESET_FOR, new Pair<>("%name%", target));
+        } else
+            this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_SETUP, new Pair<>("%name%", target));
     }
 }

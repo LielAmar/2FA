@@ -2,59 +2,65 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.lielsutils.commands.Command;
-import com.lielamar.lielsutils.modules.Pair;
+import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
+import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
+import com.lielamar.lielsutils.groups.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 
-public class HelpCommand extends Command {
+public class HelpCommand extends StandaloneCommand {
 
-    private final TwoFactorAuthentication main;
-    private final Set<Command> commands;
+    private final TwoFactorAuthentication plugin;
+    private final SuperCommand parent;
 
-    public HelpCommand(String name, TwoFactorAuthentication main, Set<Command> commands) {
-        super(name);
+    public HelpCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
+        super(Constants.helpCommand.getA(), Constants.helpCommand.getB());
 
-        this.main = main;
-        this.commands = commands;
+        this.plugin = plugin;
+        this.parent = parent;
+    }
+
+    @Override
+    public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] strings) {
+        this.plugin.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_HEADER);
+
+        Arrays.stream(this.parent.getSubCommands()).forEach(cmd -> {
+            if(cmd.getPermission() == null || commandSender.hasPermission(cmd.getPermission())) {
+                this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.HELP_COMMAND,
+                        new Pair<>("%command%", "/2FA " + cmd.getCommandName()),
+                        new Pair<>("%description%", cmd.getDescription()),
+                        new Pair<>("%aliases%", Arrays.toString(cmd.getAliases()))
+                );
+            }
+        });
+
+        this.plugin.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_FOOTER);
+        return false;
+    }
+
+    @Override
+    public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] strings) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void noPermissionEvent(@NotNull CommandSender commandSender) {
+        this.parent.noPermissionEvent(commandSender);
+    }
+
+    @Override
+    public @NotNull String getDescription() {
+        return ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.DESCRIPTION_OF_HELP_COMMAND.getMessage());
     }
 
     @Override
     public String[] getAliases() {
         return new String[] { "assist" };
-    }
-
-    @Override
-    public String[] getPermissions() {
-        return new String[] { "2fa.help" };
-    }
-
-    @Override
-    public String getDescription() {
-        return ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.DESCRIPTION_OF_HELP_COMMAND.getMessage());
-    }
-
-    @Override
-    public void execute(CommandSender commandSender, String[] args) {
-        if(!hasPermissions(commandSender)) {
-            main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.NO_PERMISSIONS);
-        } else {
-            main.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_HEADER);
-
-            this.commands.forEach(cmd -> {
-                if(cmd.hasPermissions(commandSender)) {
-                    main.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.HELP_COMMAND,
-                            new Pair<>("%command%", "/2FA " + cmd.getName()),
-                            new Pair<>("%description%", cmd.getDescription()),
-                            new Pair<>("%aliases%", Arrays.toString(cmd.getAliases()))
-                    );
-                }
-            });
-
-            main.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_FOOTER);
-        }
     }
 }

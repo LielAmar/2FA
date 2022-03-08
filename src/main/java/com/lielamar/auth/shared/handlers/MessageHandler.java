@@ -1,6 +1,6 @@
 package com.lielamar.auth.shared.handlers;
 
-import com.lielamar.lielsutils.modules.Pair;
+import com.lielamar.lielsutils.groups.Pair;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class MessageHandler {
@@ -10,6 +10,7 @@ public abstract class MessageHandler {
     public void sendMessage(Object sender, TwoFAMessages message, Pair<?, ?>... args) {
         this.sendMessage(sender, true, message, args);
     }
+
 
     /**
      * Sends the value of the provided {TwoFAMessage} object to the given player
@@ -25,7 +26,7 @@ public abstract class MessageHandler {
 
         if(raw != null && raw.length() > 0) {
             for(Pair<?, ?> pair : args)
-                raw = raw.replaceAll(pair.getKey().toString(), pair.getValue().toString());
+                raw = raw.replaceAll(pair.getA().toString(), pair.getB().toString());
 
             this.sendRaw(sender, (prefix ? rawPrefix : "") + raw);
         }
@@ -38,6 +39,7 @@ public abstract class MessageHandler {
 
     public abstract void saveConfiguration();
 
+    
     public enum TwoFAMessages {
         PREFIX("&7[&b2FA&7]&r "),
         VALIDATE_ACCOUNT("&cPlease validate your account with two-factor authentication"),
@@ -45,6 +47,7 @@ public abstract class MessageHandler {
         SUCCESSFULLY_SETUP("&aYou have successfully setup two-factor authentication"),
         MUST_BE_A_PLAYER("&cThis command must be ran as a player"),
         USAGE("&cUsage: /2fa <code>"),
+        COMMAND_NOT_FOUND("&cCommand not found"),
         YOU_ARE_REQUIRED("&6You are required to enable 2FA!"),
         GENERATING_KEY("&aGenerating your 2FA key..."),
         SUCCESSFULLY_AUTHENTICATED("&aYou have successfully authenticated"),
