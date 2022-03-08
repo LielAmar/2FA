@@ -189,11 +189,11 @@ public class DisabledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onDeath(PlayerDeathEvent event) {
-        if(!this.main.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+        if(!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
 
-        if(!this.main.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) return;
+        if(!this.plugin.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) return;
 
         // Don't drop the QR Code item if the player needs to authenticate.
-        event.getDrops().removeIf(item -> this.main.getAuthHandler().isQRCodeItem(item));
+        event.getDrops().removeIf(item -> this.plugin.getAuthHandler().isQRCodeItem(item));
     }
 }
