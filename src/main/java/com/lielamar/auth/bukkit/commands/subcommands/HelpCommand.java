@@ -45,7 +45,7 @@ public class HelpCommand extends StandaloneCommand {
     }
 
     @Override
-    public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] strings) {
+    public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] args) {
         return new ArrayList<>();
     }
 

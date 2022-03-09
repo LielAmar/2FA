@@ -54,8 +54,8 @@ public class DisableCommand extends StandaloneCommand {
     }
 
     @Override
-    public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] strings) {
-        return new TabOptionsBuilder().player().build(new String[0]);
+    public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] args) {
+        return new TabOptionsBuilder().player().build(args);
     }
 
     @Override

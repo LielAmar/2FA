@@ -94,6 +94,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
         this.storageHandler = StorageHandler.loadStorageHandler(this.configHandler, getDataFolder().getAbsolutePath());
 
         AuthCommunicationHandler authCommunicationHandler;
+
         {
             if(this.configHandler.getCommunicationMethod() == CommunicationMethod.PROXY) {
                 authCommunicationHandler = new ProxyAuthCommunication(this);
@@ -106,7 +107,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
             }
         }
 
-        this.authHandler = new AuthHandler(this, storageHandler, authCommunicationHandler);
+        this.authHandler = new AuthHandler(this, storageHandler, authCommunicationHandler, new BasicAuthCommunication(this));
         this.authTracker = new AuthTracker();
     }
 

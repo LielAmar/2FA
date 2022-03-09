@@ -75,6 +75,8 @@ public abstract class MessageHandler {
         RELOADED_CONFIG("&aConfig was reloaded"),
         FAILED_AUTHENTICATION_ALERT("&c%name% failed to authenticate %times% times"),
         SOMETHING_WENT_WRONG("&cSomething went wrong. Please contact a Staff Member!"),
+        COMMUNICATION_METHOD_NOT_CORRECT("&cWe have noticed that a lot of the requests 2FA make between servers are being timed out." +
+                "\nPlease make sure Communication-Method is set to the best option for your server in the configuration!"),
         KEYWORD_ENABLED("Enabled"),
         KEYWORD_DISABLED("Disabled"),
         KEYWORD_REQUIRED("Required"),

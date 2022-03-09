@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -85,6 +86,19 @@ public class DisabledEvents implements Listener {
         if(!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
 
         if(this.plugin.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
+            event.setCancelled(true);
+        } else if(this.plugin.getAuthHandler().isQRCodeItem(event.getItem().getItemStack())) {
+            event.getItem().remove();
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onItemPickup(EntityPickupItemEvent event) {
+        if(!(event.getEntity() instanceof Player)) return;
+        
+        if(!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
+        if(this.plugin.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) {
             event.setCancelled(true);
         } else if(this.plugin.getAuthHandler().isQRCodeItem(event.getItem().getItemStack())) {
             event.getItem().remove();

@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.6.0"
+version: "1.6.1"
 api-version: 1.13
 authors: [LielAmar, SadGhost]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
@@ -32,6 +32,7 @@ permissions:
       2fa.remove: true
       2fa.remove.others: true
       2fa.reload: true
+      2fa.alerts: true
   2fa.use:
     description: Permissions to use the /2FA command
     default: op
@@ -50,3 +51,5 @@ permissions:
   2fa.demand:
     description: A player with this permission must have 2FA linked to thier account
     default: false
+  2fa.alerts:
+    description: Admin permissions to get alerts on critical issues with 2FA configuration

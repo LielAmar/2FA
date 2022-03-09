@@ -36,8 +36,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
@@ -48,9 +48,11 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     protected Hash hash;
 
+    private int callbackTimeouts;
+
     public AuthHandler(@NotNull TwoFactorAuthentication plugin, @Nullable StorageHandler storageHandler,
-                       @Nullable AuthCommunicationHandler authCommunicationHandler) {
-        super(storageHandler, authCommunicationHandler);
+                       @Nullable AuthCommunicationHandler authCommunicationHandler, @Nullable AuthCommunicationHandler fallbackCommunicationHandler) {
+        super(storageHandler, authCommunicationHandler, fallbackCommunicationHandler);
 
         this.plugin = plugin;
 
@@ -63,6 +65,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         if(hashType.equalsIgnoreCase("SHA256"))      this.hash = new SHA256();
         else if(hashType.equalsIgnoreCase("SHA512")) this.hash = new SHA512();
         else                                                    this.hash = new NoHash();
+
+        this.callbackTimeouts = 0;
     }
 
     public void reloadOnlinePlayers() {
@@ -139,8 +143,22 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         if(super.authCommunicationHandler == null)
             super.authCommunicationHandler = new BasicAuthCommunication(this.plugin);
 
+        // Checking whether we need to retrieve data on the user
+        Player player = Bukkit.getPlayer(uuid);
+
+        if(player == null || !player.isOnline())
+            return;
+
+        if(this.getStorageHandler() == null)
+            return;
+
+        if(!player.hasPermission("2fa.use") || this.getStorageHandler().getKey(uuid) == null) {
+            this.changeState(uuid, AuthState.DISABLED);
+            return;
+        }
+
         // Setting the initial state so players can't abuse the brief moment without 2fa protection
-        changeState(uuid, AuthState.PENDING_LOGIN);
+        this.changeState(uuid, AuthState.PENDING_LOGIN);
 
         // Asking communication handler to load the player state and execute LoadAuthCallback when a result is given
         super.authCommunicationHandler.loadPlayerState(uuid, new LoadAuthCallback(uuid));
@@ -335,16 +353,11 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             if(player == null || !player.isOnline())
                 return;
 
-            if(!player.hasPermission("2fa.use")) {
-                changeState(playerUUID, AuthState.DISABLED);
-                return;
-            }
-
             if(getStorageHandler() == null)
                 return;
 
             // If AuthCommunication's result returned that the player is already authenticated, we don't need to continue
-            if(authState == AuthState.AUTHENTICATED) {
+            if(authState == AuthState.AUTHENTICATED || authState == AuthState.NONE) {
                 changeState(this.playerUUID, authState);
                 return;
             }
@@ -370,7 +383,16 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         @Override
         public void onTimeout() {
-            execute(AuthState.NONE);
+            callbackTimeouts++;
+            if(callbackTimeouts > 10) {
+                callbackTimeouts = 0;
+
+                Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission("2fa.alerts")).forEach(pl -> {
+                    plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT);
+                });
+            }
+
+            fallbackCommunicationHandler.loadPlayerState(playerUUID, this);
         }
 
         @Override

@@ -17,7 +17,7 @@ public abstract class AuthHandler {
     private final Map<UUID, Integer> failedAttempts;
 
     protected StorageHandler storageHandler;
-    protected AuthCommunicationHandler authCommunicationHandler;
+    protected AuthCommunicationHandler authCommunicationHandler, fallbackCommunicationHandler;
     protected HashMap<UUID, AuthState> authStates;
 
 
@@ -26,11 +26,17 @@ public abstract class AuthHandler {
     }
 
     public AuthHandler(@Nullable StorageHandler storageHandler, @Nullable AuthCommunicationHandler authCommunicationHandler) {
+        this(storageHandler, authCommunicationHandler, null);
+    }
+
+    public AuthHandler(@Nullable StorageHandler storageHandler, @Nullable AuthCommunicationHandler authCommunicationHandler,
+                       @Nullable AuthCommunicationHandler fallbackCommunicationHandler) {
         this.pendingKeys = new HashMap<>();
         this.failedAttempts = new HashMap<>();
 
         this.storageHandler = storageHandler;
         this.authCommunicationHandler = authCommunicationHandler;
+        this.fallbackCommunicationHandler = fallbackCommunicationHandler;
 
         this.authStates = new HashMap<>();
     }

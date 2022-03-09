@@ -19,8 +19,9 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
         long timeout = this.plugin.getConfigHandler().getCommunicationTimeout();
 
         // Timeouts all callbacks that were set more than ${timeout} seconds ago using #onTimeout
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             long currentTimestamp = System.currentTimeMillis();
+
             super.callbacks.entrySet().removeIf(entry -> {
                 if(((currentTimestamp - entry.getValue().getExecutionStamp()) / 1000) > (timeout / 20)) {
                     entry.getValue().onTimeout();
