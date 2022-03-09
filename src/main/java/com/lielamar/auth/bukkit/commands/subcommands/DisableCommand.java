@@ -37,7 +37,6 @@ public class DisableCommand extends StandaloneCommand {
                 return false;
             }
 
-
             Player player = (Player) commandSender;
 
             if(this.plugin.getAuthHandler().is2FAEnabled(player.getUniqueId())) {

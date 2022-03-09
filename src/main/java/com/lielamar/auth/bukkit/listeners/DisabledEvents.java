@@ -163,9 +163,17 @@ public class DisabledEvents implements Listener {
             if(this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) {
                 if(args.length > 0) {
                     String command = args[0];
+
                     if(!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.getA().equalsIgnoreCase(command)) {
                         event.setCancelled(true);
                         this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                    } else {
+                        try {
+                            Integer.parseInt(args[1]);
+                        } catch (NumberFormatException exception) {
+                            event.setCancelled(true);
+                            this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                        }
                     }
                 }
             } else {
