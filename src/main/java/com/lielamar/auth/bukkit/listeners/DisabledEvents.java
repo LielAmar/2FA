@@ -91,7 +91,7 @@ public class DisabledEvents implements Listener {
             event.getItem().remove();
         }
     }
-
+    
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageEvent event) {
         if(!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
