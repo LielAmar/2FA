@@ -48,13 +48,13 @@ public class DisableCommand extends StandaloneCommand {
             return false;
         }
 
-        disableForOthersCommand.runCommand(commandSender, targets);
+        this.disableForOthersCommand.execute(commandSender, targets);
         return false;
     }
 
     @Override
     public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] args) {
-        return new TabOptionsBuilder().player().build(args);
+        return new TabOptionsBuilder().players().build(args);
     }
 
     @Override

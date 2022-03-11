@@ -71,9 +71,10 @@ public abstract class MessageHandler {
         CLICK_TO_OPEN_QR("&eClick here to open the QR code"),
         USE_CANCEL_TO_CANCEL_SETUP("&cPlease use /2fa cancel to cancel the setup process"),
         RESET_FOR("&a%name%'s 2FA has been reset"),
+        YOUR_2FA_WAS_RESET("&cYour 2FA has been reset"),
         PLAYER_NOT_FOUND("&c%name% could not be found"),
         PLAYER_NOT_SETUP("&c%name% is not setup with 2FA"),
-        RELOADED_CONFIG("&aConfig was reloaded"),
+        RELOADED_CONFIG("&aConfig was reloaded!"),
         FAILED_AUTHENTICATION_ALERT("&c%name% failed to authenticate %times% times"),
         SOMETHING_WENT_WRONG("&cSomething went wrong. Please contact a Staff Member!"),
         COMMUNICATION_METHOD_NOT_CORRECT("&cWe have noticed that a lot of the requests 2FA make between servers are being timed out." +

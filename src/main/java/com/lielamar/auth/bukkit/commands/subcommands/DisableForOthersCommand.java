@@ -37,7 +37,7 @@ public class DisableForOthersCommand extends StandaloneCommand {
 
             if(targetPlayer != null) {
                 UUID targetUUID = targetPlayer.getUniqueId();
-                reset2FA(commandSender, target, targetUUID);
+                this.reset2FA(commandSender, target, targetUUID);
             } else {
                 UUIDUtils.fetchUUIDFromMojang(target)
                                 .exceptionally((exception) -> {
@@ -46,7 +46,7 @@ public class DisableForOthersCommand extends StandaloneCommand {
                                                 new Pair<>("%name%", target));
                                     return null;
                                 })
-                        .thenAccept((uuid) -> reset2FA(commandSender, target, uuid));
+                        .thenAccept((uuid) -> this.reset2FA(commandSender, target, uuid));
             }
         }
 
@@ -55,7 +55,7 @@ public class DisableForOthersCommand extends StandaloneCommand {
 
     @Override
     public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] args) {
-        return new TabOptionsBuilder().player().build(args);
+        return new TabOptionsBuilder().players().build(args);
     }
 
     @Override
@@ -72,6 +72,7 @@ public class DisableForOthersCommand extends StandaloneCommand {
         if(this.plugin.getAuthHandler().is2FAEnabled(targetUUID)) {
             this.plugin.getAuthHandler().resetKey(targetUUID);
             this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.RESET_FOR, new Pair<>("%name%", target));
+            this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.YOUR_2FA_WAS_RESET);
         } else
             this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_SETUP, new Pair<>("%name%", target));
     }

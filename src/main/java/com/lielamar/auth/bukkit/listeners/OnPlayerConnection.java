@@ -58,6 +58,11 @@ public class OnPlayerConnection implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
+        if(this.plugin.getAuthHandler().isPendingSetup(player.getUniqueId())) {
+            this.plugin.getAuthHandler().cancelKey(player.getUniqueId());
+            this.plugin.getAuthHandler().removeQRItem(player);
+        }
+
         this.plugin.getAuthHandler().playerQuit(player.getUniqueId());
     }
 }

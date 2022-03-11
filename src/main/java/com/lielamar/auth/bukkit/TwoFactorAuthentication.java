@@ -19,11 +19,14 @@ import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.AuthTracker;
 
+import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+
+import org.apache.logging.log4j.core.Logger;
 
 public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuthenticationPlugin {
 
@@ -87,6 +90,9 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
 
 
     public void setupAuth() {
+        // Registering the console filter
+        ((Logger)(LogManager.getRootLogger())).addFilter(new ConsoleFilter());
+
         this.fileManager = new FileManager(this);
 
         this.messageHandler = new MessageHandler(fileManager);

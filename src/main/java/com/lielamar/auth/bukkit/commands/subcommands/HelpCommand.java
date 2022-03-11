@@ -32,7 +32,7 @@ public class HelpCommand extends StandaloneCommand {
 
         Arrays.stream(this.parent.getSubCommands()).forEach(cmd -> {
             if(cmd.getPermission() == null || commandSender.hasPermission(cmd.getPermission())) {
-                this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.HELP_COMMAND,
+                this.plugin.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_COMMAND,
                         new Pair<>("%command%", "/2FA " + cmd.getCommandName()),
                         new Pair<>("%description%", cmd.getDescription()),
                         new Pair<>("%aliases%", Arrays.toString(cmd.getAliases()))

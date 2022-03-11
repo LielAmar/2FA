@@ -132,7 +132,7 @@
         <dependency>
             <groupId>com.lielamar</groupId>
             <artifactId>LielsUtils</artifactId>
-            <version>1.6.29</version>
+            <version>1.6.30</version>
             <scope>compile</scope>
         </dependency>
 
@@ -187,13 +187,19 @@
             <scope>provided</scope>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>org.apache.logging.log4j</groupId>-->
+<!--            <artifactId>log4j-api</artifactId>-->
+<!--            <version>2.17.2</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.0</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.17.2</version>
             <scope>provided</scope>
         </dependency>
-
 
         <dependency>
             <groupId>${group-id.googleauth}</groupId>
