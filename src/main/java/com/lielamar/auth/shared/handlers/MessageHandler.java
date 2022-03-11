@@ -69,6 +69,7 @@ public abstract class MessageHandler {
         TWOFA_IS_ENABLED("&cTwo-factor authentication is enabled on this account"),
         PLEASE_AUTHENTICATE("&cPlease authenticate using /2fa <code>"),
         CLICK_TO_OPEN_QR("&eClick here to open the QR code"),
+        USE_CANCEL_TO_CANCEL_SETUP("&cPlease use /2fa cancel to cancel the setup process"),
         RESET_FOR("&a%name%'s 2FA has been reset"),
         PLAYER_NOT_FOUND("&c%name% could not be found"),
         PLAYER_NOT_SETUP("&c%name% is not setup with 2FA"),

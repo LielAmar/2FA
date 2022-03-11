@@ -107,7 +107,7 @@ tp-after-auth:
 # - PROXY
 # - REDIS (NOT SUPPORTED YET)
 # - RABBITMQ (NOT SUPPORTED YET)
-communication-method: PROXY
+communication-method: NONE
 
 communication-data:
   # How long (in ticks) should the plugin wait before timing out communication messages

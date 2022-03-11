@@ -6,6 +6,7 @@ import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
+import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.auth.shared.utils.hash.Hash;
 import com.lielamar.auth.shared.utils.hash.NoHash;
 import com.lielamar.auth.shared.utils.hash.SHA256;
@@ -37,7 +38,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
@@ -47,8 +47,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     protected Version.ServerVersion version;
 
     protected Hash hash;
-
-    private int callbackTimeouts;
 
     public AuthHandler(@NotNull TwoFactorAuthentication plugin, @Nullable StorageHandler storageHandler,
                        @Nullable AuthCommunicationHandler authCommunicationHandler, @Nullable AuthCommunicationHandler fallbackCommunicationHandler) {
@@ -65,8 +63,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         if(hashType.equalsIgnoreCase("SHA256"))      this.hash = new SHA256();
         else if(hashType.equalsIgnoreCase("SHA512")) this.hash = new SHA512();
         else                                                    this.hash = new NoHash();
-
-        this.callbackTimeouts = 0;
     }
 
     public void reloadOnlinePlayers() {
@@ -152,8 +148,25 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         if(this.getStorageHandler() == null)
             return;
 
-        if(!player.hasPermission("2fa.use") || this.getStorageHandler().getKey(uuid) == null) {
+        if(!player.hasPermission("2fa.use")) {
             this.changeState(uuid, AuthState.DISABLED);
+            return;
+        }
+
+        if(this.getStorageHandler().getKey(uuid) == null) {
+            if(player.hasPermission(Constants.demandPermission)) {
+                createKey(player.getUniqueId());
+                changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
+
+                plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
+            } else {
+                this.changeState(uuid, AuthState.DISABLED);
+
+                if(plugin.getConfigHandler().shouldAdvise2FA()) {
+                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
+                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
+                }
+            }
             return;
         }
 
@@ -357,42 +370,25 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 return;
 
             // If AuthCommunication's result returned that the player is already authenticated, we don't need to continue
-            if(authState == AuthState.AUTHENTICATED || authState == AuthState.NONE) {
+            if(authState == AuthState.AUTHENTICATED) {
                 changeState(this.playerUUID, authState);
                 return;
             }
 
-            // Otherwise, we either want to disable their 2fa if they don't have it set up, or wait for them to log in.
-            changeState(playerUUID, (getStorageHandler().getKey(playerUUID) == null ? AuthState.DISABLED : AuthState.PENDING_LOGIN));
+            // Otherwise, we want to wait for them to log in.
+            changeState(playerUUID, AuthState.PENDING_LOGIN);
+            tryToAutoAuthenticate(player);
 
-            if(!needsToAuthenticate(player.getUniqueId())) {
-                if(player.hasPermission("2fa.demand")) {
-                    createKey(player.getUniqueId());
-                    changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
-
-                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
-                } else {
-                    if(plugin.getConfigHandler().shouldAdvise2FA()) {
-                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
-                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
-                    }
-                }
-            } else
-                tryToAutoAuthenticate(player);
+            authCommunicationHandler.setPlayerState(playerUUID, getAuthState(playerUUID));
         }
 
         @Override
         public void onTimeout() {
-            callbackTimeouts++;
-            if(callbackTimeouts > 10) {
-                callbackTimeouts = 0;
+            Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.alertsPermission)).forEach(pl ->
+                    plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT));
 
-                Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission("2fa.alerts")).forEach(pl -> {
-                    plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT);
-                });
-            }
-
-            fallbackCommunicationHandler.loadPlayerState(playerUUID, this);
+            if(fallbackCommunicationHandler != null)
+                fallbackCommunicationHandler.loadPlayerState(playerUUID, this);
         }
 
         @Override
@@ -405,13 +401,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return playerUUID;
         }
 
+
         private void tryToAutoAuthenticate(Player player) {
-            if(!needsToAuthenticate(player.getUniqueId()))
-                return;
-
-            if(getStorageHandler() == null)
-                return;
-
             if(player.getAddress() != null && player.getAddress().getAddress() != null) {
                 String ip = hash.hash(player.getAddress().getAddress().getHostAddress());
 

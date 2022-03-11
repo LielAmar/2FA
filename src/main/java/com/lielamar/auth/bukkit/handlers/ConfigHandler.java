@@ -51,7 +51,7 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
     protected boolean tpAfterAuth = false;
     protected Location tpAfterAuthLocation = null;
 
-    protected CommunicationMethod communicationMethod = CommunicationMethod.PROXY;
+    protected CommunicationMethod communicationMethod = CommunicationMethod.NONE;
     protected int communicationTimeout = 30;
 
 

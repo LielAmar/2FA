@@ -1,5 +1,6 @@
 package com.lielamar.auth.bukkit;
 
+import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.time.TimeUtils;
 
 import com.lielamar.auth.shared.handlers.MessageHandler;
@@ -43,7 +44,7 @@ public class TwoFactorAuthenticationPlaceholders extends PlaceholderExpansion {
             case "key":
                 return plugin.getAuthHandler().getStorageHandler().getKey(player.getUniqueId());
             case "is_required":
-                return player.hasPermission("2fa.demand") ?
+                return player.hasPermission(Constants.demandPermission) ?
                         MessageHandler.TwoFAMessages.KEYWORD_REQUIRED.getMessage() : MessageHandler.TwoFAMessages.KEYWORD_NOT_REQUIRED.getMessage();
         }
 

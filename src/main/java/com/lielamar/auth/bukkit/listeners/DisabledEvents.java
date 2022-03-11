@@ -2,6 +2,7 @@ package com.lielamar.auth.bukkit.listeners;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.handlers.MessageHandler;
+import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -73,6 +74,14 @@ public class DisabledEvents implements Listener {
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onItemDrop(PlayerDropItemEvent event) {
         if(!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
+
+        if(this.plugin.getAuthHandler().getAuthState(event.getPlayer().getUniqueId()) == AuthHandler.AuthState.PENDING_SETUP) {
+            if(this.plugin.getAuthHandler().isQRCodeItem(event.getItemDrop().getItemStack())) {
+                plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.USE_CANCEL_TO_CANCEL_SETUP);
+                event.setCancelled(true);
+                return;
+            }
+        }
 
         if(this.plugin.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
