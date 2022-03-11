@@ -173,17 +173,18 @@ public class DisabledEvents implements Listener {
                 if(args.length > 0) {
                     String command = args[0];
 
-                    if(!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.getA().equalsIgnoreCase(command)) {
-                        event.setCancelled(true);
-                        this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
-                    } else {
-                        try {
-                            Integer.parseInt(args[1]);
-                        } catch (NumberFormatException exception) {
-                            event.setCancelled(true);
-                            this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                    if(Constants.mainCommand.getA().equalsIgnoreCase(command)) {
+                        if(args.length > 1) {
+                            if(args[1].equalsIgnoreCase("help") || this.isNumber(args[1]))
+                                return;
                         }
                     }
+
+                    if(this.plugin.getConfigHandler().getWhitelistedCommands().contains(command))
+                        return;
+
+                    event.setCancelled(true);
+                    this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }
             } else {
                 if(args.length > 0) {
@@ -194,6 +195,15 @@ public class DisabledEvents implements Listener {
                     }
                 }
             }
+        }
+    }
+
+    private boolean isNumber(String text) {
+        try {
+            Integer.parseInt(text);
+            return true;
+        } catch(NumberFormatException ignored) {
+            return false;
         }
     }
 

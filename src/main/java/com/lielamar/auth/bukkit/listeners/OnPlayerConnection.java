@@ -38,7 +38,6 @@ public class OnPlayerConnection implements Listener {
         if(!(this.plugin.getAuthHandler().getAuthCommunicationHandler() instanceof BasicAuthCommunication))
             return;
 
-
         // Sending a request to proxy to check whether there is a proxy or not :)
         this.plugin.getAuthHandler().getAuthCommunicationHandler().checkCommunication(player.getUniqueId(),
                 new AuthCommunicationHandler.AuthCommunicationCallback() {
