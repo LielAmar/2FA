@@ -13,8 +13,15 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
 
     private final TwoFactorAuthentication plugin;
 
+    private final AuthHandler authHandler;
+
     public BasicAuthCommunication(TwoFactorAuthentication plugin) {
         this.plugin = plugin;
+
+        this.authHandler = new AuthHandler() {
+            public void changeState(@NotNull UUID uuid, @NotNull AuthState authState) { super.authStates.put(uuid, authState); }
+        };
+
 
         long timeout = this.plugin.getConfigHandler().getCommunicationTimeout();
 
@@ -37,8 +44,7 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
     public void loadPlayerState(@NotNull UUID uuid, @Nullable AuthCommunicationCallback callback) {
         UUID callbackUUID = registerCallback(callback);
 
-        AuthHandler.AuthState authState = this.plugin.getAuthHandler().getAuthState(uuid);
-        if(authState == null) authState = AuthHandler.AuthState.NONE;
+        AuthHandler.AuthState authState = this.authHandler.getAuthState(uuid);
 
         super.onResponse(uuid, callbackUUID, MessageType.LOAD_STATE, authState);
     }
@@ -47,7 +53,7 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
     public void setPlayerState(@NotNull UUID uuid, AuthHandler.@NotNull AuthState authState, @Nullable AuthCommunicationCallback callback) {
         UUID callbackUUID = registerCallback(callback);
 
-        this.plugin.getAuthHandler().changeState(uuid, authState);
+        this.authHandler.changeState(uuid, authState);
 
         super.onResponse(uuid, callbackUUID, MessageType.SET_STATE, authState);
     }

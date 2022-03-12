@@ -145,15 +145,10 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         if(player == null || !player.isOnline())
             return;
 
-        if(this.getStorageHandler() == null)
-            return;
-
         if(!player.hasPermission("2fa.use")) {
             this.changeState(uuid, AuthState.DISABLED);
             return;
         }
-        // Setting the initial state so players can't abuse the brief moment without 2fa protection
-        this.changeState(uuid, AuthState.PENDING_LOGIN);
 
         // Asking communication handler to load the player state and execute LoadAuthCallback when a result is given
         super.authCommunicationHandler.loadPlayerState(uuid, new LoadAuthCallback(uuid));
