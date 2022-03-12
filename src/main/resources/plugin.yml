@@ -4,7 +4,7 @@ api-version: 1.13
 authors: [LielAmar, SadGhost, Wolfity]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
 description: Add another layer of protection to your server
-softdepend: [PlaceholderAPI, Vault, PermissionsEX, LuckPerms]
+softdepend: [PlaceholderAPI]
 
 libraries:
   - com.warrenstrange:googleauth:1.5.0

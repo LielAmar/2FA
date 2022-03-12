@@ -1,6 +1,7 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
+import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
@@ -52,33 +53,44 @@ public class ReportCommand extends StandaloneCommand {
             if(!file.exists()) file.createNewFile();
 
             FileWriter fileWriter = new FileWriter(file, true);
-            PrintWriter print = new PrintWriter(fileWriter);
+            PrintWriter writer = new PrintWriter(fileWriter);
 
-            print.println("Server Java and OS:");
-            print.println("");
-            print.println(System.getProperty("java.runtime.version") + "" + (System.getProperty("os.name")));
-            print.println("");
-            print.println("Server Plugins:");
-            print.println("");
+            writer.println("Server Java and OS");
+            writer.println("- Java Runtime Version: " + System.getProperty("java.runtime.version"));
+            writer.println("- OS: " + System.getProperty("os.name"));
 
-            Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
-            for(Plugin p : plugins)
-                print.println(p.getName() + " - " + p.getDescription().getVersion() + " + " + p.getDescription().getAuthors() + " | Enabled: " + p.isEnabled());
+            writer.println("");
 
-            print.println("");
-            print.println("Server Jar & Version:");
-            print.println(Bukkit.getVersion());
-            print.println(Bukkit.getBukkitVersion());
-            print.println("ServerVersion: " + Version.getInstance().getServerVersion().getVersionName());
-            print.println("NMSVersion: " + Version.getInstance().getNMSVersion().getVersionName());
-            print.println("");
-            print.println("Using bungeecord: " + Class.forName("org.spigotmc.SpigotConfig").getField("bungee").getBoolean(null));
-            print.println("Loaded proxy: " + false /* this.main.getAuthHandler().isProxyLoaded */);
-            print.println("");
-            print.println("Send this on Github Issue Tracker: https://github.com/LielAmar/2FA/issues");
-            print.println("Or create a Ticket in the discord server: https://discord.com/invite/NzgBrqR");
-            print.flush();
-            print.close();
+            writer.println("Server Plugins");
+            for(Plugin plugin : Bukkit.getPluginManager().getPlugins())
+                writer.println("- " + plugin.getName() + " | " + plugin.getDescription().getVersion() + " | Enabled: " + plugin.isEnabled());
+
+            writer.println("");
+
+            writer.println("Server Jar, Versions and Information");
+            writer.println("- Spigot Build version: " + Bukkit.getVersion());
+            writer.println("- Server Version: " + Bukkit.getBukkitVersion());
+            writer.println("- Version Instance: " + Version.getInstance().getServerVersion().getVersionName());
+            writer.println("- NMSVersion Instance: " + Version.getInstance().getNMSVersion().getVersionName());
+            writer.println("- Max Memory: " + (Runtime.getRuntime().maxMemory()/1000000) + " MB");
+            writer.println("- Free Memory: " + (Runtime.getRuntime().freeMemory()/1000000) + " MB");
+            writer.println("- Total Memory: " + (Runtime.getRuntime().totalMemory()/1000000) + " MB");
+
+            writer.println("");
+
+            writer.println("Communication Method & Proxies: ");
+            writer.println("- Using Bungeecord: " + Class.forName("org.spigotmc.SpigotConfig").getField("bungee").getBoolean(null));
+            writer.println("- Is Proxy Loaded: " + (this.plugin.getAuthHandler().getAuthCommunicationHandler() instanceof ProxyAuthCommunication));
+            writer.println("- Communication Method in config: " + this.plugin.getConfigHandler().getCommunicationMethod().name());
+            writer.println("- Communication Timeout in config: " + this.plugin.getConfigHandler().getCommunicationTimeout() + " ticks");
+
+            writer.println("");
+
+            writer.println("Attach this file when creating an issue on GitHub: https://github.com/LielAmar/2FA/issues");
+            writer.println("You can also join our discord server and talk to us there: https://discord.com/invite/NzgBrqR");
+            
+            writer.flush();
+            writer.close();
 
             commandSender.sendMessage(ChatColor.GREEN + "Created a Bug Report file, Use this for your Bug Report! :)");
         } catch (IOException | ClassNotFoundException | NoSuchFieldException | IllegalAccessException exception) {
