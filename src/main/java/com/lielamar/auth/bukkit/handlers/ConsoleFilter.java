@@ -1,5 +1,6 @@
 package com.lielamar.auth.bukkit.handlers;
 
+import com.lielamar.lielsutils.numbers.NumbersUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Filter;
@@ -11,7 +12,12 @@ import java.util.Locale;
 
 public class ConsoleFilter implements Filter {
 
-    private static final String BLOCKED_STRING = "issued server command: /2fa ".toLowerCase(Locale.ROOT);
+    private static final String[] BLOCKED_STRING = {
+            "issued server command: /2fa ".toLowerCase(Locale.ROOT),
+            "issued server command: /2fa login ".toLowerCase(Locale.ROOT)
+    };
+
+    private State state = State.STARTED;
 
     @Override
     public Result getOnMismatch() {
@@ -27,14 +33,23 @@ public class ConsoleFilter implements Filter {
     private Result check(String message) {
         message = message.toLowerCase(Locale.ROOT);
 
-        if(message.contains(BLOCKED_STRING)) {
-            String[] args = message.split(BLOCKED_STRING);
-            String code = args[1].split(" ")[0];
+        if(!message.contains("2fa"))
+            return Result.NEUTRAL;
 
-            try {
-                Integer.parseInt(code);
-                return Result.DENY;
-            } catch(NumberFormatException ignored) {}
+        for(String blockedString : BLOCKED_STRING) {
+            if(message.contains(blockedString)) {
+                String[] args = message.split(blockedString);
+
+                if(args.length > 1) {
+                    String code;
+
+                    if(args[1].contains(" ")) code = args[1].split(" ")[0];
+                    else                      code = args[1];
+
+                    if(code.length() > 0 && NumbersUtils.isInteger(code))
+                        return Result.DENY;
+                }
+            }
         }
 
         return Result.NEUTRAL;
@@ -113,7 +128,7 @@ public class ConsoleFilter implements Filter {
 
     @Override
     public State getState() {
-        return State.STARTED;
+        return this.state;
     }
 
     @Override
@@ -123,7 +138,9 @@ public class ConsoleFilter implements Filter {
     public void start() {}
 
     @Override
-    public void stop() {}
+    public void stop() {
+        this.state = State.STOPPED;
+    }
 
     @Override
     public boolean isStarted() { return true; }

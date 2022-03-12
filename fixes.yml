@@ -9,3 +9,6 @@
 - Added alerts to players with the 2fa.alerts permission, to notify them when 2fa detects a configuration issue
   - Should alert players if they have communication-method set to a non-optimized method
   - Should suggest switching to communication-method set to PROXY if a proxy is detected
+
+- Fixed a bug allow players to disable other's 2fa without having the permissions to do that
+- Added a Console Filter to hide players' codes when executing /2fa <code>

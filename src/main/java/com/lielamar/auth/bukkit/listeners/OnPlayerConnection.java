@@ -2,6 +2,7 @@ package com.lielamar.auth.bukkit.listeners;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
+import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
@@ -12,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -20,8 +22,12 @@ public class OnPlayerConnection implements Listener {
 
     private final TwoFactorAuthentication plugin;
 
+    private boolean checkedProxy;
+
     public OnPlayerConnection(@NotNull TwoFactorAuthentication plugin) {
         this.plugin = plugin;
+
+        this.checkedProxy = false;
     }
 
     @EventHandler
@@ -30,6 +36,8 @@ public class OnPlayerConnection implements Listener {
 
         this.plugin.getAuthHandler().playerJoin(player.getUniqueId());
 
+        if(this.checkedProxy)
+            return;
 
         if(this.plugin.getAuthHandler().getAuthCommunicationHandler() == null)
             return;
@@ -39,7 +47,12 @@ public class OnPlayerConnection implements Listener {
             return;
 
         // Sending a request to proxy to check whether there is a proxy or not :)
-        this.plugin.getAuthHandler().getAuthCommunicationHandler().checkCommunication(player.getUniqueId(),
+        AuthCommunicationHandler proxyAuthComm = new ProxyAuthCommunication(this.plugin);
+        this.plugin.getServer().getMessenger().registerOutgoingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME);
+        this.plugin.getServer().getMessenger().registerIncomingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME,
+                (PluginMessageListener) proxyAuthComm);
+
+        proxyAuthComm.checkCommunication(player.getUniqueId(),
                 new AuthCommunicationHandler.AuthCommunicationCallback() {
 
                     @Override
@@ -52,6 +65,12 @@ public class OnPlayerConnection implements Listener {
                     public long getExecutionStamp() { return System.currentTimeMillis(); }
                     public UUID getPlayerUUID() { return player.getUniqueId(); }
                 });
+
+        this.plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME);
+        this.plugin.getServer().getMessenger().unregisterIncomingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME,
+                (PluginMessageListener) proxyAuthComm);
+
+        this.checkedProxy = true;
     }
 
     @EventHandler

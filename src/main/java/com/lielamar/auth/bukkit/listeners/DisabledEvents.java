@@ -4,6 +4,7 @@ import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.handlers.MessageHandler;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.lielsutils.numbers.NumbersUtils;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -175,7 +176,7 @@ public class DisabledEvents implements Listener {
 
                     if(Constants.mainCommand.getA().equalsIgnoreCase(command)) {
                         if(args.length > 1) {
-                            if(args[1].equalsIgnoreCase("help") || this.isNumber(args[1]))
+                            if(args[1].equalsIgnoreCase("help") || NumbersUtils.isInteger(args[1]))
                                 return;
                         }
                     }
@@ -195,15 +196,6 @@ public class DisabledEvents implements Listener {
                     }
                 }
             }
-        }
-    }
-
-    private boolean isNumber(String text) {
-        try {
-            Integer.parseInt(text);
-            return true;
-        } catch(NumberFormatException ignored) {
-            return false;
         }
     }
 
