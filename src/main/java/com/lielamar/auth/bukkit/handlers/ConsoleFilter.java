@@ -1,6 +1,5 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.lielsutils.numbers.NumbersUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Filter;
@@ -40,15 +39,8 @@ public class ConsoleFilter implements Filter {
             if(message.contains(blockedString)) {
                 String[] args = message.split(blockedString);
 
-                if(args.length > 1) {
-                    String code;
-
-                    if(args[1].contains(" ")) code = args[1].split(" ")[0];
-                    else                      code = args[1];
-
-                    if(code.length() > 0 && NumbersUtils.isInteger(code))
-                        return Result.DENY;
-                }
+                if(args.length > 1)
+                    return Result.DENY;
             }
         }
 

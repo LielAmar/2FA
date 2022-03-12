@@ -14,6 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -30,13 +33,16 @@ public class ProxyAuthCommunication extends AuthCommunicationHandler implements 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             long currentTimestamp = System.currentTimeMillis();
 
-            super.callbacks.entrySet().removeIf(entry -> {
-                if(((currentTimestamp - entry.getValue().getExecutionStamp()) / 1000) > (timeout / 20)) {
-                    entry.getValue().onTimeout();
-                    return true;
-                }
-                return false;
-            });
+            List<Map.Entry<UUID, AuthCommunicationCallback>> remove = new ArrayList<>();
+            for(Map.Entry<UUID, AuthCommunicationCallback> entry : super.callbacks.entrySet()) {
+                if(((currentTimestamp - entry.getValue().getExecutionStamp()) / 1000) > (timeout / 20))
+                    remove.add(entry);
+            }
+
+            for(Map.Entry<UUID, AuthCommunicationCallback> entry : remove) {
+                entry.getValue().onTimeout();
+                super.callbacks.remove(entry.getKey());
+            }
         }, timeout, timeout);
     }
 

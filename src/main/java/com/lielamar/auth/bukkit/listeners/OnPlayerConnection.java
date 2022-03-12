@@ -34,43 +34,48 @@ public class OnPlayerConnection implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        this.plugin.getAuthHandler().playerJoin(player.getUniqueId());
+        this.plugin.getAuthHandler().changeState(player.getUniqueId(), AuthHandler.AuthState.PENDING_LOGIN);
 
-        if(this.checkedProxy)
-            return;
+        // Adding a 1 tick delay so requests to proxy are sent correctly
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            this.plugin.getAuthHandler().playerJoin(player.getUniqueId());
 
-        if(this.plugin.getAuthHandler().getAuthCommunicationHandler() == null)
-            return;
+            if(this.checkedProxy)
+                return;
 
-        // If we have the communication-method set to something other than NONE, we don't need to do any checks.
-        if(!(this.plugin.getAuthHandler().getAuthCommunicationHandler() instanceof BasicAuthCommunication))
-            return;
+            if(this.plugin.getAuthHandler().getAuthCommunicationHandler() == null)
+                return;
 
-        // Sending a request to proxy to check whether there is a proxy or not :)
-        AuthCommunicationHandler proxyAuthComm = new ProxyAuthCommunication(this.plugin);
-        this.plugin.getServer().getMessenger().registerOutgoingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME);
-        this.plugin.getServer().getMessenger().registerIncomingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME,
-                (PluginMessageListener) proxyAuthComm);
+            // If we have the communication-method set to something other than NONE, we don't need to do any checks.
+            if(!(this.plugin.getAuthHandler().getAuthCommunicationHandler() instanceof BasicAuthCommunication))
+                return;
 
-        proxyAuthComm.checkCommunication(player.getUniqueId(),
-                new AuthCommunicationHandler.AuthCommunicationCallback() {
+            // Sending a request to proxy to check whether there is a proxy or not :)
+            AuthCommunicationHandler proxyAuthComm = new ProxyAuthCommunication(this.plugin);
+            this.plugin.getServer().getMessenger().registerOutgoingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME);
+            this.plugin.getServer().getMessenger().registerIncomingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME,
+                    (PluginMessageListener) proxyAuthComm);
 
-                    @Override
-                    public void execute(AuthHandler.AuthState authState) {
-                        Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.alertsPermission)).forEach(pl ->
-                                plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT));
-                    }
+            proxyAuthComm.checkCommunication(player.getUniqueId(),
+                    new AuthCommunicationHandler.AuthCommunicationCallback() {
 
-                    public void onTimeout() {}
-                    public long getExecutionStamp() { return System.currentTimeMillis(); }
-                    public UUID getPlayerUUID() { return player.getUniqueId(); }
-                });
+                        @Override
+                        public void execute(AuthHandler.AuthState authState) {
+                            Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.alertsPermission)).forEach(pl ->
+                                    plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT));
+                        }
 
-        this.plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME);
-        this.plugin.getServer().getMessenger().unregisterIncomingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME,
-                (PluginMessageListener) proxyAuthComm);
+                        public void onTimeout() {}
+                        public long getExecutionStamp() { return System.currentTimeMillis(); }
+                        public UUID getPlayerUUID() { return player.getUniqueId(); }
+                    });
 
-        this.checkedProxy = true;
+            this.plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME);
+            this.plugin.getServer().getMessenger().unregisterIncomingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME,
+                    (PluginMessageListener) proxyAuthComm);
+
+            this.checkedProxy = true;
+        }, 1L);
     }
 
     @EventHandler

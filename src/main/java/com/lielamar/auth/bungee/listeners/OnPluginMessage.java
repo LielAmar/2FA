@@ -55,7 +55,7 @@ public class OnPluginMessage implements Listener {
                     this.plugin.getAuthHandler().changeState(player.getUniqueId(), state);
                 }
 
-                sendResponse(messageUUID, player, messageType);
+                this.sendResponse(messageUUID, player, messageType);
             } catch (IOException exception) {
                 exception.printStackTrace();
             }

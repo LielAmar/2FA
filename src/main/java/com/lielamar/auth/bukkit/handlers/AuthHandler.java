@@ -129,7 +129,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         authStates.put(uuid, authState);
 
-        // If the PlayerStateChangeEvent was not cancelled we wanna update the auth communication handler
+        // If the PlayerStateChangeEvent was not cancelled we want to update the auth communication handler
         if(player != null && authState == AuthState.AUTHENTICATED)
             this.authCommunicationHandler.setPlayerState(uuid, authState);
     }
@@ -152,24 +152,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             this.changeState(uuid, AuthState.DISABLED);
             return;
         }
-
-        if(this.getStorageHandler().getKey(uuid) == null) {
-            if(player.hasPermission(Constants.demandPermission)) {
-                createKey(player.getUniqueId());
-                changeState(player.getUniqueId(), AuthState.DEMAND_SETUP);
-
-                plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
-            } else {
-                this.changeState(uuid, AuthState.DISABLED);
-
-                if(plugin.getConfigHandler().shouldAdvise2FA()) {
-                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
-                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
-                }
-            }
-            return;
-        }
-
         // Setting the initial state so players can't abuse the brief moment without 2fa protection
         this.changeState(uuid, AuthState.PENDING_LOGIN);
 
@@ -373,6 +355,28 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             if(authState == AuthState.AUTHENTICATED) {
                 changeState(this.playerUUID, authState);
                 return;
+            }
+
+            if(authState == AuthState.NONE) {
+                if(getStorageHandler().getKey(this.playerUUID) == null) {
+                    if(player.hasPermission(Constants.demandPermission)) {
+                        createKey(this.playerUUID);
+                        changeState(this.playerUUID, AuthState.DEMAND_SETUP);
+
+                        if(getAuthCommunicationHandler() != null)
+                            getAuthCommunicationHandler().setPlayerState(this.playerUUID, AuthState.DEMAND_SETUP);
+
+                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.YOU_ARE_REQUIRED);
+                    } else {
+                        changeState(this.playerUUID, AuthState.DISABLED);
+
+                        if(plugin.getConfigHandler().shouldAdvise2FA()) {
+                            plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SETUP_RECOMMENDATION);
+                            plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GET_STARTED);
+                        }
+                    }
+                    return;
+                }
             }
 
             // Otherwise, we want to wait for them to log in.
