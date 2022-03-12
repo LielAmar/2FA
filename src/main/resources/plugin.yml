@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.6.1"
+version: "1.6.2"
 api-version: 1.13
 authors: [LielAmar, SadGhost]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
@@ -48,8 +48,9 @@ permissions:
   2fa.reload:
     description: Admin permissions to reload the 2FA plugin
     default: op
+  2fa.alerts:
+    description: Admin permissions to get alerts on critical issues with 2FA configuration
+    default: op
   2fa.demand:
     description: A player with this permission must have 2FA linked to thier account
     default: false
-  2fa.alerts:
-    description: Admin permissions to get alerts on critical issues with 2FA configuration

@@ -2,7 +2,9 @@ package com.lielamar.auth.bukkit.listeners;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.handlers.MessageHandler;
+import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.lielsutils.numbers.NumbersUtils;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,7 +14,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -74,6 +75,14 @@ public class DisabledEvents implements Listener {
     public void onItemDrop(PlayerDropItemEvent event) {
         if(!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
 
+        if(this.plugin.getAuthHandler().getAuthState(event.getPlayer().getUniqueId()) == AuthHandler.AuthState.PENDING_SETUP) {
+            if(this.plugin.getAuthHandler().isQRCodeItem(event.getItemDrop().getItemStack())) {
+                plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.USE_CANCEL_TO_CANCEL_SETUP);
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         if(this.plugin.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         } else if(this.plugin.getAuthHandler().isQRCodeItem(event.getItemDrop().getItemStack())) {
@@ -91,20 +100,7 @@ public class DisabledEvents implements Listener {
             event.getItem().remove();
         }
     }
-
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onItemPickup(EntityPickupItemEvent event) {
-        if(!(event.getEntity() instanceof Player)) return;
-        
-        if(!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
-
-        if(this.plugin.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) {
-            event.setCancelled(true);
-        } else if(this.plugin.getAuthHandler().isQRCodeItem(event.getItem().getItemStack())) {
-            event.getItem().remove();
-        }
-    }
-
+    
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageEvent event) {
         if(!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) return;
@@ -164,17 +160,18 @@ public class DisabledEvents implements Listener {
                 if(args.length > 0) {
                     String command = args[0];
 
-                    if(!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.getA().equalsIgnoreCase(command)) {
-                        event.setCancelled(true);
-                        this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
-                    } else {
-                        try {
-                            Integer.parseInt(args[1]);
-                        } catch (NumberFormatException exception) {
-                            event.setCancelled(true);
-                            this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                    if(Constants.mainCommand.getA().equalsIgnoreCase(command)) {
+                        if(args.length > 1) {
+                            if(args[1].equalsIgnoreCase("help") || NumbersUtils.isInteger(args[1]))
+                                return;
                         }
                     }
+
+                    if(this.plugin.getConfigHandler().getWhitelistedCommands().contains(command))
+                        return;
+
+                    event.setCancelled(true);
+                    this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }
             } else {
                 if(args.length > 0) {

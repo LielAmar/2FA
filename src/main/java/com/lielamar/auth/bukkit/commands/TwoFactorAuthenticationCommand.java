@@ -58,22 +58,22 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
             // If we don't receive an argument we want to either execute the help command if they have 2fa setup, or execute the setup (enable) command if they don't have it setup.
             if(args.length == 0) {
                 if(this.helpCommand != null)
-                    this.helpCommand.runCommand(commandSender, args);
+                    this.helpCommand.execute(commandSender, args);
                 return false;
             }
 
             if(plugin.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_LOGIN) {
-                if(loginCommand != null)
-                    loginCommand.runCommand(player, args);
+                if(this.loginCommand != null)
+                    this.loginCommand.execute(player, args);
 
                 return false;
             } else if(plugin.getAuthHandler().isPendingSetup(player.getUniqueId())) {
                 Command subCommand = super.getSubCommand(args[0]);
 
                 if(subCommand instanceof CancelCommand)
-                    subCommand.runCommand(player, args);
+                    subCommand.execute(player, args);
                 else if(this.setupCommand != null)
-                    this.setupCommand.runCommand(player, args);
+                    this.setupCommand.execute(player, args);
             }
 
             return false;

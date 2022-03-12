@@ -19,11 +19,17 @@ import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.AuthTracker;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Filter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+
+import org.apache.logging.log4j.core.Logger;
+
+import java.util.Iterator;
 
 public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuthenticationPlugin {
 
@@ -41,6 +47,9 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
         if(!Bukkit.getPluginManager().isPluginEnabled(this))
             return;
 
+        // Register the ConsoleFilter
+        ((Logger)(LogManager.getRootLogger())).addFilter(new ConsoleFilter());
+
         this.sendStartupMessage();
 
         this.setupAuth();
@@ -54,6 +63,14 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
 
     @Override
     public void onDisable() {
+        // Unregister the ConsoleFilter
+        Iterator<Filter> filters = ((Logger)(LogManager.getRootLogger())).getFilters();
+        while(filters.hasNext()) {
+            Filter filter = filters.next();
+            if(filter instanceof ConsoleFilter)
+                filter.stop();
+        }
+
         if(this.storageHandler != null)
             this.storageHandler.unload();
     }
@@ -80,13 +97,14 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
                 + ChatColor.DARK_GRAY + "Made with " + ChatColor.RED + "♥" + ChatColor.DARK_GRAY + " by "
                 + ChatColor.AQUA + getDescription().getAuthors().toString().replaceAll("\\[", "").replace("]", ""));
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "  / /_| | / ____ \\ " + "    "
-                + ChatColor.DARK_GRAY + "Time contributed so far " + ChatColor.AQUA + "~175 Hours");
+                + ChatColor.DARK_GRAY + "Time contributed so far " + ChatColor.AQUA + "~225 Hours");
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + " |____|_|/_/    \\_\\");
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "                   ");
     }
 
 
     public void setupAuth() {
+        // Registering the console filter
         this.fileManager = new FileManager(this);
 
         this.messageHandler = new MessageHandler(fileManager);

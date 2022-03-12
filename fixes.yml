@@ -1,0 +1,14 @@
+- Fixed a bug allowing players to drop maps when in setup mode
+- Fixed a bug not updating bungeecord with players' authentication state
+  - This caused players to be able to execute bungeecord commands while not authenticated
+- Fixed a bug allowing players to disable 2fa before authenticating
+- Fixed a bug that made the plugin not demand 2fa from players with the 2fa.demand permission
+- Updated LielsUtils to a newer version
+  - Fixed a bug causing an InternalError to be thrown whenever players tried to tab-complete a command
+- Removed unnecessary checks
+- Added alerts to players with the 2fa.alerts permission, to notify them when 2fa detects a configuration issue
+  - Should alert players if they have communication-method set to a non-optimized method
+  - Should suggest switching to communication-method set to PROXY if a proxy is detected
+
+- Fixed a bug allow players to disable other's 2fa without having the permissions to do that
+- Added a Console Filter to hide players' codes when executing /2fa <code>

@@ -48,7 +48,7 @@ public class EnableCommand extends StandaloneCommand {
 
     @Override
     public List<String> tabOptions(@NotNull CommandSender commandSender, @NotNull String[] args) {
-        return new TabOptionsBuilder().player().build(args);
+        return new TabOptionsBuilder().players().build(args);
     }
 
     @Override
