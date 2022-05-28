@@ -39,7 +39,7 @@
         <version.googleauth>1.5.0</version.googleauth>
         <version.commons-codec>1.15</version.commons-codec>
         <version.hikari-cp>5.0.1</version.hikari-cp>
-        <version.h2>2.1.210</version.h2>
+        <version.h2>2.1.212</version.h2>
         <version.mysql>8.0.29</version.mysql>
         <version.maria-db>2.7.3</version.maria-db>
         <version.postgres>42.3.3</version.postgres>
