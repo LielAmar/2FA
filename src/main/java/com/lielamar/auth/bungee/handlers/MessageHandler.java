@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 
-public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
+public final class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
     private final TwoFactorAuthentication plugin;
     private Configuration config;
@@ -27,32 +27,38 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     @Override
     protected void sendRaw(final Object player, final String message) {
-        if(player instanceof ProxiedPlayer)
-            ((ProxiedPlayer)player).sendMessage(ChatMessageType.CHAT, TextComponent.fromLegacyText(ColorUtils.translateAlternateColorCodes('&', message)));
+        if (player instanceof ProxiedPlayer) {
+            ((ProxiedPlayer) player).sendMessage(ChatMessageType.CHAT, TextComponent.fromLegacyText(ColorUtils.translateAlternateColorCodes('&', message)));
+        }
     }
 
     @Override
     public void reload() {
-        if(!this.plugin.getDataFolder().exists())
+        if (!this.plugin.getDataFolder().exists()) {
             this.plugin.getDataFolder().mkdirs();
+        }
 
         this.file = new File(this.plugin.getDataFolder(), super.messagesFileName);
 
-        if(!this.file.exists()) {
-            try { this.file.createNewFile(); } catch (IOException exception) { exception.printStackTrace(); }
+        if (!this.file.exists()) {
+            try {
+                this.file.createNewFile();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
         }
 
         try {
             this.config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(this.file);
 
-            for(TwoFAMessages message : TwoFAMessages.values()) {
-                if(!this.config.contains(message.name())) {
+            for (TwoFAMessages message : TwoFAMessages.values()) {
+                if (!this.config.contains(message.name())) {
                     this.config.set(message.name(), message.getMessage());
                 } else {
                     message.setMessage(this.config.getString(message.name()));
                 }
             }
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
 
@@ -61,6 +67,10 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     @Override
     public void saveConfiguration() {
-        try { ConfigurationProvider.getProvider(YamlConfiguration.class).save(this.config, this.file); } catch (IOException exception) { exception.printStackTrace(); }
+        try {
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(this.config, this.file);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 }

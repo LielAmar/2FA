@@ -18,19 +18,21 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     @Override
     public void changeState(@NotNull UUID uuid, @NotNull AuthState authState) {
-        if(authState == getAuthState(uuid))
+        if (authState == getAuthState(uuid)) {
             return;
+        }
 
         Optional<Player> optionalPlayer = this.plugin.getProxy().getPlayer(uuid);
-        
-        if(optionalPlayer.isPresent()) {
+
+        if (optionalPlayer.isPresent()) {
             Player player = optionalPlayer.get();
 
             PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authState);
             this.plugin.getProxy().getEventManager().fire(event);
 
-            if(event.getResult() == PlayerStateChangeEvent.StateResult.denied())
+            if (event.getResult() == PlayerStateChangeEvent.StateResult.denied()) {
                 return;
+            }
 
             authState = event.getAuthState();
         }

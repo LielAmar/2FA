@@ -38,10 +38,13 @@ public class PlayerStateChangeEvent implements ResultedEvent<PlayerStateChangeEv
     }
 
     public static class StateResult implements ResultedEvent.Result {
+
         private static final PlayerStateChangeEvent.StateResult DENIED = new PlayerStateChangeEvent.StateResult();
 
         @Override
-        public boolean isAllowed() { return true; }
+        public boolean isAllowed() {
+            return true;
+        }
 
         public static PlayerStateChangeEvent.StateResult denied() {
             return DENIED;

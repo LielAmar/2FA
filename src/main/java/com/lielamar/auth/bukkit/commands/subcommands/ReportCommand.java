@@ -3,6 +3,7 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
+import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
 import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
@@ -92,6 +93,12 @@ public class ReportCommand extends StandaloneCommand {
             writer.println("- Communication Method in config: " + this.plugin.getConfigHandler().getCommunicationMethod().name());
             writer.println("- Communication Timeout in config: " + this.plugin.getConfigHandler().getCommunicationTimeout() + " ticks");
 
+            writer.println("");
+            
+            writer.println("Storage Information: ");
+            writer.println("- Type of Storage: " + this.plugin.getConfigHandler().getStorageMethod().name());
+            writer.println("- Is Storage loaded: " + StorageHandler.isLoaded);
+            
             writer.println("");
 
             writer.println("Attach this file when creating an issue on GitHub: https://github.com/LielAmar/2FA/issues");

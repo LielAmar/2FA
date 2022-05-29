@@ -9,6 +9,8 @@ public interface TwoFactorAuthenticationPlugin {
     void setupAuth();
 
     MessageHandler getMessageHandler();
+
     ConfigHandler getConfigHandler();
+
     AuthHandler getAuthHandler();
 }

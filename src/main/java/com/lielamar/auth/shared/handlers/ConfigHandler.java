@@ -11,7 +11,6 @@ public abstract class ConfigHandler {
 
     protected final String configFileName = "config.yml";
 
-
     protected Map<Class<?>, Boolean> disabledEvents = new HashMap<>();
     protected List<String> whitelistedCommands = new ArrayList<>();
     protected List<String> blacklistedCommands = new ArrayList<>();
@@ -33,28 +32,73 @@ public abstract class ConfigHandler {
 
     protected String mongodbURI = "";
 
+    public Map<Class<?>, Boolean> getDisabledEvents() {
+        return this.disabledEvents;
+    }
 
-    public Map<Class<?>, Boolean> getDisabledEvents() { return this.disabledEvents; }
-    public List<String> getWhitelistedCommands() { return this.whitelistedCommands; }
-    public List<String> getBlacklistedCommands() { return this.blacklistedCommands; }
+    public List<String> getWhitelistedCommands() {
+        return this.whitelistedCommands;
+    }
 
-    public StorageMethod getStorageMethod() { return this.storageMethod; }
-    public String getHost() { return this.host; }
-    public int getPort() { return this.port; }
-    public String getDatabase() { return this.database; }
-    public String getUsername() { return this.username; }
-    public String getPassword() { return this.password; }
-    public String getTablePrefix() { return this.tablePrefix; }
-    public String getCollectionPrefix() { return this.collectionPrefix; }
+    public List<String> getBlacklistedCommands() {
+        return this.blacklistedCommands;
+    }
 
-    public int getMaximumPoolSize() { return this.maximumPoolSize; }
-    public int getMinimumIdle() { return this.minimumIdle; }
-    public int getMaximumLifetime() { return this.maximumLifetime; }
-    public int getKeepAliveTime() { return this.keepAliveTime; }
-    public int getConnectionTimeout() { return this.connectionTimeout; }
+    public StorageMethod getStorageMethod() {
+        return this.storageMethod;
+    }
 
-    public String getMongodbURI() { return this.mongodbURI; }
+    public String getHost() {
+        return this.host;
+    }
 
+    public int getPort() {
+        return this.port;
+    }
+
+    public String getDatabase() {
+        return this.database;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public String getTablePrefix() {
+        return this.tablePrefix;
+    }
+
+    public String getCollectionPrefix() {
+        return this.collectionPrefix;
+    }
+
+    public int getMaximumPoolSize() {
+        return this.maximumPoolSize;
+    }
+
+    public int getMinimumIdle() {
+        return this.minimumIdle;
+    }
+
+    public int getMaximumLifetime() {
+        return this.maximumLifetime;
+    }
+
+    public int getKeepAliveTime() {
+        return this.keepAliveTime;
+    }
+
+    public int getConnectionTimeout() {
+        return this.connectionTimeout;
+    }
+
+    public String getMongodbURI() {
+        return this.mongodbURI;
+    }
 
     public abstract void reload();
 }

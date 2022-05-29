@@ -11,27 +11,26 @@ public abstract class MessageHandler {
         this.sendMessage(sender, true, message, args);
     }
 
-
     /**
      * Sends the value of the provided {TwoFAMessage} object to the given player
      *
-     * @param sender    Sender to send the message to
-     * @param prefix    Whether to send the prefix as well
-     * @param message   TwoFAMessage object to send its value
-     * @param args      Array of pairs of arguments to switch in the message
+     * @param sender Sender to send the message to
+     * @param prefix Whether to send the prefix as well
+     * @param message TwoFAMessage object to send its value
+     * @param args Array of pairs of arguments to switch in the message
      */
     public void sendMessage(Object sender, boolean prefix, TwoFAMessages message, Pair<?, ?>... args) {
         String raw = message.getMessage();
         String rawPrefix = TwoFAMessages.PREFIX.getMessage();
 
-        if(raw != null && raw.length() > 0) {
-            for(Pair<?, ?> pair : args)
+        if (raw != null && raw.length() > 0) {
+            for (Pair<?, ?> pair : args) {
                 raw = raw.replaceAll(pair.getA().toString(), pair.getB().toString());
+            }
 
             this.sendRaw(sender, (prefix ? rawPrefix : "") + raw);
         }
     }
-
 
     protected abstract void sendRaw(final Object p0, final String p1);
 
@@ -39,7 +38,6 @@ public abstract class MessageHandler {
 
     public abstract void saveConfiguration();
 
-    
     public enum TwoFAMessages {
         PREFIX("&7[&b2FA&7]&r "),
         VALIDATE_ACCOUNT("&cPlease validate your account with two-factor authentication"),
@@ -77,8 +75,8 @@ public abstract class MessageHandler {
         RELOADED_CONFIG("&aConfig was reloaded!"),
         FAILED_AUTHENTICATION_ALERT("&c%name% failed to authenticate %times% times"),
         SOMETHING_WENT_WRONG("&cSomething went wrong. Please contact a Staff Member!"),
-        COMMUNICATION_METHOD_NOT_CORRECT("&cWe've detected you have a proxy but your &7communication-method &cis set to &7NONE &cin config.yml." +
-                "\nPlease configure your &7communication-method &cproperly, otherwise the plugin might not work correctly!"),
+        COMMUNICATION_METHOD_NOT_CORRECT("&cWe've detected you have a proxy but your &7communication-method &cis set to &7NONE &cin config.yml."
+                + "\nPlease configure your &7communication-method &cproperly, otherwise the plugin might not work correctly!"),
         KEYWORD_ENABLED("Enabled"),
         KEYWORD_DISABLED("Disabled"),
         KEYWORD_REQUIRED("Required"),

@@ -8,7 +8,7 @@ import org.bson.Document;
 
 import java.util.UUID;
 
-public class MongoDBStorage extends StorageHandler {
+public final class MongoDBStorage extends StorageHandler {
 
     private MongoClient mongoClient;
     private MongoCollection<Document> mongoCollection;
@@ -24,7 +24,7 @@ public class MongoDBStorage extends StorageHandler {
     private final String fullPlayersCollectionName;
 
     public MongoDBStorage(String host, String database, String username, String password, int port,
-                          String collectionPrefix, String uri) {
+            String collectionPrefix, String uri) {
         this.host = host;
         this.database = database;
         this.port = port;
@@ -42,14 +42,15 @@ public class MongoDBStorage extends StorageHandler {
      * Opens a MongoDB connection
      */
     public void openConnection() {
-        if(this.mongoClient != null)
+        if (this.mongoClient != null) {
             throw new IllegalStateException("A MongoDB instance already exists for the following database: " + this.database);
+        }
 
-        if(this.uri.length() > 0) {
+        if (this.uri.length() > 0) {
             MongoClientURI uri = new MongoClientURI(this.uri);
             this.mongoClient = new MongoClient(uri);
         } else {
-            if(this.username.length() > 0 && this.password.length() > 0) {
+            if (this.username.length() > 0 && this.password.length() > 0) {
                 MongoCredential credential = MongoCredential.createCredential(this.username, this.database, this.password.toCharArray());
                 this.mongoClient = new MongoClient(new ServerAddress(this.host, this.port), credential, MongoClientOptions.builder().build());
             } else {
@@ -61,13 +62,12 @@ public class MongoDBStorage extends StorageHandler {
         this.mongoCollection = mongoDatabase.getCollection(fullPlayersCollectionName);
     }
 
-
     @Override
     public String setKey(UUID uuid, String key) {
         Document query = new Document("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
-        if(playerDocument == null) {
+        if (playerDocument == null) {
             Document insertDocument = new Document("uuid", uuid.toString());
             insertDocument.append("key", key);
             insertDocument.append("ip", null);
@@ -86,8 +86,9 @@ public class MongoDBStorage extends StorageHandler {
         Document query = new Document("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
-        if(playerDocument != null)
+        if (playerDocument != null) {
             return playerDocument.getString("key");
+        }
         return null;
     }
 
@@ -101,13 +102,12 @@ public class MongoDBStorage extends StorageHandler {
         setKey(uuid, null);
     }
 
-
     @Override
     public String setIP(UUID uuid, String ip) {
         Document query = new Document("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
-        if(playerDocument == null) {
+        if (playerDocument == null) {
             Document insertDocument = new Document("uuid", uuid.toString());
             insertDocument.append("key", null);
             insertDocument.append("ip", ip);
@@ -126,8 +126,9 @@ public class MongoDBStorage extends StorageHandler {
         Document query = new Document("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
-        if(playerDocument != null)
+        if (playerDocument != null) {
             return playerDocument.getString("ip");
+        }
         return null;
     }
 
@@ -136,13 +137,12 @@ public class MongoDBStorage extends StorageHandler {
         return getIP(uuid) != null;
     }
 
-
     @Override
     public long setEnableDate(UUID uuid, long enableDate) {
         Document query = new Document("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
-        if(playerDocument == null) {
+        if (playerDocument == null) {
             Document insertDocument = new Document("uuid", uuid.toString());
             insertDocument.append("key", null);
             insertDocument.append("ip", null);
@@ -161,8 +161,9 @@ public class MongoDBStorage extends StorageHandler {
         Document query = new Document("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
-        if(playerDocument != null)
+        if (playerDocument != null) {
             return playerDocument.getLong("enable_date");
+        }
         return -1;
     }
 

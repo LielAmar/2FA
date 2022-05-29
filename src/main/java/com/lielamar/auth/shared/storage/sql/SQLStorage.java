@@ -32,7 +32,7 @@ public class SQLStorage extends StorageHandler {
     private final String fullPlayersTableName;
 
     public SQLStorage(String driver, String host, String database, String username, String password, int port,
-                        String tablePrefix, int maximumPoolSize, int minimumIdle, int maximumLifetime, int keepAliveTime, int connectionTimeout) {
+            String tablePrefix, int maximumPoolSize, int minimumIdle, int maximumLifetime, int keepAliveTime, int connectionTimeout) {
         this.driver = driver;
 
         this.host = host;
@@ -52,7 +52,6 @@ public class SQLStorage extends StorageHandler {
         this.setupHikari();
     }
 
-
     /**
      * Sets up Hikari
      */
@@ -65,7 +64,7 @@ public class SQLStorage extends StorageHandler {
             hikari.setMaxLifetime(this.maximumLifetime);
             hikari.setKeepaliveTime(this.keepAliveTime);
             hikari.setConnectionTimeout(this.connectionTimeout);
-        } catch(NoSuchMethodError exception) {
+        } catch (NoSuchMethodError exception) {
             Bukkit.getServer().getLogger().severe("Something went wrong when setting up HikariCP. If something does not work"
                     + " correctly, please report it to the 2FA team");
         }
@@ -77,8 +76,9 @@ public class SQLStorage extends StorageHandler {
         properties.setProperty("port", port + "");
         properties.setProperty("databaseName", database);
         properties.setProperty("user", username);
-        if(password.length() > 0)
+        if (password.length() > 0) {
             properties.setProperty("password", password);
+        }
         hikari.setDataSourceProperties(properties);
 
         this.createTables();
@@ -101,19 +101,19 @@ public class SQLStorage extends StorageHandler {
             try {
                 sql = "SELECT column_name FROM information_schema.columns WHERE table_name = '" + this.fullPlayersTableName + "' and column_name = 'enable_date'";
                 stmt = connection.prepareStatement(sql);
-                if(!stmt.executeQuery().next()) {
+                if (!stmt.executeQuery().next()) {
                     sql = "ALTER TABLE " + this.fullPlayersTableName + " ADD `enable_date` long DEFAULT -1;";
                     stmt = connection.prepareStatement(sql);
                     stmt.executeUpdate();
                 }
-            } catch(Exception ignored) {
-                Bukkit.getServer().getLogger().severe("The plugin could not add the 'enable_date' column to your SQL database in table: " + this.fullPlayersTableName + "." +
-                        "Please give your SQL user permissions to information_schema or add the column manually, otherwise the plugin won't work properly!");
+            } catch (Exception ignored) {
+                Bukkit.getServer().getLogger().severe("The plugin could not add the 'enable_date' column to your SQL database in table: " + this.fullPlayersTableName + "."
+                        + "Please give your SQL user permissions to information_schema or add the column manually, otherwise the plugin won't work properly!");
             }
-        } catch(SQLException exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
@@ -123,21 +123,22 @@ public class SQLStorage extends StorageHandler {
         }
     }
 
-
     @Override
     public String setKey(UUID uuid, String key) {
         Connection connection = null;
 
         try {
             connection = hikari.getConnection();
-            if(connection.isClosed()) return null;
+            if (connection.isClosed()) {
+                return null;
+            }
 
             PreparedStatement statement;
             statement = connection.prepareStatement("SELECT `key` FROM " + this.fullPlayersTableName + " WHERE `uuid` = ?;");
             statement.setString(1, uuid.toString());
             ResultSet result = statement.executeQuery();
 
-            if(result.next()) {
+            if (result.next()) {
                 statement = connection.prepareStatement("UPDATE " + this.fullPlayersTableName + " SET `key` = ? WHERE `uuid` = ?;");
                 statement.setString(1, key);
                 statement.setString(2, uuid.toString());
@@ -151,10 +152,10 @@ public class SQLStorage extends StorageHandler {
 
             statement.executeUpdate();
             return key;
-        } catch(SQLException exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
@@ -172,21 +173,23 @@ public class SQLStorage extends StorageHandler {
 
         try {
             connection = hikari.getConnection();
-            if(connection.isClosed()) return null;
+            if (connection.isClosed()) {
+                return null;
+            }
 
             PreparedStatement statement = connection.prepareStatement("SELECT `key` FROM " + this.fullPlayersTableName + " WHERE `uuid` = ?;");
             statement.setString(1, uuid.toString());
             ResultSet result = statement.executeQuery();
 
-            if(result.next()) {
+            if (result.next()) {
                 String key = result.getString("key");
 
                 return key.equalsIgnoreCase("") ? null : key;
             }
-        } catch(SQLException exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
@@ -208,21 +211,22 @@ public class SQLStorage extends StorageHandler {
         this.setKey(uuid, "");
     }
 
-
     @Override
     public String setIP(UUID uuid, String ip) {
         Connection connection = null;
 
         try {
             connection = hikari.getConnection();
-            if(connection.isClosed()) return null;
+            if (connection.isClosed()) {
+                return null;
+            }
 
             PreparedStatement statement;
             statement = connection.prepareStatement("SELECT * FROM " + this.fullPlayersTableName + " WHERE `uuid` = ?;");
             statement.setString(1, uuid.toString());
             ResultSet result = statement.executeQuery();
 
-            if(result.next()) {
+            if (result.next()) {
                 statement = connection.prepareStatement("UPDATE " + this.fullPlayersTableName + " SET `ip` = ? WHERE `uuid` = ?;");
                 statement.setString(1, ip);
                 statement.setString(2, uuid.toString());
@@ -236,10 +240,10 @@ public class SQLStorage extends StorageHandler {
 
             statement.executeUpdate();
             return ip;
-        } catch(SQLException exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
@@ -257,20 +261,22 @@ public class SQLStorage extends StorageHandler {
 
         try {
             connection = hikari.getConnection();
-            if(connection.isClosed()) return null;
+            if (connection.isClosed()) {
+                return null;
+            }
 
             PreparedStatement statement = connection.prepareStatement("SELECT `ip` FROM " + this.fullPlayersTableName + " WHERE `uuid` = ?;");
             statement.setString(1, uuid.toString());
             ResultSet result = statement.executeQuery();
 
-            if(result.next()) {
+            if (result.next()) {
                 String IP = result.getString("ip");
                 return IP.equalsIgnoreCase("") ? null : IP;
             }
-        } catch(SQLException exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
@@ -287,21 +293,22 @@ public class SQLStorage extends StorageHandler {
         return this.getIP(uuid) != null;
     }
 
-
     @Override
     public long setEnableDate(UUID uuid, long enableDate) {
         Connection connection = null;
 
         try {
             connection = hikari.getConnection();
-            if(connection.isClosed()) return -1;
+            if (connection.isClosed()) {
+                return -1;
+            }
 
             PreparedStatement statement;
             statement = connection.prepareStatement("SELECT * FROM " + this.fullPlayersTableName + " WHERE `uuid` = ?;");
             statement.setString(1, uuid.toString());
             ResultSet result = statement.executeQuery();
 
-            if(result.next()) {
+            if (result.next()) {
                 statement = connection.prepareStatement("UPDATE " + this.fullPlayersTableName + " SET `enable_date` = ? WHERE `uuid` = ?;");
                 statement.setLong(1, enableDate);
                 statement.setString(2, uuid.toString());
@@ -315,10 +322,10 @@ public class SQLStorage extends StorageHandler {
 
             statement.executeUpdate();
             return enableDate;
-        } catch(SQLException exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
@@ -336,19 +343,21 @@ public class SQLStorage extends StorageHandler {
 
         try {
             connection = hikari.getConnection();
-            if(connection.isClosed()) return -1;
+            if (connection.isClosed()) {
+                return -1;
+            }
 
             PreparedStatement statement = connection.prepareStatement("SELECT `enable_date` FROM " + this.fullPlayersTableName + " WHERE `uuid` = ?;");
             statement.setString(1, uuid.toString());
             ResultSet result = statement.executeQuery();
 
-            if(result.next()) {
+            if (result.next()) {
                 return result.getLong("enableDate");
             }
-        } catch(SQLException exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
@@ -367,7 +376,8 @@ public class SQLStorage extends StorageHandler {
 
     @Override
     public void unload() {
-        if(!hikari.isClosed())
+        if (!hikari.isClosed()) {
             hikari.close();
+        }
     }
 }
