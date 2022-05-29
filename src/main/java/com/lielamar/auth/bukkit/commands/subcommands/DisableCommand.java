@@ -31,19 +31,20 @@ public class DisableCommand extends StandaloneCommand {
 
     @Override
     public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] targets) {
-        if(targets.length == 0) {
-            if(!(commandSender instanceof Player)) {
+        if (targets.length == 0) {
+            if (!(commandSender instanceof Player)) {
                 this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.MUST_BE_A_PLAYER);
                 return false;
             }
 
             Player player = (Player) commandSender;
 
-            if(this.plugin.getAuthHandler().is2FAEnabled(player.getUniqueId())) {
+            if (this.plugin.getAuthHandler().is2FAEnabled(player.getUniqueId())) {
                 this.plugin.getAuthHandler().resetKey(player.getUniqueId());
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.RESET_2FA);
-            } else
+            } else {
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NOT_SETUP);
+            }
 
             return false;
         }
@@ -69,6 +70,6 @@ public class DisableCommand extends StandaloneCommand {
 
     @Override
     public String[] getAliases() {
-        return new String[] { "remove", "disable", "reset", "off", "deactivate", "false" };
+        return new String[]{"remove", "disable", "reset", "off", "deactivate", "false"};
     }
 }

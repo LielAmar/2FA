@@ -21,14 +21,22 @@ public class OnAuthStateChange implements Listener {
         this.plugin = plugin;
 
         String hashType = this.plugin.getConfigHandler().getIpHashType().toUpperCase();
-        if(hashType.equalsIgnoreCase("SHA256"))      this.hash = new SHA256();
-        else if(hashType.equalsIgnoreCase("SHA512")) this.hash = new SHA512();
-        else                                                    this.hash = new NoHash();
+        switch (hashType.toUpperCase()){
+            case "SHA256":
+                this.hash = new SHA256();
+                break;
+            case "SHA512":
+                this.hash = new SHA512();
+                break;
+            default:
+                this.hash = new NoHash();
+                break;
+        }
     }
 
     @EventHandler
     public void onStateChange(PlayerStateChangeEvent event) {
-        if(event.getNewAuthState().equals(AuthHandler.AuthState.AUTHENTICATED)) {
+        if (event.getNewAuthState().equals(AuthHandler.AuthState.AUTHENTICATED)) {
             event.getPlayer().setFlySpeed((float) 0.1);
             event.getPlayer().setWalkSpeed((float) 0.2);
 
@@ -43,17 +51,20 @@ public class OnAuthStateChange implements Listener {
     public void onPreAuthPostAuth(PlayerStateChangeEvent event) {
         Player player = event.getPlayer();
 
-        if(!player.isOnline())
+        if (!player.isOnline()) {
             return;
-
-        if(event.getNewAuthState() == AuthHandler.AuthState.PENDING_LOGIN) {
-            if(this.plugin.getConfigHandler().shouldTeleportBeforeAuth() && this.plugin.getConfigHandler().teleportBeforeAuthLocation() != null)
-                player.teleport(this.plugin.getConfigHandler().teleportBeforeAuthLocation());
         }
 
-        if(event.getNewAuthState() == AuthHandler.AuthState.AUTHENTICATED || event.getNewAuthState() == AuthHandler.AuthState.DISABLED) {
-            if(this.plugin.getConfigHandler().shouldTeleportAfterAuth() && this.plugin.getConfigHandler().teleportAfterAuthLocation() != null)
+        if (event.getNewAuthState() == AuthHandler.AuthState.PENDING_LOGIN) {
+            if (this.plugin.getConfigHandler().shouldTeleportBeforeAuth() && this.plugin.getConfigHandler().teleportBeforeAuthLocation() != null) {
+                player.teleport(this.plugin.getConfigHandler().teleportBeforeAuthLocation());
+            }
+        }
+        
+        if (event.getNewAuthState() == AuthHandler.AuthState.AUTHENTICATED || event.getNewAuthState() == AuthHandler.AuthState.DISABLED) {
+            if (this.plugin.getConfigHandler().shouldTeleportAfterAuth() && this.plugin.getConfigHandler().teleportAfterAuthLocation() != null) {
                 player.teleport(this.plugin.getConfigHandler().teleportAfterAuthLocation());
+            }
         }
     }
 }

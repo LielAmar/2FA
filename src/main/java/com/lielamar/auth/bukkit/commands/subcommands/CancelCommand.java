@@ -27,20 +27,22 @@ public class CancelCommand extends StandaloneCommand {
 
     @Override
     public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] strings) {
-        if(!(commandSender instanceof Player)) {
+        if (!(commandSender instanceof Player)) {
             this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.MUST_BE_A_PLAYER);
             return false;
         }
 
         Player player = (Player) commandSender;
 
-        if(this.plugin.getAuthHandler().isPendingSetup(player.getUniqueId())) {
-            if(this.plugin.getAuthHandler().cancelKey(player.getUniqueId()))
+        if (this.plugin.getAuthHandler().isPendingSetup(player.getUniqueId())) {
+            if (this.plugin.getAuthHandler().cancelKey(player.getUniqueId())) {
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.CANCELED_SETUP);
+            }
 
             this.plugin.getAuthHandler().removeQRItem(player);
-        } else
+        } else {
             this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NOT_IN_SETUP_MODE);
+        }
 
         return false;
     }
@@ -62,6 +64,6 @@ public class CancelCommand extends StandaloneCommand {
 
     @Override
     public String[] getAliases() {
-        return new String[] { "cancel", "stop" };
+        return new String[]{"cancel", "stop"};
     }
 }

@@ -17,7 +17,6 @@ public class PlayerFailedAuthenticationEvent extends Event {
         this.failedAttempts = failedAttempts;
     }
 
-
     public Player getPlayer() {
         return player;
     }
@@ -25,7 +24,6 @@ public class PlayerFailedAuthenticationEvent extends Event {
     public int getFailedAttempts() {
         return this.failedAttempts;
     }
-
 
     @Override
     public @NotNull HandlerList getHandlers() {

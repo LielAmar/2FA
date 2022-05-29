@@ -40,8 +40,9 @@ public class OnPlayerConnection implements Listener {
         Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
             this.plugin.getAuthHandler().playerJoin(player.getUniqueId());
 
-            if(!this.checkedProxy)
+            if (!this.checkedProxy) {
                 this.checkProxy(player);
+            }
         }, 1L);
     }
 
@@ -49,7 +50,7 @@ public class OnPlayerConnection implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        if(this.plugin.getAuthHandler().isPendingSetup(player.getUniqueId())) {
+        if (this.plugin.getAuthHandler().isPendingSetup(player.getUniqueId())) {
             this.plugin.getAuthHandler().cancelKey(player.getUniqueId());
             this.plugin.getAuthHandler().removeQRItem(player);
         }
@@ -57,15 +58,16 @@ public class OnPlayerConnection implements Listener {
         this.plugin.getAuthHandler().playerQuit(player.getUniqueId());
     }
 
-
     private void checkProxy(Player player) {
         // Checking if we even have an auth communication handler
-        if(this.plugin.getAuthHandler().getAuthCommunicationHandler() == null)
+        if (this.plugin.getAuthHandler().getAuthCommunicationHandler() == null) {
             return;
+        }
 
         // If we have the communication-method set to something other than NONE, we don't need to do any checks.
-        if(!(this.plugin.getAuthHandler().getAuthCommunicationHandler() instanceof BasicAuthCommunication))
+        if (!(this.plugin.getAuthHandler().getAuthCommunicationHandler() instanceof BasicAuthCommunication)) {
             return;
+        }
 
         // Sending a request to proxy to check whether there is a proxy or not :)
         AuthCommunicationHandler proxyAuthComm = new ProxyAuthCommunication(this.plugin);
@@ -77,16 +79,26 @@ public class OnPlayerConnection implements Listener {
 
             @Override
             public void execute(AuthHandler.AuthState authState) {
-                Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.alertsPermission)).forEach(pl ->
-                        plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT));
+                Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.alertsPermission)).forEach(pl
+                        -> plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT));
 
                 plugin.getServer().getMessenger().unregisterIncomingPluginChannel(plugin, Constants.PROXY_CHANNEL_NAME,
                         (PluginMessageListener) proxyAuthComm);
             }
 
-            public void onTimeout() {}
-            public long getExecutionStamp() { return System.currentTimeMillis(); }
-            public UUID getPlayerUUID() { return player.getUniqueId(); }
+            @Override
+            public void onTimeout() {
+            }
+
+            @Override
+            public long getExecutionStamp() {
+                return System.currentTimeMillis();
+            }
+
+            @Override
+            public UUID getPlayerUUID() {
+                return player.getUniqueId();
+            }
         });
 
         this.plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(this.plugin, Constants.PROXY_CHANNEL_NAME);

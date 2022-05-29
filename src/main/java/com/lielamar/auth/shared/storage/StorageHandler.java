@@ -104,6 +104,7 @@ public abstract class StorageHandler {
      * Sets up the Storage connection of the database
      *
      * @param configHandler   Config the get the necessary data from
+     * @param absolutePath
      * @return                Created Storage Handler
      */
     public static StorageHandler loadStorageHandler(ConfigHandler configHandler, String absolutePath) {

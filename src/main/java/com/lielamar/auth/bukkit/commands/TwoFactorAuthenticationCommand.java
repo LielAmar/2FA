@@ -33,8 +33,7 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
                 new CancelCommand(plugin, this),
                 new ReloadCommand(plugin, this),
                 new ReportCommand(plugin, this),
-                new HelpCommand(plugin, this)
-        };
+                new HelpCommand(plugin, this)};
 
         this.helpCommand = super.getSubCommand("help");
         this.loginCommand = super.getSubCommand("login");
@@ -59,6 +58,7 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
             if(args.length == 0) {
                 if(this.helpCommand != null)
                     this.helpCommand.execute(commandSender, args);
+                
                 return false;
             }
 
@@ -101,7 +101,6 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
     public @NotNull Command[] getSubCommands() {
         return this.commands;
     }
-
 
     @Override
     public @NotNull String getUsage() {

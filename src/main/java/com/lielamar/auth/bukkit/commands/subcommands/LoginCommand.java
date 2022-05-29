@@ -28,7 +28,7 @@ public class LoginCommand extends StandaloneCommand {
 
     @Override
     public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] args) {
-        if(!(commandSender instanceof Player)) {
+        if (!(commandSender instanceof Player)) {
             this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.MUST_BE_A_PLAYER);
             return false;
         }
@@ -37,15 +37,16 @@ public class LoginCommand extends StandaloneCommand {
 
         StringBuilder code = new StringBuilder();
 
-        for(String arg : args)
+        for (String arg : args) {
             code.append(arg);
+        }
 
         try {
             boolean isValid = this.plugin.getAuthHandler().validateKey(player.getUniqueId(), Integer.valueOf(code.toString()));
 
-            if(isValid)
+            if (isValid) {
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SUCCESSFULLY_AUTHENTICATED);
-            else {
+            } else {
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INCORRECT_CODE);
 
                 PlayerFailedAuthenticationEvent event = new PlayerFailedAuthenticationEvent(player,

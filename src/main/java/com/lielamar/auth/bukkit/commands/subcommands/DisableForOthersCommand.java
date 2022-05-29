@@ -32,20 +32,21 @@ public class DisableForOthersCommand extends StandaloneCommand {
 
     @Override
     public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] targets) {
-        for(String target : targets) {
+        for (String target : targets) {
             Player targetPlayer = Bukkit.getPlayer(target);
 
-            if(targetPlayer != null) {
+            if (targetPlayer != null) {
                 UUID targetUUID = targetPlayer.getUniqueId();
                 this.reset2FA(commandSender, target, targetUUID);
             } else {
                 UUIDUtils.fetchUUIDFromMojang(target)
-                                .exceptionally((exception) -> {
-                                    if(exception.getCause() instanceof UUIDNotFoundException)
-                                        this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_FOUND,
-                                                new Pair<>("%name%", target));
-                                    return null;
-                                })
+                        .exceptionally((exception) -> {
+                            if (exception.getCause() instanceof UUIDNotFoundException) {
+                                this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_FOUND,
+                                        new Pair<>("%name%", target));
+                            }
+                            return null;
+                        })
                         .thenAccept((uuid) -> this.reset2FA(commandSender, target, uuid));
             }
         }
@@ -69,11 +70,12 @@ public class DisableForOthersCommand extends StandaloneCommand {
     }
 
     private void reset2FA(CommandSender commandSender, String target, UUID targetUUID) {
-        if(this.plugin.getAuthHandler().is2FAEnabled(targetUUID)) {
+        if (this.plugin.getAuthHandler().is2FAEnabled(targetUUID)) {
             this.plugin.getAuthHandler().resetKey(targetUUID);
             this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.RESET_FOR, new Pair<>("%name%", target));
             this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.YOUR_2FA_WAS_RESET);
-        } else
+        } else {
             this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.PLAYER_NOT_SETUP, new Pair<>("%name%", target));
+        }
     }
 }

@@ -35,13 +35,18 @@ public class EnableCommand extends StandaloneCommand {
 
         Player player = (Player) commandSender;
 
-        if(this.plugin.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.DISABLED) {
-            this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GENERATING_KEY);
-            this.plugin.getAuthHandler().createKey(player.getUniqueId());
-        } else if(this.plugin.getAuthHandler().getAuthState(player.getUniqueId()) == AuthHandler.AuthState.PENDING_SETUP)
-            this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.ALREADY_IN_SETUP_MODE);
-        else
-            this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.ALREADY_SETUP);
+        switch (this.plugin.getAuthHandler().getAuthState(player.getUniqueId())) {
+            case DISABLED:
+                this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.GENERATING_KEY);
+                this.plugin.getAuthHandler().createKey(player.getUniqueId());
+                break;
+            case PENDING_SETUP:
+                this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.ALREADY_IN_SETUP_MODE);
+                break;
+            default:
+                this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.ALREADY_SETUP);
+                break;
+        }
 
         return false;
     }
