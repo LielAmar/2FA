@@ -43,7 +43,7 @@
         <version.mysql>8.0.29</version.mysql>
         <version.maria-db>3.0.5</version.maria-db>
         <version.postgres>42.3.3</version.postgres>
-        <version.mongo-db>3.12.10</version.mongo-db>
+        <version.mongo-db>3.12.11</version.mongo-db>
         <version.slf4j>2.0.0-alpha7</version.slf4j>
 
     </properties>
