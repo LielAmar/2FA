@@ -36,8 +36,8 @@ public class DisabledEvents implements Listener {
         }
 
         if (this.plugin.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
-            if (event.getTo() != null && (event.getTo().getBlockZ() != event.getFrom().getBlockZ() || event.getTo().getBlockX() != event.getFrom().getBlockX())) {
-                event.setTo(event.getFrom());
+            if(event.getTo() != null && (event.getTo().getBlockZ() != event.getFrom().getBlockZ() || event.getTo().getBlockX() != event.getFrom().getBlockX())) {
+                event.getPlayer().teleport(event.getFrom());
                 this.plugin.getMessageHandler().sendMessage(event.getPlayer(), MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
             }
         }

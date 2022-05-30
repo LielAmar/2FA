@@ -237,6 +237,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     ItemMeta meta = mapItem.getItemMeta();
                     if (meta != null) {
                         meta.setDisplayName(ChatColor.GRAY + "QR Code");
+                        meta.setLore(null);
                         mapItem.setItemMeta(meta);
                     }
 

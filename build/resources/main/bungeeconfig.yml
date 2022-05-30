@@ -1,0 +1,30 @@
+# ===========================================================================================
+# Thank you for using the Two Factor Authentication plugin by Liel Amar.
+# Special thanks to Connor Linfoot for developing the original MC2FA plugin.
+# For support, you can contact me through our discord server: https://discord.gg/NzgBrqR.
+#
+# If you have any problems connecting to the database, whether it be MySQL or Mongo,
+# please delete this file, start up your server once again and re-set the values.
+#
+# Github: https://github.com/LielAmar/2FA
+# ===========================================================================================
+
+# Events to disable if a player is not authenticated yet
+# true - will block the event
+# false - will allow the event
+#
+# * Note that plugins such as Skript don't use / for commands, so in order to prevent those, you need to disable chat events :)
+disabled-events:
+  commands: true
+  chat: true
+  server-switch: true
+
+# If the "commands" event is disabled, you can whitelist specific commands with the below setting
+# These commands only will executed successfully. Anything else will be blocked.
+whitelisted-commands:
+  - "help"
+
+# If the "commands" event is not disabled, you can blacklist specific commands with the below setting
+# These commands only will be blacklisted. Anything else will be permitted
+blacklisted-commands:
+  - "server"
