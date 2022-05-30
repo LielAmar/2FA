@@ -44,7 +44,7 @@
         <version.maria-db>2.7.3</version.maria-db>
         <version.postgres>42.3.3</version.postgres>
         <version.mongo-db>3.12.10</version.mongo-db>
-        <version.slf4j>2.0.0-alpha5</version.slf4j>
+        <version.slf4j>2.0.0-alpha7</version.slf4j>
 
     </properties>
 
