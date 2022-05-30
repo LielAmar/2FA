@@ -60,10 +60,10 @@ public class DependencyHandler {
         String hikariCpVersion = properties.getProperty("version_hikari_cp", "4.0.3");
         String h2Version = properties.getProperty("version_h2", "2.1.212");
         String mysqlVersion = properties.getProperty("version_mysql", "8.0.29");
-        String mariaDBVersion = properties.getProperty("version_maria_db", "2.7.3");
+        String mariaDBVersion = properties.getProperty("version_maria_db", "3.0.5");
         String postgresVersion = properties.getProperty("version_postgres", "42.3.3");
         String mongoDBVersion = properties.getProperty("version_mongo_db", "3.12.10");
-        String slf4jVersion = properties.getProperty("version_slf4j", "2.0.0-alpha5");
+        String slf4jVersion = properties.getProperty("version_slf4j", "2.0.0-alpha7");
 
         Bukkit.getServer().getLogger().info("Loading library Google Auth v" + googleAuthVersion);
         Library library = Library.builder()

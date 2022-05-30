@@ -12,10 +12,10 @@ libraries:
   - com.zaxxer:HikariCP:4.0.3
   - com.h2database:h2:2.1.212
   - mysql:mysql-connector-java:8.0.29
-  - org.mariadb.jdbc:mariadb-java-client:2.7.3
+  - org.mariadb.jdbc:mariadb-java-client:3.0.5
   - org.postgresql:postgresql:42.3.3
   - org.mongodb:mongo-java-driver:3.12.10
-  - org.slf4j:slf4j-api:2.0.0-alpha5
+  - org.slf4j:slf4j-api:2.0.0-alpha7
 
 commands:
   2fa:
