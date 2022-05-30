@@ -75,6 +75,7 @@ public class JSONStorage extends StorageHandler {
     @Override
     public String setKey(UUID uuid, String key) {
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
@@ -96,6 +97,7 @@ public class JSONStorage extends StorageHandler {
     @Override
     public String getKey(UUID uuid) {
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
@@ -126,7 +128,9 @@ public class JSONStorage extends StorageHandler {
 
     @Override
     public String setIP(UUID uuid, String ip) {
+
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
@@ -148,6 +152,7 @@ public class JSONStorage extends StorageHandler {
     @Override
     public String getIP(UUID uuid) {
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
@@ -174,6 +179,7 @@ public class JSONStorage extends StorageHandler {
     @Override
     public long setEnableDate(UUID uuid, long enableDate) {
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
@@ -198,7 +204,7 @@ public class JSONStorage extends StorageHandler {
             if (!jsonObject.has("enable_date")) {
                 return -1;
             }
-
+            
             return jsonObject.getLong("enable_date");
         } catch (IOException exception) {
             exception.printStackTrace();
@@ -213,5 +219,10 @@ public class JSONStorage extends StorageHandler {
 
     @Override
     public void unload() {
+    }
+    
+    @Override
+    public boolean isLoaded() {
+        return false;
     }
 }

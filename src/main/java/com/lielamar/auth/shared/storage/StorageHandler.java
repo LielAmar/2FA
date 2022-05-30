@@ -98,6 +98,11 @@ public abstract class StorageHandler {
      * Unloads everything related to the storage type
      */
     public abstract void unload();
+    
+    /**
+     * Check if external storage was loaded
+     */
+    public abstract boolean isLoaded();
 
     /**
      * Sets up the Storage connection of the database

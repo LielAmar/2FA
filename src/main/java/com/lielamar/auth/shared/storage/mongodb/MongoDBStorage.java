@@ -23,6 +23,8 @@ public final class MongoDBStorage extends StorageHandler {
 
     private final String fullPlayersCollectionName;
 
+    private boolean loaded = false;
+
     public MongoDBStorage(String host, String database, String username, String password, int port,
             String collectionPrefix, String uri) {
         this.host = host;
@@ -35,7 +37,14 @@ public final class MongoDBStorage extends StorageHandler {
 
         this.fullPlayersCollectionName = collectionPrefix + "players";
 
-        openConnection();
+        try {
+            loaded = true;
+            openConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+            loaded = false;
+        }
+
     }
 
     /**
@@ -175,5 +184,10 @@ public final class MongoDBStorage extends StorageHandler {
     @Override
     public void unload() {
         mongoClient.close();
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return loaded;
     }
 }

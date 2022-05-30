@@ -133,6 +133,7 @@ storage-data:
   host: "localhost"
 
   # by default, -1 will use the default port. If you need to specific a different port, changes this
+  # for MONGODB use 27017
   port: -1
 
   # The name of the database to use when storing data

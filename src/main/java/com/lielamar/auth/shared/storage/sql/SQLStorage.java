@@ -31,6 +31,8 @@ public class SQLStorage extends StorageHandler {
 
     private final String fullPlayersTableName;
 
+    private boolean loaded = false;
+
     public SQLStorage(String driver, String host, String database, String username, String password, int port,
             String tablePrefix, int maximumPoolSize, int minimumIdle, int maximumLifetime, int keepAliveTime, int connectionTimeout) {
         this.driver = driver;
@@ -49,7 +51,15 @@ public class SQLStorage extends StorageHandler {
 
         this.fullPlayersTableName = tablePrefix + "players";
 
-        this.setupHikari();
+        try {
+            loaded = true;
+            this.setupHikari();
+        } catch (Exception ex) {
+            Bukkit.getServer().getLogger().severe("Something went wrong when setting up HikariCP. If something does not work"
+                    + " correctly, please report it to the 2FA team");
+
+            loaded = false;
+        }
     }
 
     /**
@@ -59,14 +69,18 @@ public class SQLStorage extends StorageHandler {
         hikari = new HikariDataSource();
 
         try {
+            loaded = true;
+            
             hikari.setMaximumPoolSize(this.maximumPoolSize);
             hikari.setMinimumIdle(this.minimumIdle);
             hikari.setMaxLifetime(this.maximumLifetime);
             hikari.setKeepaliveTime(this.keepAliveTime);
             hikari.setConnectionTimeout(this.connectionTimeout);
-        } catch (NoSuchMethodError exception) {
+        } catch (Exception ex) {
             Bukkit.getServer().getLogger().severe("Something went wrong when setting up HikariCP. If something does not work"
                     + " correctly, please report it to the 2FA team");
+
+            loaded = false;
         }
 
         hikari.setDataSourceClassName(this.driver);
@@ -91,6 +105,8 @@ public class SQLStorage extends StorageHandler {
         Connection connection = null;
 
         try {
+            loaded = true;
+            
             connection = hikari.getConnection();
 
             String sql = "CREATE TABLE IF NOT EXISTS " + this.fullPlayersTableName + " (`uuid` varchar(64), `key` varchar(64), `ip` varchar(256), `enable_date` long);";
@@ -109,15 +125,20 @@ public class SQLStorage extends StorageHandler {
             } catch (Exception ignored) {
                 Bukkit.getServer().getLogger().severe("The plugin could not add the 'enable_date' column to your SQL database in table: " + this.fullPlayersTableName + "."
                         + "Please give your SQL user permissions to information_schema or add the column manually, otherwise the plugin won't work properly!");
+                
+                loaded = false;
             }
         } catch (SQLException exception) {
             exception.printStackTrace();
+            loaded = false;
         } finally {
+            loaded = false;
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
                     exception.printStackTrace();
+                    loaded = false;
                 }
             }
         }
@@ -128,6 +149,7 @@ public class SQLStorage extends StorageHandler {
         Connection connection = null;
 
         try {
+            loaded = true;
             connection = hikari.getConnection();
             if (connection.isClosed()) {
                 return null;
@@ -154,7 +176,9 @@ public class SQLStorage extends StorageHandler {
             return key;
         } catch (SQLException exception) {
             exception.printStackTrace();
+            loaded = false;
         } finally {
+            loaded = false;
             if (connection != null) {
                 try {
                     connection.close();
@@ -172,6 +196,7 @@ public class SQLStorage extends StorageHandler {
         Connection connection = null;
 
         try {
+            loaded = true;
             connection = hikari.getConnection();
             if (connection.isClosed()) {
                 return null;
@@ -188,7 +213,9 @@ public class SQLStorage extends StorageHandler {
             }
         } catch (SQLException exception) {
             exception.printStackTrace();
+            loaded = false;
         } finally {
+            loaded = false;
             if (connection != null) {
                 try {
                     connection.close();
@@ -216,6 +243,7 @@ public class SQLStorage extends StorageHandler {
         Connection connection = null;
 
         try {
+            loaded = true;
             connection = hikari.getConnection();
             if (connection.isClosed()) {
                 return null;
@@ -242,7 +270,9 @@ public class SQLStorage extends StorageHandler {
             return ip;
         } catch (SQLException exception) {
             exception.printStackTrace();
+            loaded = false;
         } finally {
+            loaded = false;
             if (connection != null) {
                 try {
                     connection.close();
@@ -260,6 +290,7 @@ public class SQLStorage extends StorageHandler {
         Connection connection = null;
 
         try {
+            loaded = true;
             connection = hikari.getConnection();
             if (connection.isClosed()) {
                 return null;
@@ -275,7 +306,9 @@ public class SQLStorage extends StorageHandler {
             }
         } catch (SQLException exception) {
             exception.printStackTrace();
+            loaded = false;
         } finally {
+            loaded = false;
             if (connection != null) {
                 try {
                     connection.close();
@@ -298,6 +331,7 @@ public class SQLStorage extends StorageHandler {
         Connection connection = null;
 
         try {
+            loaded = true;
             connection = hikari.getConnection();
             if (connection.isClosed()) {
                 return -1;
@@ -324,7 +358,9 @@ public class SQLStorage extends StorageHandler {
             return enableDate;
         } catch (SQLException exception) {
             exception.printStackTrace();
+            loaded = false;
         } finally {
+            loaded = false;
             if (connection != null) {
                 try {
                     connection.close();
@@ -342,6 +378,7 @@ public class SQLStorage extends StorageHandler {
         Connection connection = null;
 
         try {
+            loaded = true;
             connection = hikari.getConnection();
             if (connection.isClosed()) {
                 return -1;
@@ -356,7 +393,9 @@ public class SQLStorage extends StorageHandler {
             }
         } catch (SQLException exception) {
             exception.printStackTrace();
+            loaded = false;
         } finally {
+            loaded = false;
             if (connection != null) {
                 try {
                     connection.close();
@@ -379,5 +418,10 @@ public class SQLStorage extends StorageHandler {
         if (!hikari.isClosed()) {
             hikari.close();
         }
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return loaded;
     }
 }

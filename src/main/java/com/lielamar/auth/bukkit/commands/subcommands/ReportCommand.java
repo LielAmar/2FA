@@ -94,11 +94,11 @@ public class ReportCommand extends StandaloneCommand {
             writer.println("- Communication Timeout in config: " + this.plugin.getConfigHandler().getCommunicationTimeout() + " ticks");
 
             writer.println("");
-            
+
             writer.println("Storage Information: ");
             writer.println("- Type of Storage: " + this.plugin.getConfigHandler().getStorageMethod().name());
-            writer.println("- Is Storage loaded: " + StorageHandler.isLoaded);
-            
+            writer.println("- Is external Storage loaded: " + this.plugin.getStorageHandler().isLoaded());
+
             writer.println("");
 
             writer.println("Attach this file when creating an issue on GitHub: https://github.com/LielAmar/2FA/issues");
