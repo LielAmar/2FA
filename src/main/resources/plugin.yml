@@ -13,8 +13,8 @@ libraries:
   - com.h2database:h2:2.1.212
   - mysql:mysql-connector-java:8.0.29
   - org.mariadb.jdbc:mariadb-java-client:3.0.5
-  - org.postgresql:postgresql:42.3.3
-  - org.mongodb:mongo-java-driver:3.12.10
+  - org.postgresql:postgresql:42.3.6
+  - org.mongodb:mongo-java-driver:3.12.11
   - org.slf4j:slf4j-api:2.0.0-alpha7
 
 commands:
