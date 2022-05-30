@@ -33,7 +33,7 @@ dependencies {
     implementation 'net.byteflux:libby-core:1.1.5'
     implementation 'net.byteflux:libby-bukkit:1.1.5'
 
-    compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT'
     compileOnly 'net.md-5:bungeecord-api:1.16-R0.4'
     compileOnly 'com.velocitypowered:velocity-api:3.1.0'
 
