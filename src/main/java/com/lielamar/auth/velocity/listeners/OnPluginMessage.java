@@ -29,21 +29,23 @@ public class OnPluginMessage extends PluginMessagingHandler {
 
     @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
-        if(event.getIdentifier() != this.plugin.getOUTGOING())
+        if (event.getIdentifier() != this.plugin.getOUTGOING()) {
             return;
+        }
 
         ByteArrayDataInput msg = ByteStreams.newDataInput(event.getData());
         String subChannel = msg.readUTF();
 
         // If the SubChannel name is the 2FA's SubChannel name
-        if(subChannel.equals(Constants.PROXY_SUB_CHANNEL_NAME)) {
+        if (subChannel.equals(Constants.PROXY_SUB_CHANNEL_NAME)) {
             UUID messageUUID = UUID.fromString(msg.readUTF());
             UUID playerUUID = UUID.fromString(msg.readUTF());
 
             Optional<Player> optionalPlayer = this.plugin.getProxy().getPlayer(playerUUID);
 
-            if(!optionalPlayer.isPresent())
+            if (!optionalPlayer.isPresent()) {
                 return;
+            }
 
             Player player = optionalPlayer.get();
 
@@ -55,7 +57,7 @@ public class OnPluginMessage extends PluginMessagingHandler {
             try {
                 AuthCommunicationHandler.MessageType messageType = AuthCommunicationHandler.MessageType.valueOf(msgBodyData.readUTF());
 
-                if(messageType == AuthCommunicationHandler.MessageType.SET_STATE) {
+                if (messageType == AuthCommunicationHandler.MessageType.SET_STATE) {
                     AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
 
                     this.plugin.getAuthHandler().changeState(player.getUniqueId(), state);
@@ -81,7 +83,7 @@ public class OnPluginMessage extends PluginMessagingHandler {
         try {
             msgBodyData.writeUTF(messageType.name());
             msgBodyData.writeUTF(authState.name());
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
 

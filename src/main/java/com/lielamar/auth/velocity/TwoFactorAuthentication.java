@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 
 import java.nio.file.Path;
 
-@Plugin(id = "twofa", name = "2FA", version = "1.6.2", description = "Add another layer of protection to your server", authors = { "Liel Amar", "SadGhost", "Wolfity"})
+@Plugin(id = "twofa", name = "2FA", version = "1.6.2", description = "Add another layer of protection to your server", authors = {"Liel Amar", "SadGhost", "Wolfity"})
 public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
 
     private final ProxyServer proxy;
@@ -48,7 +48,7 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         this.registerListeners();
     }
 
-
+    @Override
     public void setupAuth() {
         this.configHandler = new ConfigHandler(this);
         this.messageHandler = new MessageHandler(this);
@@ -65,13 +65,34 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         this.proxy.getChannelRegistrar().register(OUTGOING = MinecraftChannelIdentifier.create(PluginMessagingHandler.channelName.split(":")[0], PluginMessagingHandler.channelName.split(":")[1]));
     }
 
+    public ProxyServer getProxy() {
+        return this.proxy;
+    }
 
-    public ProxyServer getProxy() { return this.proxy; }
-    public Path getDataDirectory() { return this.dataDirectory; }
-    public MinecraftChannelIdentifier getINCOMING() { return this.INCOMING; }
-    public MinecraftChannelIdentifier getOUTGOING() { return this.OUTGOING; }
+    public Path getDataDirectory() {
+        return this.dataDirectory;
+    }
 
-    public ConfigHandler getConfigHandler() { return this.configHandler; }
-    public MessageHandler getMessageHandler() { return this.messageHandler; }
-    public AuthHandler getAuthHandler() { return this.authHandler; }
+    public MinecraftChannelIdentifier getINCOMING() {
+        return this.INCOMING;
+    }
+
+    public MinecraftChannelIdentifier getOUTGOING() {
+        return this.OUTGOING;
+    }
+
+    @Override
+    public ConfigHandler getConfigHandler() {
+        return this.configHandler;
+    }
+
+    @Override
+    public MessageHandler getMessageHandler() {
+        return this.messageHandler;
+    }
+
+    @Override
+    public AuthHandler getAuthHandler() {
+        return this.authHandler;
+    }
 }

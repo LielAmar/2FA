@@ -12,8 +12,8 @@ import java.util.Locale;
 public class ConsoleFilter implements Filter {
 
     private static final String[] BLOCKED_STRING = {
-            "issued server command: /2fa ".toLowerCase(Locale.ROOT),
-            "issued server command: /2fa login ".toLowerCase(Locale.ROOT)
+        "issued server command: /2fa ".toLowerCase(Locale.ROOT),
+        "issued server command: /2fa login ".toLowerCase(Locale.ROOT)
     };
 
     private State state = State.STARTED;
@@ -28,19 +28,20 @@ public class ConsoleFilter implements Filter {
         return Result.NEUTRAL;
     }
 
-
     private Result check(String message) {
         message = message.toLowerCase(Locale.ROOT);
 
-        if(!message.contains("2fa"))
+        if (!message.contains("2fa")) {
             return Result.NEUTRAL;
+        }
 
-        for(String blockedString : BLOCKED_STRING) {
-            if(message.contains(blockedString)) {
+        for (String blockedString : BLOCKED_STRING) {
+            if (message.contains(blockedString)) {
                 String[] args = message.split(blockedString);
 
-                if(args.length > 1)
+                if (args.length > 1) {
                     return Result.DENY;
+                }
             }
         }
 
@@ -117,17 +118,18 @@ public class ConsoleFilter implements Filter {
         return this.check(event.getMessage().getFormattedMessage());
     }
 
-
     @Override
     public State getState() {
         return this.state;
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
-    public void start() {}
+    public void start() {
+    }
 
     @Override
     public void stop() {
@@ -135,9 +137,12 @@ public class ConsoleFilter implements Filter {
     }
 
     @Override
-    public boolean isStarted() { return true; }
+    public boolean isStarted() {
+        return true;
+    }
 
     @Override
-    public boolean isStopped() { return false; }
+    public boolean isStopped() {
+        return false;
+    }
 }
-

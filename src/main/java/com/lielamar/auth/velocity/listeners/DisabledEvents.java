@@ -24,22 +24,23 @@ public class DisabledEvents {
     public void onMessage(CommandExecuteEvent event) {
         CommandSource source = event.getCommandSource();
 
-        if(!(source instanceof Player))
+        if (!(source instanceof Player)) {
             return;
+        }
 
         Player player = (Player) source;
 
-        if(this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
+        if (this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
             String command = event.getCommand();
 
-            if(this.plugin.getConfigHandler().isDisableCommands()) {
-                if(!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !command.toLowerCase(Locale.ROOT)
+            if (this.plugin.getConfigHandler().isDisableCommands()) {
+                if (!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !command.toLowerCase(Locale.ROOT)
                         .startsWith(Constants.mainCommand.getA().toLowerCase(Locale.ROOT))) {
                     event.setResult(CommandExecuteEvent.CommandResult.denied());
                     this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }
             } else {
-                if(this.plugin.getConfigHandler().getBlacklistedCommands().contains(command)) {
+                if (this.plugin.getConfigHandler().getBlacklistedCommands().contains(command)) {
                     event.setResult(CommandExecuteEvent.CommandResult.denied());
                     this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }
@@ -51,8 +52,8 @@ public class DisabledEvents {
     public void onServerConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
 
-        if(this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
-            if(this.plugin.getConfigHandler().isDisableServerSwitch()) {
+        if (this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
+            if (this.plugin.getConfigHandler().isDisableServerSwitch()) {
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
             }

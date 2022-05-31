@@ -28,14 +28,15 @@ public class OnPluginMessage implements Listener {
     @EventHandler
     public void onQueryReceive(PluginMessageEvent event) {
         // If the Channel name is not the 2FA's Channel name we want to return
-        if(!event.getTag().equals(Constants.PROXY_CHANNEL_NAME))
+        if (!event.getTag().equals(Constants.PROXY_CHANNEL_NAME)) {
             return;
+        }
 
         ByteArrayDataInput msg = ByteStreams.newDataInput(event.getData());
         String subChannel = msg.readUTF();
 
         // If the SubChannel name is the 2FA's SubChannel name
-        if(subChannel.equals(Constants.PROXY_SUB_CHANNEL_NAME)) {
+        if (subChannel.equals(Constants.PROXY_SUB_CHANNEL_NAME)) {
             UUID messageUUID = UUID.fromString(msg.readUTF());
             UUID playerUUID = UUID.fromString(msg.readUTF());
 
@@ -49,7 +50,7 @@ public class OnPluginMessage implements Listener {
             try {
                 AuthCommunicationHandler.MessageType messageType = AuthCommunicationHandler.MessageType.valueOf(msgBodyData.readUTF());
 
-                if(messageType == AuthCommunicationHandler.MessageType.SET_STATE) {
+                if (messageType == AuthCommunicationHandler.MessageType.SET_STATE) {
                     AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
 
                     this.plugin.getAuthHandler().changeState(player.getUniqueId(), state);
@@ -75,7 +76,7 @@ public class OnPluginMessage implements Listener {
         try {
             msgBodyData.writeUTF(messageType.name());
             msgBodyData.writeUTF(authState.name());
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
 

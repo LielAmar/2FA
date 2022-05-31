@@ -24,7 +24,6 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
         this.newAuthState = newAuthState;
     }
 
-
     @Override
     public boolean isCancelled() {
         return cancelled;
@@ -54,7 +53,6 @@ public class PlayerStateChangeEvent extends Event implements Cancellable {
     public void setNewAuthState(@NotNull AuthHandler.AuthState newAuthState) {
         this.newAuthState = newAuthState;
     }
-
 
     @Override
     public @NotNull HandlerList getHandlers() {

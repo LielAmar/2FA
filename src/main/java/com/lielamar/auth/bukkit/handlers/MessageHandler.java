@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
+public final class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
     private static boolean PLACEHOLDER_API_ENABLED;
 
@@ -27,14 +27,14 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
 
     @Override
     protected void sendRaw(Object sender, String message) {
-        if(sender instanceof CommandSender) {
-            if(PLACEHOLDER_API_ENABLED && sender instanceof Player)
+        if (sender instanceof CommandSender) {
+            if (PLACEHOLDER_API_ENABLED && sender instanceof Player) {
                 message = PlaceholderAPI.setPlaceholders((Player) sender, message);
+            }
 
-            ((CommandSender)sender).sendMessage(ColorUtils.translateAlternateColorCodes('&', message));
+            ((CommandSender) sender).sendMessage(ColorUtils.translateAlternateColorCodes('&', message));
         }
     }
-
 
     public void sendClickableMessage(Player player, TwoFAMessages message, String clickAction) {
         String rawMessage = message.getMessage();
@@ -58,16 +58,16 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
         player.spigot().sendMessage(component);
     }
 
-
     @Override
     public void reload() {
         this.config.reloadConfig();
 
-        for(TwoFAMessages message : TwoFAMessages.values()) {
-            if(!this.config.contains(message.name()))
+        for (TwoFAMessages message : TwoFAMessages.values()) {
+            if (!this.config.contains(message.name())) {
                 this.config.set(message.name(), message.getMessage());
-            else
+            } else {
                 message.setMessage(this.config.getString(message.name()));
+            }
         }
 
         this.saveConfiguration();

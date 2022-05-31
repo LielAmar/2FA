@@ -18,7 +18,6 @@ public class JSONStorage extends StorageHandler {
         this.dir.mkdir();
     }
 
-
     /**
      * Returns the JSON file of a player's uuid
      *
@@ -39,8 +38,8 @@ public class JSONStorage extends StorageHandler {
         File file = new File(this.dir, uuid.toString() + ".json");
 
         try {
-            if(!file.exists()) {
-                if(file.createNewFile()) {
+            if (!file.exists()) {
+                if (file.createNewFile()) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("key", JSONObject.NULL);
                     jsonObject.put("ip", JSONObject.NULL);
@@ -50,21 +49,22 @@ public class JSONStorage extends StorageHandler {
             } else {
                 JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
                 boolean changed = false;
-                if(!jsonObject.has("key")) {
+                if (!jsonObject.has("key")) {
                     jsonObject.put("key", JSONObject.NULL);
                     changed = true;
                 }
-                if(!jsonObject.has("ip")) {
+                if (!jsonObject.has("ip")) {
                     jsonObject.put("ip", JSONObject.NULL);
                     changed = true;
                 }
-                if(!jsonObject.has("enable_date")) {
+                if (!jsonObject.has("enable_date")) {
                     jsonObject.put("enable_date", -1);
                     changed = true;
                 }
 
-                if(changed)
+                if (changed) {
                     JSONUtils.write(jsonObject, new FileOutputStream(file));
+                }
             }
         } catch (IOException exception) {
             exception.printStackTrace();
@@ -72,20 +72,23 @@ public class JSONStorage extends StorageHandler {
         return file;
     }
 
-
     @Override
     public String setKey(UUID uuid, String key) {
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if(key == null) jsonObject.put("key", JSONObject.NULL);
-            else jsonObject.put("key", key);
+            if (key == null) {
+                jsonObject.put("key", JSONObject.NULL);
+            } else {
+                jsonObject.put("key", key);
+            }
 
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
             return key;
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
         return null;
@@ -94,15 +97,20 @@ public class JSONStorage extends StorageHandler {
     @Override
     public String getKey(UUID uuid) {
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if(!jsonObject.has("key")) return null;
+            if (!jsonObject.has("key")) {
+                return null;
+            }
             Object key = jsonObject.get("key");
-            if(key == JSONObject.NULL) return null;
+            if (key == JSONObject.NULL) {
+                return null;
+            }
 
             return key.toString();
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
         return null;
@@ -118,20 +126,24 @@ public class JSONStorage extends StorageHandler {
         setKey(uuid, null);
     }
 
-
     @Override
     public String setIP(UUID uuid, String ip) {
+
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if(ip == null) jsonObject.put("ip", JSONObject.NULL);
-            else jsonObject.put("ip", ip);
+            if (ip == null) {
+                jsonObject.put("ip", JSONObject.NULL);
+            } else {
+                jsonObject.put("ip", ip);
+            }
 
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
             return ip;
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
         return null;
@@ -140,12 +152,17 @@ public class JSONStorage extends StorageHandler {
     @Override
     public String getIP(UUID uuid) {
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if(!jsonObject.has("ip")) return null;
+            if (!jsonObject.has("ip")) {
+                return null;
+            }
             Object ip = jsonObject.get("ip");
-            if(ip == JSONObject.NULL) return null;
+            if (ip == JSONObject.NULL) {
+                return null;
+            }
 
             return ip.toString();
         } catch (IOException exception) {
@@ -159,10 +176,10 @@ public class JSONStorage extends StorageHandler {
         return getIP(uuid) != null;
     }
 
-
     @Override
     public long setEnableDate(UUID uuid, long enableDate) {
         try {
+            
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
@@ -171,7 +188,7 @@ public class JSONStorage extends StorageHandler {
             JSONUtils.write(jsonObject, new FileOutputStream(file));
 
             return enableDate;
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
 
@@ -184,8 +201,10 @@ public class JSONStorage extends StorageHandler {
             File file = getFile(uuid);
             JSONObject jsonObject = JSONUtils.read(new FileInputStream(file));
 
-            if(!jsonObject.has("enable_date")) return -1;
-
+            if (!jsonObject.has("enable_date")) {
+                return -1;
+            }
+            
             return jsonObject.getLong("enable_date");
         } catch (IOException exception) {
             exception.printStackTrace();
@@ -199,5 +218,11 @@ public class JSONStorage extends StorageHandler {
     }
 
     @Override
-    public void unload() {}
+    public void unload() {
+    }
+    
+    @Override
+    public boolean isLoaded() {
+        return false;
+    }
 }

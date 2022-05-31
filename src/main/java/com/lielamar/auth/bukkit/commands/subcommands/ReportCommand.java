@@ -3,6 +3,7 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
+import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
 import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
@@ -44,13 +45,19 @@ public class ReportCommand extends StandaloneCommand {
 
         try {
             File dataFolder = this.plugin.getDataFolder();
-            if(!dataFolder.exists()) dataFolder.mkdir();
+            if (!dataFolder.exists()) {
+                dataFolder.mkdir();
+            }
 
             File reportFolder = new File(this.plugin.getDataFolder(), "reports");
-            if(!reportFolder.exists()) reportFolder.mkdir();
+            if (!reportFolder.exists()) {
+                reportFolder.mkdir();
+            }
 
             File file = new File(reportFolder, format.format(now).replaceAll(":", "-") + "-PrintInfo.txt");
-            if(!file.exists()) file.createNewFile();
+            if (!file.exists()) {
+                file.createNewFile();
+            }
 
             FileWriter fileWriter = new FileWriter(file, true);
             PrintWriter writer = new PrintWriter(fileWriter);
@@ -62,8 +69,10 @@ public class ReportCommand extends StandaloneCommand {
             writer.println("");
 
             writer.println("Server Plugins");
-            for(Plugin plugin : Bukkit.getPluginManager().getPlugins())
+
+            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
                 writer.println("- " + plugin.getName() + " | " + plugin.getDescription().getVersion() + " | Enabled: " + plugin.isEnabled());
+            }
 
             writer.println("");
 
@@ -72,9 +81,9 @@ public class ReportCommand extends StandaloneCommand {
             writer.println("- Server Version: " + Bukkit.getBukkitVersion());
             writer.println("- Version Instance: " + Version.getInstance().getServerVersion().getVersionName());
             writer.println("- NMSVersion Instance: " + Version.getInstance().getNMSVersion().getVersionName());
-            writer.println("- Max Memory: " + (Runtime.getRuntime().maxMemory()/1000000) + " MB");
-            writer.println("- Free Memory: " + (Runtime.getRuntime().freeMemory()/1000000) + " MB");
-            writer.println("- Total Memory: " + (Runtime.getRuntime().totalMemory()/1000000) + " MB");
+            writer.println("- Max Memory: " + (Runtime.getRuntime().maxMemory() / 1000000) + " MB");
+            writer.println("- Free Memory: " + (Runtime.getRuntime().freeMemory() / 1000000) + " MB");
+            writer.println("- Total Memory: " + (Runtime.getRuntime().totalMemory() / 1000000) + " MB");
 
             writer.println("");
 
@@ -86,9 +95,15 @@ public class ReportCommand extends StandaloneCommand {
 
             writer.println("");
 
+            writer.println("Storage Information: ");
+            writer.println("- Type of Storage: " + this.plugin.getConfigHandler().getStorageMethod().name());
+            writer.println("- Is external Storage loaded: " + this.plugin.getStorageHandler().isLoaded());
+
+            writer.println("");
+
             writer.println("Attach this file when creating an issue on GitHub: https://github.com/LielAmar/2FA/issues");
             writer.println("You can also join our discord server and talk to us there: https://discord.com/invite/NzgBrqR");
-            
+
             writer.flush();
             writer.close();
 
@@ -118,6 +133,6 @@ public class ReportCommand extends StandaloneCommand {
 
     @Override
     public String[] getAliases() {
-        return new String[] { "print", "info", "report" };
+        return new String[]{"print", "info", "report"};
     }
 }

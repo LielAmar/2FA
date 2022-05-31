@@ -30,9 +30,10 @@ public class TwoFactorAuthentication extends Plugin implements TwoFactorAuthenti
     }
 
     @Override
-    public void onDisable() {}
+    public void onDisable() {
+    }
 
-
+    @Override
     public void setupAuth() {
         this.messageHandler = new MessageHandler(this);
         this.configHandler = new ConfigHandler(this);
@@ -51,7 +52,6 @@ public class TwoFactorAuthentication extends Plugin implements TwoFactorAuthenti
         getProxy().registerChannel(PluginMessagingHandler.channelName);
     }
 
-
     private void setupBStats() {
         int pluginId = 9355;
         BungeeMetrics metrics = new BungeeMetrics(this, pluginId);
@@ -63,9 +63,22 @@ public class TwoFactorAuthentication extends Plugin implements TwoFactorAuthenti
         }));
     }
 
+    @Override
+    public MessageHandler getMessageHandler() {
+        return this.messageHandler;
+    }
 
-    public MessageHandler getMessageHandler() { return this.messageHandler; }
-    public ConfigHandler getConfigHandler() { return this.configHandler; }
-    public AuthHandler getAuthHandler() { return this.authHandler; }
-    public AuthTracker getAuthTracker() { return this.authTracker; }
+    @Override
+    public ConfigHandler getConfigHandler() {
+        return this.configHandler;
+    }
+
+    @Override
+    public AuthHandler getAuthHandler() {
+        return this.authHandler;
+    }
+
+    public AuthTracker getAuthTracker() {
+        return this.authTracker;
+    }
 }

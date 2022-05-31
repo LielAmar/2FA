@@ -19,9 +19,11 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
         this.plugin = plugin;
 
         this.authHandler = new AuthHandler() {
-            public void changeState(@NotNull UUID uuid, @NotNull AuthState authState) { super.authStates.put(uuid, authState); }
+            @Override
+            public void changeState(@NotNull UUID uuid, @NotNull AuthState authState) {
+                super.authStates.put(uuid, authState);
+            }
         };
-
 
         long timeout = this.plugin.getConfigHandler().getCommunicationTimeout();
 
@@ -30,7 +32,7 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
             long currentTimestamp = System.currentTimeMillis();
 
             super.callbacks.entrySet().removeIf(entry -> {
-                if(((currentTimestamp - entry.getValue().getExecutionStamp()) / 1000) > (timeout / 20)) {
+                if (((currentTimestamp - entry.getValue().getExecutionStamp()) / 1000) > (timeout / 20)) {
                     entry.getValue().onTimeout();
                     return true;
                 }
@@ -38,7 +40,6 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
             });
         }, timeout, timeout);
     }
-
 
     @Override
     public void loadPlayerState(@NotNull UUID uuid, @Nullable AuthCommunicationCallback callback) {

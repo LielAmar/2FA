@@ -19,14 +19,13 @@ public class OnMapDrop implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         List<ItemStack> toRemove = new ArrayList<>();
 
-        for(ItemStack item : event.getDrops()) {
-            if(this.plugin.getAuthHandler().isQRCodeItem(item))
-                toRemove.add(item);
-        }
+        event.getDrops().stream()
+                .filter(this.plugin.getAuthHandler()::isQRCodeItem)
+                .forEachOrdered(toRemove::add);
 
         event.getDrops().removeAll(toRemove);
     }

@@ -10,7 +10,6 @@ import com.lielamar.lielsutils.bukkit.files.FileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -30,18 +29,22 @@ public class ReloadCommand extends StandaloneCommand {
     @Override
     public boolean runCommand(@NotNull CommandSender commandSender, @NotNull String[] strings) {
         Map<UUID, AuthHandler.AuthState> states = new HashMap<>();
-
-        for(Player pl : Bukkit.getOnlinePlayers())
-            states.put(pl.getUniqueId(), this.plugin.getAuthHandler().getAuthState(pl.getUniqueId()));
+        
+        Bukkit.getOnlinePlayers().forEach(players -> {
+            states.put(players.getUniqueId(), 
+                    this.plugin.getAuthHandler().getAuthState(players.getUniqueId()));
+        });
 
         FileManager.Config config = this.plugin.getFileManager().getConfig("config");
-        if(config != null) config.reloadConfig();
+        if (config != null) {
+            config.reloadConfig();
+        }
 
         this.plugin.getMessageHandler().reload();
         this.plugin.setupAuth();
-
-        for(UUID uuid : states.keySet())
-            this.plugin.getAuthHandler().changeState(uuid, states.get(uuid));
+        
+        states.keySet().forEach(uuid
+                -> this.plugin.getAuthHandler().changeState(uuid, states.get(uuid)));
 
         this.plugin.getMessageHandler().sendMessage(commandSender, MessageHandler.TwoFAMessages.RELOADED_CONFIG);
         return false;
@@ -62,7 +65,8 @@ public class ReloadCommand extends StandaloneCommand {
         return ChatColor.translateAlternateColorCodes('&', MessageHandler.TwoFAMessages.DESCRIPTION_OF_RELOAD_COMMAND.getMessage());
     }
 
+    @Override
     public String[] getAliases() {
-        return new String[] { "rl" };
+        return new String[]{"rl"};
     }
 }

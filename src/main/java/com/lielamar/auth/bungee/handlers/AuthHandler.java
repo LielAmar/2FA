@@ -11,16 +11,18 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
     @Override
     public void changeState(@NotNull UUID uuid, @NotNull AuthState authState) {
-        if(authState == super.getAuthState(uuid))
+        if (authState == super.getAuthState(uuid)) {
             return;
+        }
 
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-        if(player != null) {
+        if (player != null) {
             PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, authStates.get(uuid), authState);
 
             ProxyServer.getInstance().getPluginManager().callEvent(event);
-            if(event.isCancelled())
+            if (event.isCancelled()) {
                 return;
+            }
 
             authState = event.getNewAuthState();
         }

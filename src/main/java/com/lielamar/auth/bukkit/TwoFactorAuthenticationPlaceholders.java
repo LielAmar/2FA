@@ -15,7 +15,6 @@ public class TwoFactorAuthenticationPlaceholders extends PlaceholderExpansion {
         this.plugin = plugin;
     }
 
-
     @Override
     public String getIdentifier() {
         return "2FA";
@@ -31,21 +30,27 @@ public class TwoFactorAuthenticationPlaceholders extends PlaceholderExpansion {
         return plugin.getDescription().getVersion();
     }
 
-
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        switch(identifier.toLowerCase()) {
+        switch (identifier.toLowerCase()) {
             case "is_enabled":
-                return plugin.getAuthHandler().is2FAEnabled(player.getUniqueId()) ?
-                        MessageHandler.TwoFAMessages.KEYWORD_ENABLED.getMessage() : MessageHandler.TwoFAMessages.KEYWORD_DISABLED.getMessage();
+                return plugin.getAuthHandler().is2FAEnabled(player.getUniqueId())
+                        ? MessageHandler.TwoFAMessages.KEYWORD_ENABLED.getMessage()
+                        : MessageHandler.TwoFAMessages.KEYWORD_DISABLED.getMessage();
+                
             case "time_since_enabled":
                 long enableDate = plugin.getAuthHandler().getStorageHandler().getEnableDate(player.getUniqueId());
-                return enableDate == -1 ? "Not Enabled" : TimeUtils.parseTime(System.currentTimeMillis() - enableDate);
+                return enableDate == -1 ? "Not Enabled"
+                        : TimeUtils.parseTime(System.currentTimeMillis() - enableDate);
+                
             case "key":
-                return plugin.getAuthHandler().getStorageHandler().getKey(player.getUniqueId());
+                return plugin.getAuthHandler().getStorageHandler()
+                        .getKey(player.getUniqueId());
+                
             case "is_required":
-                return player.hasPermission(Constants.demandPermission) ?
-                        MessageHandler.TwoFAMessages.KEYWORD_REQUIRED.getMessage() : MessageHandler.TwoFAMessages.KEYWORD_NOT_REQUIRED.getMessage();
+                return player.hasPermission(Constants.demandPermission)
+                        ? MessageHandler.TwoFAMessages.KEYWORD_REQUIRED.getMessage()
+                        : MessageHandler.TwoFAMessages.KEYWORD_NOT_REQUIRED.getMessage();
         }
 
         return null;

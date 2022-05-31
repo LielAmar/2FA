@@ -5,29 +5,26 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
-  test_pull_requests:
+  build:
 
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '16'
-        continue-on-error: false
+    - uses: actions/checkout@v2
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+        server-id: github
+        settings-path: ${{ github.workspace }}
 
-      - name: Clean & Install
-        run: mvn clean install
-        continue-on-error: false
-
-      - name: Package
-        run: mvn package
-        continue-on-error: false
-
-      - name: Test
-        run: mvn test
-        continue-on-error: false
+    - name: Build with Gradle
+      run: gradle :clean :build

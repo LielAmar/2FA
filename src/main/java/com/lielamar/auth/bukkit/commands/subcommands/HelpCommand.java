@@ -31,7 +31,7 @@ public class HelpCommand extends StandaloneCommand {
         this.plugin.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_HEADER);
 
         Arrays.stream(this.parent.getSubCommands()).forEach(cmd -> {
-            if(cmd.getPermission() == null || commandSender.hasPermission(cmd.getPermission())) {
+            if (cmd.getPermission() == null || commandSender.hasPermission(cmd.getPermission())) {
                 this.plugin.getMessageHandler().sendMessage(commandSender, false, MessageHandler.TwoFAMessages.HELP_COMMAND,
                         new Pair<>("%command%", "/2FA " + cmd.getCommandName()),
                         new Pair<>("%description%", cmd.getDescription()),
@@ -61,6 +61,6 @@ public class HelpCommand extends StandaloneCommand {
 
     @Override
     public String[] getAliases() {
-        return new String[] { "assist" };
+        return new String[]{"assist"};
     }
 }

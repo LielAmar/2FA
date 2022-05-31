@@ -34,18 +34,18 @@ public class ProxyAuthCommunication extends AuthCommunicationHandler implements 
             long currentTimestamp = System.currentTimeMillis();
 
             List<Map.Entry<UUID, AuthCommunicationCallback>> remove = new ArrayList<>();
-            for(Map.Entry<UUID, AuthCommunicationCallback> entry : super.callbacks.entrySet()) {
-                if(((currentTimestamp - entry.getValue().getExecutionStamp()) / 1000) > (timeout / 20))
-                    remove.add(entry);
-            }
+            
+            super.callbacks.entrySet().stream()
+                    .filter(entry -> ((currentTimestamp - entry.getValue().getExecutionStamp()) / 1000) > (timeout / 20))
+                    .forEach(remove::add);
 
-            for(Map.Entry<UUID, AuthCommunicationCallback> entry : remove) {
+            remove.forEach(entry -> {
                 entry.getValue().onTimeout();
                 super.callbacks.remove(entry.getKey());
-            }
+            });
+
         }, timeout, timeout);
     }
-
 
     @Override
     public void loadPlayerState(@NotNull UUID uuid, @Nullable AuthCommunicationCallback callback) {
@@ -85,14 +85,16 @@ public class ProxyAuthCommunication extends AuthCommunicationHandler implements 
 
     @Override
     public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte[] data) {
-        if(!channel.equals(Constants.PROXY_CHANNEL_NAME))
+        if (!channel.equals(Constants.PROXY_CHANNEL_NAME)) {
             return;
+        }
 
         ByteArrayDataInput response = ByteStreams.newDataInput(data);
         String subChannelName = response.readUTF();
 
-        if(!subChannelName.equals(Constants.PROXY_SUB_CHANNEL_NAME))
+        if (!subChannelName.equals(Constants.PROXY_SUB_CHANNEL_NAME)) {
             return;
+        }
 
         UUID messageUUID = UUID.fromString(response.readUTF());
         UUID playerUUID = UUID.fromString(response.readUTF());
@@ -113,7 +115,6 @@ public class ProxyAuthCommunication extends AuthCommunicationHandler implements 
         }
     }
 
-
     private void setMessageHeader(@NotNull ByteArrayDataOutput msg, @NotNull UUID uuid, @NotNull UUID callbackUUID) {
         msg.writeUTF(Constants.PROXY_SUB_CHANNEL_NAME);
         msg.writeUTF(callbackUUID.toString());
@@ -126,9 +127,10 @@ public class ProxyAuthCommunication extends AuthCommunicationHandler implements 
         try {
             bodyData.writeUTF(messageType.name());
 
-            for(String param : parameters)
+            for (String param : parameters) {
                 bodyData.writeUTF(param);
-        } catch(IOException exception) {
+            }
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
     }
@@ -138,11 +140,11 @@ public class ProxyAuthCommunication extends AuthCommunicationHandler implements 
         msg.write(msgBody.toByteArray());
     }
 
-
     public void sendMessage(@NotNull UUID uuid, @NotNull ByteArrayDataOutput msg) {
         Player player = Bukkit.getPlayer(uuid);
 
-        if(player != null && player.isOnline())
+        if (player != null && player.isOnline()) {
             player.sendPluginMessage(this.plugin, Constants.PROXY_CHANNEL_NAME, msg.toByteArray());
+        }
     }
 }

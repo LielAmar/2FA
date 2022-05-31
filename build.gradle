@@ -1,0 +1,69 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+group = 'com.lielamar.auth'
+version = '1.6.3'
+
+defaultTasks 'clean', 'shadowJar'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+
+    maven { url = 'https://api.lielamar.com/repository/maven-public/' }
+    maven { url = 'https://repo.alessiodp.com/releases/' }
+
+
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://repo.velocitypowered.com/snapshots/' }
+
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+}
+
+dependencies {
+    
+    implementation 'org.json:json:20220320'
+    
+    implementation 'com.lielamar:LielsUtils:1.6.31'
+
+    implementation 'net.byteflux:libby-core:1.1.5'
+    implementation 'net.byteflux:libby-bukkit:1.1.5'
+
+    compileOnly 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT'
+    compileOnly 'net.md-5:bungeecord-api:1.16-R0.4'
+    compileOnly 'com.velocitypowered:velocity-api:3.1.0'
+
+    compileOnly 'me.clip:placeholderapi:2.11.1'
+
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
+    compileOnly 'com.warrenstrange:googleauth:1.5.0'
+    compileOnly 'commons-codec:commons-codec:1.15'
+    compileOnly 'com.zaxxer:HikariCP:4.0.3'
+    compileOnly 'com.h2database:h2:2.1.212'
+    compileOnly 'mysql:mysql-connector-java:8.0.29'
+    compileOnly 'org.mariadb.jdbc:mariadb-java-client:2.7.3'
+    compileOnly 'org.postgresql:postgresql:42.3.6'
+    compileOnly 'org.mongodb:mongo-java-driver:3.12.11'
+    compileOnly 'org.slf4j:slf4j-api:2.0.0-alpha7'
+}
+
+jar {
+    enabled = false
+    dependsOn(shadowJar)
+}
+
+shadowJar {
+    classifier = null
+
+    relocate 'net.byteflux', 'com.lielamar.auth.shade'
+    relocate 'org.json', 'com.lielamar.auth.shade.json'
+    relocate 'com.google.gson', 'com.lielamar.auth.shade.gson'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

@@ -44,11 +44,12 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
     public void onEnable() {
         this.setupDependencies();
 
-        if(!Bukkit.getPluginManager().isPluginEnabled(this))
+        if (!Bukkit.getPluginManager().isPluginEnabled(this)) {
             return;
+        }
 
         // Register the ConsoleFilter
-        ((Logger)(LogManager.getRootLogger())).addFilter(new ConsoleFilter());
+        ((Logger) (LogManager.getRootLogger())).addFilter(new ConsoleFilter());
 
         this.sendStartupMessage();
 
@@ -64,27 +65,31 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
     @Override
     public void onDisable() {
         // Unregister the ConsoleFilter
-        Iterator<Filter> filters = ((Logger)(LogManager.getRootLogger())).getFilters();
-        while(filters.hasNext()) {
+        Iterator<Filter> filters = ((Logger) (LogManager.getRootLogger())).getFilters();
+        
+        while (filters.hasNext()) {
             Filter filter = filters.next();
-            if(filter instanceof ConsoleFilter)
+            if (filter instanceof ConsoleFilter) {
                 filter.stop();
+            }
         }
 
-        if(this.storageHandler != null)
+        if (this.storageHandler != null) {
             this.storageHandler.unload();
+        }
     }
 
-
     private void setupDependencies() {
-        try { Class.forName("com.warrenstrange.googleauth.GoogleAuthenticator"); }
-        catch(ClassNotFoundException exception) {
+        try {
+            Class.forName("com.warrenstrange.googleauth.GoogleAuthenticator");
+        } catch (ClassNotFoundException exception) {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] The default spigot dependency loader either does not exist or failed to load dependencies. Falling back to a custom dependency loader");
             new DependencyHandler(this);
         }
 
-        if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new TwoFactorAuthenticationPlaceholders(this).register();
+        }
     }
 
     private void sendStartupMessage() {
@@ -102,7 +107,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "                   ");
     }
 
-
+    @Override
     public void setupAuth() {
         // Registering the console filter
         this.fileManager = new FileManager(this);
@@ -113,16 +118,14 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
 
         AuthCommunicationHandler authCommunicationHandler;
 
-        {
-            if(this.configHandler.getCommunicationMethod() == CommunicationMethod.PROXY) {
-                authCommunicationHandler = new ProxyAuthCommunication(this);
+        if (this.configHandler.getCommunicationMethod() == CommunicationMethod.PROXY) {
+            authCommunicationHandler = new ProxyAuthCommunication(this);
 
-                getServer().getMessenger().registerOutgoingPluginChannel(this, Constants.PROXY_CHANNEL_NAME);
-                getServer().getMessenger().registerIncomingPluginChannel(this, Constants.PROXY_CHANNEL_NAME,
-                        (PluginMessageListener) authCommunicationHandler);
-            } else {
-                authCommunicationHandler = new BasicAuthCommunication(this);
-            }
+            getServer().getMessenger().registerOutgoingPluginChannel(this, Constants.PROXY_CHANNEL_NAME);
+            getServer().getMessenger().registerIncomingPluginChannel(this, Constants.PROXY_CHANNEL_NAME,
+                    (PluginMessageListener) authCommunicationHandler);
+        } else {
+            authCommunicationHandler = new BasicAuthCommunication(this);
         }
 
         this.authHandler = new AuthHandler(this, storageHandler, authCommunicationHandler, new BasicAuthCommunication(this));
@@ -130,7 +133,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
     }
 
     private void registerListeners() {
-        PluginManager pm = Bukkit.getPluginManager();
+        PluginManager pm = this.getServer().getPluginManager();
 
         pm.registerEvents(new OnAuthStateChange(this), this);
         pm.registerEvents(new OnPlayerConnection(this), this);
@@ -141,7 +144,6 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
     private void registerCommands() {
         new TwoFactorAuthenticationCommand(this).registerCommand(this);
     }
-
 
     private void setupBStats() {
         int pluginId = 9355;
@@ -155,15 +157,35 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
     }
 
     private void setupUpdateChecker() {
-        if(this.configHandler.shouldCheckForUpdates())
+        if (this.configHandler.shouldCheckForUpdates()) {
             new SpigotUpdateChecker(this, 85594).checkForUpdates();
+        }
     }
 
+    public FileManager getFileManager() {
+        return fileManager;
+    }
 
-    public FileManager getFileManager() { return fileManager; }
-    public MessageHandler getMessageHandler() { return this.messageHandler; }
-    public ConfigHandler getConfigHandler() { return this.configHandler; }
-    public StorageHandler getStorageHandler() { return this.storageHandler; }
-    public AuthHandler getAuthHandler() { return this.authHandler; }
-    public AuthTracker getAuthTracker() { return this.authTracker; }
+    @Override
+    public MessageHandler getMessageHandler() {
+        return this.messageHandler;
+    }
+
+    @Override
+    public ConfigHandler getConfigHandler() {
+        return this.configHandler;
+    }
+
+    public StorageHandler getStorageHandler() {
+        return this.storageHandler;
+    }
+
+    @Override
+    public AuthHandler getAuthHandler() {
+        return this.authHandler;
+    }
+
+    public AuthTracker getAuthTracker() {
+        return this.authTracker;
+    }
 }
