@@ -42,7 +42,7 @@ dependencies {
     compileOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
     compileOnly 'com.warrenstrange:googleauth:1.5.0'
     compileOnly 'commons-codec:commons-codec:1.15'
-    compileOnly 'com.zaxxer:HikariCP:4.0.3'
+    compileOnly 'com.zaxxer:HikariCP:5.0.1'
     compileOnly 'com.h2database:h2:2.1.212'
     compileOnly 'mysql:mysql-connector-java:8.0.29'
     compileOnly 'org.mariadb.jdbc:mariadb-java-client:2.7.3'
