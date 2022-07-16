@@ -37,8 +37,11 @@ public class OnAuthStateChange implements Listener {
     @EventHandler
     public void onStateChange(PlayerStateChangeEvent event) {
         if (event.getNewAuthState().equals(AuthHandler.AuthState.AUTHENTICATED)) {
-            event.getPlayer().setFlySpeed((float) 0.1);
-            event.getPlayer().setWalkSpeed((float) 0.2);
+            
+            if (plugin.getConfig().getBoolean("change-walking-speed", false){
+                event.getPlayer().setFlySpeed((float) 0.1);
+                event.getPlayer().setWalkSpeed((float) 0.2);
+            }
 
             this.plugin.getStorageHandler().setIP(event.getPlayer().getUniqueId(),
                     this.hash.hash(event.getPlayer().getAddress().getAddress().getHostAddress()));
