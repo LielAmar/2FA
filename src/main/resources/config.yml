@@ -33,6 +33,9 @@ map-ids: []
 # - NONE (no hash - not recommended!)
 ip-hash: SHA256
 
+# The player walk speed changes on joining
+change-walking-speed: true
+
 # How much delay should the plugin apply to loading players when the server reloads
 # This is useful when you have multiple databases with different latencies
 # You can use it to ensure your permissions plugin loads before the players are reloaded
