@@ -14,8 +14,6 @@ repositories {
     mavenCentral()
 
     maven { url = 'https://api.lielamar.com/repository/maven-public/' }
-    maven { url = 'https://repo.alessiodp.com/releases/' }
-
 
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
