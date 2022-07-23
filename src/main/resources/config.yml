@@ -16,6 +16,8 @@ qr-code-service: "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://
 check-for-updates: true
 
 # Your server name. This will be the name of the service displayed in the authenticator app
+# Note that some authenticators don't support names with spaces.
+# If you use an authenticator other than Google Auth, consider removing spaces in the server name.
 server-name: "My Minecraft Server"
 
 # Whether to send a message advising to use 2FA if the player has permissions to use it
