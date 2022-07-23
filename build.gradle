@@ -43,7 +43,7 @@ dependencies {
     compileOnly 'com.warrenstrange:googleauth:1.5.0'
     compileOnly 'commons-codec:commons-codec:1.15'
     compileOnly 'com.zaxxer:HikariCP:4.0.3'
-    compileOnly 'com.h2database:h2:2.1.212'
+    compileOnly 'com.h2database:h2:2.1.214'
     compileOnly 'mysql:mysql-connector-java:8.0.29'
     compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.0.6'
     compileOnly 'org.postgresql:postgresql:42.3.6'
