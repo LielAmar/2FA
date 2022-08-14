@@ -34,6 +34,7 @@ public class OnPlayerConnection implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
+        this.plugin.getAuthHandler().removeQRItem(player);
         this.plugin.getAuthHandler().changeState(player.getUniqueId(), AuthHandler.AuthState.PENDING_LOGIN);
 
         // Adding a 1 tick delay so requests to proxy are sent correctly

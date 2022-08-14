@@ -72,6 +72,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 this.hash = new NoHash();
                 break;
         }
+
+        for(Player pl : Bukkit.getOnlinePlayers())
+            removeQRItem(pl);
     }
 
     public void reloadOnlinePlayers() {
@@ -339,6 +342,12 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 player.getInventory().remove(itemStack);
             }
         });
+
+        if (isQRCodeItem(player.getInventory().getItemInOffHand())) {
+            player.getInventory().setItemInOffHand(null);
+        }
+
+        player.updateInventory();
     }
 
     /**

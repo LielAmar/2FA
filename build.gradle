@@ -13,7 +13,16 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 repositories {
     mavenCentral()
 
-    maven { url = 'https://api.lielamar.com/repository/maven-public/' }
+    maven {
+        url = 'https://api.lielamar.com/repository/maven-public/'
+        content {
+            content {
+                includeGroup "net.byteflux"
+                includeGroup "com.lielamar"
+                includeGroup "com.lielamar.ConnectionsManager"
+            }
+        }
+    }
 
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
@@ -28,11 +37,11 @@ dependencies {
     
     implementation 'com.lielamar:LielsUtils:1.6.31'
 
-    implementation 'net.byteflux:libby-core:1.1.5'
+    implementation 'net.byteflux:libby-core:1.1.5-v2'
     implementation 'net.byteflux:libby-bukkit:1.1.5'
 
     compileOnly 'org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT'
-    compileOnly 'net.md-5:bungeecord-api:1.16-R0.4'
+    compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
     compileOnly 'com.velocitypowered:velocity-api:3.1.0'
 
     compileOnly 'me.clip:placeholderapi:2.11.2'
@@ -43,8 +52,8 @@ dependencies {
     compileOnly 'com.zaxxer:HikariCP:4.0.3'
     compileOnly 'com.h2database:h2:2.1.214'
     compileOnly 'mysql:mysql-connector-java:8.0.29'
-    compileOnly 'org.postgresql:postgresql:42.4.0'
-    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.0.6'
+    compileOnly 'org.postgresql:postgresql:42.4.1'
+    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.0.7'
     compileOnly 'org.mongodb:mongo-java-driver:3.12.11'
     compileOnly 'org.slf4j:slf4j-api:2.0.0-alpha7'
 }
