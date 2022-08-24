@@ -52,7 +52,7 @@ dependencies {
     compileOnly 'com.zaxxer:HikariCP:4.0.3'
     compileOnly 'com.h2database:h2:2.1.214'
     compileOnly 'mysql:mysql-connector-java:8.0.29'
-    compileOnly 'org.postgresql:postgresql:42.4.1'
+    compileOnly 'org.postgresql:postgresql:42.5.0'
     compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.0.7'
     compileOnly 'org.mongodb:mongo-java-driver:3.12.11'
     compileOnly 'org.slf4j:slf4j-api:2.0.0-alpha7'
