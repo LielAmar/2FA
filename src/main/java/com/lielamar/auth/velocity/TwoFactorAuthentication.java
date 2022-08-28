@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 
 import java.nio.file.Path;
 
-@Plugin(id = "twofa", name = "2FA", version = "1.6.2", description = "Add another layer of protection to your server", authors = {"Liel Amar", "SadGhost", "Wolfity"})
+@Plugin(id = "twofa", name = "2FA", version = "1.6.4", description = "Add another layer of protection to your server", authors = {"Liel Amar", "SadGhost", "Wolfity"})
 public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
 
     private final ProxyServer proxy;

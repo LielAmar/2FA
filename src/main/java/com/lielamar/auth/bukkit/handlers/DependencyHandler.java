@@ -31,6 +31,7 @@ public class DependencyHandler {
         String postgresVersion = "42.3.6";
         String mongoDBVersion = "3.12.11";
         String slf4jVersion = "2.0.0-alpha7";
+        String log4jVersion = "2.18.0";
 
         Bukkit.getServer().getLogger().info("Loading library Google Auth v" + googleAuthVersion);
         Library library = Library.builder()
@@ -101,6 +102,14 @@ public class DependencyHandler {
                 .groupId("org.slf4j")
                 .artifactId("slf4j-api")
                 .version(slf4jVersion)
+                .build();
+        loader.loadLibrary(library);
+
+        Bukkit.getServer().getLogger().info("Loading library Log4j v" + slf4jVersion);
+        library = Library.builder()
+                .groupId("org.apache.logging.log4j")
+                .artifactId("log4j-core")
+                .version(log4jVersion)
                 .build();
         loader.loadLibrary(library);
     }

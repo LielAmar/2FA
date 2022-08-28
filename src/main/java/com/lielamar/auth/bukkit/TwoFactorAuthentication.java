@@ -93,18 +93,19 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
     }
 
     private void sendStartupMessage() {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "                   ");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "  ___  ______      ");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + " |__ \\|  ____/\\    ");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "    ) | |__ /  \\   " + "    "
-                + ChatColor.DARK_AQUA + "2FA " + ChatColor.AQUA + "v" + getDescription().getVersion());
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "   / /|  __/ /\\ \\  " + "    "
-                + ChatColor.DARK_GRAY + "Made with " + ChatColor.RED + "♥" + ChatColor.DARK_GRAY + " by "
-                + ChatColor.AQUA + getDescription().getAuthors().toString().replaceAll("\\[", "").replace("]", ""));
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "  / /_| | / ____ \\ " + "    "
-                + ChatColor.DARK_GRAY + "Time contributed so far " + ChatColor.AQUA + "~225 Hours");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + " |____|_|/_/    \\_\\");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "                   ");
+        String version = ChatColor.DARK_AQUA + "2FA " + ChatColor.AQUA + "v" + getDescription().getVersion();
+        String madeBy = ChatColor.DARK_GRAY + "Made with " + ChatColor.RED + "love" + ChatColor.DARK_GRAY + " by "
+                + ChatColor.AQUA + getDescription().getAuthors().toString().replaceAll("\\[", "").replace("]", "");
+        String timeSpent = ChatColor.DARK_GRAY + "Time contributed so far " + ChatColor.AQUA + "~240 Hours";
+
+        Bukkit.getConsoleSender().sendMessage("");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + " ___    _______    ___    ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "|__ \\  |   ____|  /   \\    ");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "   ) | |  |__    /  ^  \\   " + "    " + version);
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "  / /  |   __|  /  /_\\  \\  " + "    " + madeBy);
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + " / /_  |  |    /  _____  \\ " + "    " + timeSpent);
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "|____| |__|   /__/     \\__\\");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_AQUA + "");
     }
 
     @Override

@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.6.3"
+version: "1.6.4"
 api-version: 1.13
 authors: [LielAmar, SadGhost, Wolfity]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
@@ -16,6 +16,7 @@ libraries:
   - org.postgresql:postgresql:42.3.6
   - org.mongodb:mongo-java-driver:3.12.11
   - org.slf4j:slf4j-api:2.0.0-alpha7
+  - org.apache.logging.log4j:log4j-core:2.18.0
 
 commands:
   2fa:

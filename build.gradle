@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.lielamar.auth'
-version = '1.6.3'
+version = '1.6.4'
 
 defaultTasks 'clean', 'shadowJar'
 

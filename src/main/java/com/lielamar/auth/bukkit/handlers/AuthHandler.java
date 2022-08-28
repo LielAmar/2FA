@@ -343,8 +343,10 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             }
         });
 
-        if (isQRCodeItem(player.getInventory().getItemInOffHand())) {
-            player.getInventory().setItemInOffHand(null);
+        if (version.above(Version.ServerVersion.v1_9_0)) {
+            if (isQRCodeItem(player.getInventory().getItemInOffHand())) {
+                player.getInventory().setItemInOffHand(null);
+            }
         }
 
         player.updateInventory();
