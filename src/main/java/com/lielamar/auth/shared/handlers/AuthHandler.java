@@ -98,7 +98,7 @@ public abstract class AuthHandler {
      * Checks if a player has a Secret Key
      *
      * @param uuid UUID of the player to check
-     * @return Whether or not the player has a Secret Key
+     * @return Whether the player has a Secret Key
      */
     public boolean is2FAEnabled(@NotNull UUID uuid) {
         if (!this.authStates.containsKey(uuid)) {
@@ -113,7 +113,7 @@ public abstract class AuthHandler {
      * Checks if a player is Pending 2FA Setup
      *
      * @param uuid UUID of the player to check
-     * @return Whether or not the player is pending setup
+     * @return Whether the player is pending setup
      */
     public boolean isPendingSetup(@NotNull UUID uuid) {
         return this.authStates.get(uuid).equals(AuthState.PENDING_SETUP)
@@ -140,7 +140,7 @@ public abstract class AuthHandler {
      *
      * @param uuid UUID of the player to validate the key of
      * @param code Inserted code
-     * @return Whether or not the code is valid
+     * @return Whether the code is valid
      */
     public boolean validateKey(@NotNull UUID uuid, @NotNull Integer code) {
         String key = this.getKey(uuid);
@@ -158,7 +158,7 @@ public abstract class AuthHandler {
      *
      * @param uuid UUID of the player to validate the key of
      * @param code Inserted code
-     * @return Whether or not the code is valid
+     * @return Whether the code is valid
      */
     public boolean approveKey(@NotNull UUID uuid, @NotNull Integer code) {
         if (this.getStorageHandler() == null) {
@@ -222,7 +222,7 @@ public abstract class AuthHandler {
      * Checks if a player needs to authenticate
      *
      * @param uuid UUID of the player to check
-     * @return Whether or not the player needs to authenticate
+     * @return Whether the player needs to authenticate
      */
     public boolean needsToAuthenticate(@NotNull UUID uuid) {
         return this.is2FAEnabled(uuid) && !this.authStates.get(uuid).equals(AuthState.AUTHENTICATED);
@@ -232,7 +232,6 @@ public abstract class AuthHandler {
      * Returns the amount of times a player has failed authentication
      *
      * @param uuid UUID of the player to check
-     * @param amount
      * @return Amount of fails
      */
     public int increaseFailedAttempts(@NotNull UUID uuid, int amount) {
