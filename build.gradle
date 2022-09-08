@@ -40,6 +40,8 @@ dependencies {
     implementation 'net.byteflux:libby-core:1.1.5-v2'
     implementation 'net.byteflux:libby-bukkit:1.1.5'
 
+    implementation 'com.google.inject:guice:5.1.0'
+
     compileOnly 'org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT'
     compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
     compileOnly 'com.velocitypowered:velocity-api:3.1.0'
@@ -69,6 +71,7 @@ shadowJar {
     relocate 'net.byteflux', 'com.lielamar.auth.shade'
     relocate 'org.json', 'com.lielamar.auth.shade.json'
     relocate 'com.google.gson', 'com.lielamar.auth.shade.gson'
+    relocate 'com.google.inject', 'com.lielamar.auth.shade.inject'
 }
 
 tasks.withType(JavaCompile) {

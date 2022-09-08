@@ -34,12 +34,13 @@ public class TwoFactorAuthentication extends Plugin implements TwoFactorAuthenti
     }
 
     @Override
-    public void setupAuth() {
+    public com.lielamar.auth.shared.handlers.AuthHandler setupAuth() {
         this.messageHandler = new MessageHandler(this);
         this.configHandler = new ConfigHandler(this);
         this.authHandler = new AuthHandler();
 
         this.authTracker = new AuthTracker();
+        return authHandler;
     }
 
     public void registerListeners() {

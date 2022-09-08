@@ -20,7 +20,7 @@ public class ReloadCommand extends StandaloneCommand {
     private final SuperCommand parent;
 
     public ReloadCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
-        super(Constants.reloadCommand.getA(), Constants.reloadCommand.getB());
+        super(Constants.RELOAD_COMMAND.getA(), Constants.RELOAD_COMMAND.getB());
 
         this.plugin = plugin;
         this.parent = parent;

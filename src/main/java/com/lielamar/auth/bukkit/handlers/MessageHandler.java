@@ -8,8 +8,11 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import javax.inject.Inject;
 
 public final class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHandler {
 
@@ -17,8 +20,9 @@ public final class MessageHandler extends com.lielamar.auth.shared.handlers.Mess
 
     private final FileManager.Config config;
 
-    public MessageHandler(FileManager fileManager) {
-        PLACEHOLDER_API_ENABLED = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+    @Inject
+    public MessageHandler(FileManager fileManager, Server server) {
+        PLACEHOLDER_API_ENABLED = server.getPluginManager().isPluginEnabled("PlaceholderAPI");
 
         this.config = fileManager.getConfig(super.messagesFileName);
 

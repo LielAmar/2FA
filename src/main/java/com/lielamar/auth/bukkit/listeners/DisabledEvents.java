@@ -180,7 +180,7 @@ public class DisabledEvents implements Listener {
                 if (args.length > 0) {
                     String command = args[0];
 
-                    if (Constants.mainCommand.getA().equalsIgnoreCase(command)) {
+                    if (Constants.MAIN_COMMAND.getA().equalsIgnoreCase(command)) {
                         if (args.length > 1) {
                             if (args[1].equalsIgnoreCase("help") || NumbersUtils.isInteger(args[1])) {
                                 return;

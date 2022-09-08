@@ -21,7 +21,7 @@ public class TwoFactorAuthenticationCommand extends SuperCommand {
     private final Command helpCommand, loginCommand, setupCommand;
 
     public TwoFactorAuthenticationCommand(TwoFactorAuthentication plugin) {
-        super(Constants.mainCommand.getA(), Constants.mainCommand.getB());
+        super(Constants.MAIN_COMMAND.getA(), Constants.MAIN_COMMAND.getB());
 
         this.plugin = plugin;
 

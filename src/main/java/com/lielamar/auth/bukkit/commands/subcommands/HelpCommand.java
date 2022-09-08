@@ -20,7 +20,7 @@ public class HelpCommand extends StandaloneCommand {
     private final SuperCommand parent;
 
     public HelpCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
-        super(Constants.helpCommand.getA(), Constants.helpCommand.getB());
+        super(Constants.HELP_COMMAND.getA(), Constants.HELP_COMMAND.getB());
 
         this.plugin = plugin;
         this.parent = parent;

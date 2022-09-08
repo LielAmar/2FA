@@ -1,7 +1,6 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
-import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
@@ -20,7 +19,7 @@ public class EnableCommand extends StandaloneCommand {
     private final SuperCommand parent;
 
     public EnableCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
-        super(Constants.enableCommand.getA(), Constants.enableCommand.getB());
+        super(Constants.ENABLE_COMMAND.getA(), Constants.ENABLE_COMMAND.getB());
 
         this.plugin = plugin;
         this.parent = parent;

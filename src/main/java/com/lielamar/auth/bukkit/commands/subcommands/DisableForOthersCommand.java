@@ -24,7 +24,7 @@ public class DisableForOthersCommand extends StandaloneCommand {
     private final SuperCommand parent;
 
     public DisableForOthersCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
-        super(Constants.disableForOthersCommand.getA(), Constants.disableForOthersCommand.getB());
+        super(Constants.DISABLE_FOR_OTHERS_COMMAND.getA(), Constants.DISABLE_FOR_OTHERS_COMMAND.getB());
 
         this.plugin = plugin;
         this.parent = parent;

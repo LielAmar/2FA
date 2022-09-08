@@ -19,7 +19,7 @@ public class CancelCommand extends StandaloneCommand {
     private final SuperCommand parent;
 
     public CancelCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
-        super(Constants.cancelCommand.getA(), Constants.cancelCommand.getB());
+        super(Constants.CANCEL_COMMAND.getA(), Constants.CANCEL_COMMAND.getB());
 
         this.plugin = plugin;
         this.parent = parent;

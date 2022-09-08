@@ -35,7 +35,7 @@ public class DisabledEvents {
 
             if (this.plugin.getConfigHandler().isDisableCommands()) {
                 if (!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !command.toLowerCase(Locale.ROOT)
-                        .startsWith(Constants.mainCommand.getA().toLowerCase(Locale.ROOT))) {
+                        .startsWith(Constants.MAIN_COMMAND.getA().toLowerCase(Locale.ROOT))) {
                     event.setResult(CommandExecuteEvent.CommandResult.denied());
                     this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                 }

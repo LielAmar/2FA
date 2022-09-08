@@ -17,41 +17,43 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.*;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 
 public final class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandler {
 
     private final FileManager.Config config;
 
+    @Inject
     public ConfigHandler(FileManager fileManager) {
         this.config = fileManager.getConfig(super.configFileName);
 
         this.reload();
     }
 
-    protected boolean checkForUpdates = true;
+    private boolean checkForUpdates = true;
 
-    protected String serverName = "My Minecraft Server";
-    protected boolean advise2FA = true;
+    private String serverName = "My Minecraft Server";
+    private boolean advise2FA = true;
 
-    protected int reservedMaps = 20;
-    protected int[] mapIDs = new int[reservedMaps];
+    private int reservedMaps = 20;
+    private int[] mapIDs = new int[reservedMaps];
 
-    protected long reloadDelay = 0;
+    private long reloadDelay = 0;
 
-    protected String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/";
-    protected String ipHashType = "SHA256";
+    private String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/";
+    private String ipHashType = "SHA256";
 
-    protected boolean requireOnIPChange = true;
-    protected boolean requireOnEveryLogin = false;
+    private boolean requireOnIPChange = true;
+    private boolean requireOnEveryLogin = false;
 
-    protected boolean tpBeforeAuth = false;
-    protected Location tpBeforeAuthLocation = null;
-    protected boolean tpAfterAuth = false;
-    protected Location tpAfterAuthLocation = null;
+    private boolean tpBeforeAuth = false;
+    private Location tpBeforeAuthLocation = null;
+    private boolean tpAfterAuth = false;
+    private Location tpAfterAuthLocation = null;
 
-    protected CommunicationMethod communicationMethod = CommunicationMethod.NONE;
-    protected int communicationTimeout = 30;
+    private CommunicationMethod communicationMethod = CommunicationMethod.NONE;
+    private int communicationTimeout = 30;
 
     public boolean shouldCheckForUpdates() {
         return this.checkForUpdates;

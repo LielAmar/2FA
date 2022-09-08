@@ -18,7 +18,7 @@ public class SetupCommand extends StandaloneCommand {
     private final SuperCommand parent;
 
     public SetupCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
-        super(Constants.setupCommand.getA(), Constants.setupCommand.getB());
+        super(Constants.SETUP_COMMAND.getA(), Constants.SETUP_COMMAND.getB());
 
         this.plugin = plugin;
         this.parent = parent;

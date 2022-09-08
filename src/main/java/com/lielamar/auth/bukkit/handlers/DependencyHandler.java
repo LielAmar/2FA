@@ -6,18 +6,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
+import java.util.logging.Logger;
+
 public class DependencyHandler {
 
     public DependencyHandler(Plugin plugin) {
         try {
             this.loadDependencies(plugin);
         } catch (Exception exception) {
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA detected that you are using Java 16 without the --add-opens java.base/java.lang=ALL-UNNAMED or the --add-opens java.base/java.net=ALL-UNNAMED flags!");
-            Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] If you want the plugin to support all features, most significantly Remote Databases, please add this flag to your startup script");
+            plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] 2FA detected that you are using Java 16 without the --add-opens java.base/java.lang=ALL-UNNAMED or the --add-opens java.base/java.net=ALL-UNNAMED flags!");
+            plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + "[2FA] If you want the plugin to support all features, most significantly Remote Databases, please add this flag to your startup script");
         }
     }
 
     private void loadDependencies(Plugin plugin) {
+        Logger logger = plugin.getServer().getLogger();
         BukkitLibraryManager loader = new BukkitLibraryManager(plugin);
 
         loader.addMavenCentral();
@@ -33,7 +36,7 @@ public class DependencyHandler {
         String slf4jVersion = "2.0.0-alpha7";
         String log4jVersion = "2.18.0";
 
-        Bukkit.getServer().getLogger().info("Loading library Google Auth v" + googleAuthVersion);
+        logger.info("Loading library Google Auth v" + googleAuthVersion);
         Library library = Library.builder()
                 .groupId("com.warrenstrange")
                 .artifactId("googleauth")
@@ -41,7 +44,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library Commons-Codec v" + commonsCodecVersion);
+        logger.info("Loading library Commons-Codec v" + commonsCodecVersion);
         library = Library.builder()
                 .groupId("commons-codec")
                 .artifactId("commons-codec")
@@ -49,7 +52,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library HikariCP v" + hikariCpVersion);
+        logger.info("Loading library HikariCP v" + hikariCpVersion);
         library = Library.builder()
                 .groupId("com.zaxxer")
                 .artifactId("HikariCP")
@@ -57,7 +60,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library H2 v" + h2Version);
+        logger.info("Loading library H2 v" + h2Version);
         library = Library.builder()
                 .groupId("com.h2database")
                 .artifactId("h2")
@@ -65,7 +68,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library MySQL v" + mysqlVersion);
+        logger.info("Loading library MySQL v" + mysqlVersion);
         library = Library.builder()
                 .groupId("mysql")
                 .artifactId("mysql-connector-java")
@@ -73,7 +76,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library MariaDB v" + mariaDBVersion);
+        logger.info("Loading library MariaDB v" + mariaDBVersion);
         library = Library.builder()
                 .groupId("org.mariadb.jdbc")
                 .artifactId("mariadb-java-client")
@@ -81,7 +84,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library PostgreSQL v" + postgresVersion);
+        logger.info("Loading library PostgreSQL v" + postgresVersion);
         library = Library.builder()
                 .groupId("org.postgresql")
                 .artifactId("postgresql")
@@ -89,7 +92,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library MongoDB v" + mongoDBVersion);
+        logger.info("Loading library MongoDB v" + mongoDBVersion);
         library = Library.builder()
                 .groupId("org.mongodb")
                 .artifactId("mongo-java-driver")
@@ -97,7 +100,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library Slf4j v" + slf4jVersion);
+        logger.info("Loading library Slf4j v" + slf4jVersion);
         library = Library.builder()
                 .groupId("org.slf4j")
                 .artifactId("slf4j-api")
@@ -105,7 +108,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library Log4j v" + slf4jVersion);
+        logger.info("Loading library Log4j v" + slf4jVersion);
         library = Library.builder()
                 .groupId("org.apache.logging.log4j")
                 .artifactId("log4j-core")

@@ -25,7 +25,7 @@ public class OnMapDrop implements Listener {
 
         event.getDrops().stream()
                 .filter(this.plugin.getAuthHandler()::isQRCodeItem)
-                .forEachOrdered(toRemove::add);
+                .forEach(toRemove::add);
 
         event.getDrops().removeAll(toRemove);
     }

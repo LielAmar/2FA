@@ -80,7 +80,7 @@ public class OnPlayerConnection implements Listener {
 
             @Override
             public void execute(AuthHandler.AuthState authState) {
-                Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.alertsPermission)).forEach(pl
+                Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.ALERTS_PERMISSION)).forEach(pl
                         -> plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT));
 
                 plugin.getServer().getMessenger().unregisterIncomingPluginChannel(plugin, Constants.PROXY_CHANNEL_NAME,

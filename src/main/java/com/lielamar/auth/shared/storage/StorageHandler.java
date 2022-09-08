@@ -13,7 +13,7 @@ public abstract class StorageHandler {
     public static boolean isLoaded;
 
     /**
-     * Sets the Key of the player who's UUID is uuid
+     * Sets the Key of the player whose UUID is uuid
      *
      * @param uuid UUID of the player to set the Key of
      * @param secretKey Key to set
@@ -22,7 +22,7 @@ public abstract class StorageHandler {
     public abstract String setKey(UUID uuid, String secretKey);
 
     /**
-     * Returns the Key of the player who's UUID is uuid
+     * Returns the Key of the player whose UUID is uuid
      *
      * @param uuid UUID of the player to get the Key of
      * @return Key of the player
@@ -30,22 +30,22 @@ public abstract class StorageHandler {
     public abstract String getKey(UUID uuid);
 
     /**
-     * Checks whether or not a player who's UUID is uuid has a Key
+     * Checks whether a player whose UUID is uuid has a Key
      *
      * @param uuid UUID of the player to check the Key of
-     * @return Whether or not the player has a Key
+     * @return Whether the player has a Key
      */
     public abstract boolean hasKey(UUID uuid);
 
     /**
-     * Removes the Key of the player who's UUID is uuid
+     * Removes the Key of the player whose UUID is uuid
      *
      * @param uuid UUID of the player to remove the Key of
      */
     public abstract void removeKey(UUID uuid);
 
     /**
-     * Sets the Last IP of the player who's UUID is uuid
+     * Sets the Last IP of the player whose UUID is uuid
      *
      * @param uuid UUID of the player to set the IP of
      * @param lastIP IP to set
@@ -54,7 +54,7 @@ public abstract class StorageHandler {
     public abstract String setIP(UUID uuid, String lastIP);
 
     /**
-     * Returns the IP of the player who's UUID is uuid
+     * Returns the IP of the player whose UUID is uuid
      *
      * @param uuid UUID of the player to get the IP of
      * @return Last IP of the player
@@ -62,15 +62,15 @@ public abstract class StorageHandler {
     public abstract String getIP(UUID uuid);
 
     /**
-     * Checks whether or not a player who's UUID is uuid has a Last IP
+     * Checks whether a player whose UUID is uuid has a Last IP
      *
      * @param uuid UUID of the player to check the IP of
-     * @return Whether or not the player has a Last IP
+     * @return Whether the player has a Last IP
      */
     public abstract boolean hasIP(UUID uuid);
 
     /**
-     * Sets the Enable Date of the player who's UUID is uuid
+     * Sets the Enable Date of the player whose UUID is uuid
      *
      * @param uuid UUID of the player to set the Enable Date of
      * @param enableDate Enable Date to set
@@ -79,7 +79,7 @@ public abstract class StorageHandler {
     public abstract long setEnableDate(UUID uuid, long enableDate);
 
     /**
-     * Returns the Enable Date of the player who's UUID is uuid
+     * Returns the Enable Date of the player whose UUID is uuid
      *
      * @param uuid UUID of the player to get the Enable Date of
      * @return Enable Date of the player
@@ -87,10 +87,10 @@ public abstract class StorageHandler {
     public abstract long getEnableDate(UUID uuid);
 
     /**
-     * Checks whether or not a player who's UUID is uuid has an Enable Date
+     * Checks whether a player whose UUID is uuid has an Enable Date
      *
      * @param uuid UUID of the player to check the Enable Date of
-     * @return Whether or not the player has an Enable Date
+     * @return Whether the player has an Enable Date
      */
     public abstract boolean hasEnableDate(UUID uuid);
 
@@ -108,7 +108,7 @@ public abstract class StorageHandler {
      * Sets up the Storage connection of the database
      *
      * @param configHandler Config the get the necessary data from
-     * @param absolutePath
+     * @param absolutePath The path
      * @return Created Storage Handler
      */
     public static StorageHandler loadStorageHandler(ConfigHandler configHandler, String absolutePath) {

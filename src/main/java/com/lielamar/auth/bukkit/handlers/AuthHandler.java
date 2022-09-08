@@ -17,50 +17,50 @@ import com.lielamar.lielsutils.bukkit.map.ImageRender;
 import com.lielamar.lielsutils.bukkit.map.MapUtils;
 
 import com.lielamar.lielsutils.bukkit.version.Version;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
-
     protected final TwoFactorAuthentication plugin;
+    protected final Server server;
 
     protected Map<Integer, Long> lastUsedMapIds;
     protected Version.ServerVersion version;
 
     protected Hash hash;
 
+    @Inject
     public AuthHandler(@NotNull TwoFactorAuthentication plugin, @Nullable StorageHandler storageHandler,
-            @Nullable AuthCommunicationHandler authCommunicationHandler, @Nullable AuthCommunicationHandler fallbackCommunicationHandler) {
+                       @Nullable AuthCommunicationHandler authCommunicationHandler, @Nullable AuthCommunicationHandler fallbackCommunicationHandler,
+                       Server server) {
         super(storageHandler, authCommunicationHandler, fallbackCommunicationHandler);
 
         this.plugin = plugin;
+        this.server = server;
 
         this.lastUsedMapIds = new HashMap<>();
-        Arrays.stream(plugin.getConfigHandler().getMapIDs()).forEach(i -> lastUsedMapIds.put(i, -1L));
+        for (int i : plugin.getConfigHandler().getMapIDs()) {
+            lastUsedMapIds.put(i, -1L);
+        }
 
         this.version = Version.getInstance().getServerVersion();
 
         String hashType = this.plugin.getConfigHandler().getIpHashType();
-        
         switch (hashType.toUpperCase()){
             case "SHA256":
                 this.hash = new SHA256();
@@ -73,15 +73,16 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 break;
         }
 
-        for(Player pl : Bukkit.getOnlinePlayers())
+        for (Player pl : this.server.getOnlinePlayers()) {
             removeQRItem(pl);
+        }
     }
 
     public void reloadOnlinePlayers() {
         // Applying 2fa for online players
         // We add at least 1 tick delay, ensuring the permission plugin is loaded beforehand
-        Bukkit.getScheduler().runTaskLater(this.plugin,
-                () -> Bukkit.getOnlinePlayers().forEach(player -> this.playerJoin(player.getUniqueId())),
+        this.server.getScheduler().runTaskLater(this.plugin,
+                () -> this.server.getOnlinePlayers().forEach(player -> this.playerJoin(player.getUniqueId())),
                 Math.min(1, this.plugin.getConfigHandler().getReloadDelay()));
     }
 
@@ -90,7 +91,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         String key = super.createKey(uuid);
 
         // If the player is online it gives them a QR code
-        Player player = Bukkit.getPlayer(uuid);
+        Player player = this.server.getPlayer(uuid);
         if (player != null && player.isOnline()) {
             giveQRCodeItem(player);
         }
@@ -102,7 +103,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     public boolean validateKey(@NotNull UUID uuid, @NotNull Integer code) {
         boolean valid = super.validateKey(uuid, code);
 
-        Player player = Bukkit.getPlayer(uuid);
+        Player player = this.server.getPlayer(uuid);
         if (player != null && player.isOnline()) {
             if (valid) {
                 removeQRItem(player);
@@ -117,7 +118,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         boolean approved = super.approveKey(uuid, code);
 
         if (approved) {
-            Player player = Bukkit.getPlayer(uuid);
+            Player player = this.server.getPlayer(uuid);
             if (player != null) {
                 removeQRItem(player);
             }
@@ -136,7 +137,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         if (player != null) {
             PlayerStateChangeEvent event = new PlayerStateChangeEvent(player, getAuthState(uuid), authState);
 
-            Bukkit.getPluginManager().callEvent(event);
+            this.server.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 return;
             }
@@ -158,7 +159,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         }
 
         // Checking whether we need to retrieve data on the user
-        Player player = Bukkit.getPlayer(uuid);
+        Player player = this.server.getPlayer(uuid);
 
         if (player == null || !player.isOnline()) {
             return;
@@ -177,9 +178,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     String getQRCodeURL(@NotNull String urlTemplate, @NotNull UUID uuid) {
         String encodedPart = "%%label%%?secret=%%key%%&issuer=%%title%%";
 
-        Player player = Bukkit.getPlayer(uuid);
+        Player player = this.server.getPlayer(uuid);
 
-        String label = (player == null) ? "player" : player.getName();
+        String label = player == null ? "player" : player.getName();
         String title = this.plugin.getConfigHandler().getServerName();
         String key = super.getPendingKey(uuid);
 
@@ -187,7 +188,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return null;
         }
 
-        encodedPart = encodedPart.replaceAll("%%label%%", label).replaceAll("%%title%%", title).replaceAll("%%key%%", key);
+        encodedPart = encodedPart.replaceAll("%%label%%", label)
+                .replaceAll("%%title%%", title)
+                .replaceAll("%%key%%", key);
 
         try {
             return urlTemplate + URLEncoder.encode(encodedPart, StandardCharsets.UTF_8.toString());
@@ -209,88 +212,84 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return;
         }
 
-        new BukkitRunnable() {
+        server.getScheduler().runTaskAsynchronously(this.plugin, () -> {
             final MapView view = getMap(player.getWorld());
+            view.getRenderers().forEach(view::removeRenderer);
 
-            @Override
-            public void run() {
-                view.getRenderers().forEach(view::removeRenderer);
+            try {
+                ImageRender renderer = new ImageRender(url);
+                view.addRenderer(renderer);
 
-                try {
-                    ImageRender renderer = new ImageRender(url);
-                    view.addRenderer(renderer);
+                ItemStack mapItem;
 
-                    ItemStack mapItem;
+                if (version.above(Version.ServerVersion.v1_13_0)) {
+                    mapItem = new ItemStack(Material.FILLED_MAP);
 
-                    if (version.above(Version.ServerVersion.v1_13_0)) {
-                        mapItem = new ItemStack(Material.FILLED_MAP);
+                    if (mapItem.getItemMeta() instanceof MapMeta) {
+                        MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
 
-                        if (mapItem.getItemMeta() instanceof MapMeta) {
-                            MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
-
-                            if (mapMeta != null) {
-                                mapMeta.setMapId(view.getId());
-                                mapItem.setItemMeta(mapMeta);
-                            }
-                        }
-                    } else {
-                        mapItem = new ItemStack(Material.MAP, 1, MapUtils.getMapID(view));
-                    }
-
-                    ItemMeta meta = mapItem.getItemMeta();
-                    if (meta != null) {
-                        meta.setDisplayName(ChatColor.GRAY + "QR Code");
-                        mapItem.setItemMeta(meta);
-                    }
-
-                    // If the inventory is full we don't want to remove any of the player's items, but rather tell them to use the clickable message
-                    // to authenticate
-                    // otherwise, we want to add the map with the qr code to their first available hotbar slot and move the item in that slot.
-                    if (player.getInventory().firstEmpty() == -1) {
-                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVENTORY_FULL_USE_CLICKABLE_MESSAGE);
-                    } else {
-                        int availableFirstSlot = player.getInventory().firstEmpty();
-
-                        if (availableFirstSlot > 8) {
-                            ItemStack oldItem = player.getInventory().firstEmpty() != 0 ? player.getInventory().getItem(0) : null;
-
-                            player.getInventory().setItem(0, mapItem);
-
-                            if (oldItem != null) {
-                                player.getInventory().addItem(oldItem);
-                            }
-
-                            player.getInventory().setHeldItemSlot(0);
-                        } else {
-                            player.getInventory().setItem(availableFirstSlot, mapItem);
-                            player.getInventory().setHeldItemSlot(availableFirstSlot);
+                        if (mapMeta != null) {
+                            mapMeta.setMapId(view.getId());
+                            mapItem.setItemMeta(mapMeta);
                         }
                     }
-
-                    // If the player's key is not null we want to send him the hover and clickable messages
-                    // with the key and the link to the QR image.
-                    // otherwise, we would want to completely void the player's key data, remove the QRItem and also send him a message about the issue.
-                    if (getPendingKey(player.getUniqueId()) != null) {
-                        if (!MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage().isEmpty()) {
-                            plugin.getMessageHandler().sendClickableMessage(player, MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR,
-                                    url.replaceAll("128x128", "256x256"));
-                        }
-
-                        if (!MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage().isEmpty()) {
-                            plugin.getMessageHandler().sendHoverMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA,
-                                    ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
-                        }
-                    } else {
-                        removeQRItem(player);
-                        resetKey(player.getUniqueId());
-                        plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
-                    }
-                } catch (IOException | NumberFormatException exception) {
-                    exception.printStackTrace();
-                    player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
+                } else {
+                    mapItem = new ItemStack(Material.MAP, 1, MapUtils.getMapID(view));
                 }
+
+                ItemMeta meta = mapItem.getItemMeta();
+                if (meta != null) {
+                    meta.setDisplayName(ChatColor.GRAY + "QR Code");
+                    mapItem.setItemMeta(meta);
+                }
+
+                // If the inventory is full we don't want to remove any of the player's items, but rather tell them to use the clickable message
+                // to authenticate
+                // otherwise, we want to add the map with the qr code to their first available hotbar slot and move the item in that slot.
+                if (player.getInventory().firstEmpty() == -1) {
+                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVENTORY_FULL_USE_CLICKABLE_MESSAGE);
+                } else {
+                    int availableFirstSlot = player.getInventory().firstEmpty();
+
+                    if (availableFirstSlot > 8) {
+                        ItemStack oldItem = player.getInventory().firstEmpty() != 0 ? player.getInventory().getItem(0) : null;
+
+                        player.getInventory().setItem(0, mapItem);
+
+                        if (oldItem != null) {
+                            player.getInventory().addItem(oldItem);
+                        }
+
+                        player.getInventory().setHeldItemSlot(0);
+                    } else {
+                        player.getInventory().setItem(availableFirstSlot, mapItem);
+                        player.getInventory().setHeldItemSlot(availableFirstSlot);
+                    }
+                }
+
+                // If the player's key is not null we want to send him the hover and clickable messages
+                // with the key and the link to the QR image.
+                // otherwise, we would want to completely void the player's key data, remove the QRItem and also send him a message about the issue.
+                if (getPendingKey(player.getUniqueId()) != null) {
+                    if (!MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage().isEmpty()) {
+                        plugin.getMessageHandler().sendClickableMessage(player, MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR,
+                                url.replaceAll("128x128", "256x256"));
+                    }
+
+                    if (!MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage().isEmpty()) {
+                        plugin.getMessageHandler().sendHoverMessage(player, MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA,
+                                ColorUtils.translateAlternateColorCodes('&', "&7Key: &b" + getPendingKey(player.getUniqueId())));
+                    }
+                } else {
+                    removeQRItem(player);
+                    resetKey(player.getUniqueId());
+                    plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
+                }
+            } catch (IOException | NumberFormatException exception) {
+                exception.printStackTrace();
+                player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
             }
-        }.runTaskAsynchronously(this.plugin);
+        });
     }
 
     /**
@@ -308,7 +307,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         MapView mapView;
 
         if (lastUsedMapIds.size() < this.plugin.getConfigHandler().getAmountOfReservedMaps()) {
-            mapView = Bukkit.createMap(world);
+            mapView = server.createMap(world);
             this.plugin.getConfig().set("Map IDs", this.plugin.getConfig().getIntegerList("Map IDs").add((int) MapUtils.getMapID(mapView)));
         } else {
             int mapIdWithLongestTime = -1;
@@ -320,7 +319,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                 }
             }
 
-            mapView = Bukkit.getMap((short) mapIdWithLongestTime);
+            mapView = server.getMap((short) mapIdWithLongestTime);
         }
 
         if (mapView == null) {
@@ -375,7 +374,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         @Override
         public void execute(AuthState authState) {
-            Player player = Bukkit.getPlayer(this.getPlayerUUID());
+            Player player = server.getPlayer(this.getPlayerUUID());
 
             if (player == null || !player.isOnline()) {
                 return;
@@ -393,7 +392,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
             if (authState == AuthState.NONE) {
                 if (getStorageHandler().getKey(this.playerUUID) == null) {
-                    if (player.hasPermission(Constants.demandPermission)) {
+                    if (player.hasPermission(Constants.DEMAND_PERMISSION)) {
                         createKey(this.playerUUID);
                         changeState(this.playerUUID, AuthState.DEMAND_SETUP);
 
@@ -423,7 +422,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         @Override
         public void onTimeout() {
-            Bukkit.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.alertsPermission)).forEach(pl
+            server.getOnlinePlayers().stream().filter(pl -> pl.hasPermission(Constants.ALERTS_PERMISSION)).forEach(pl
                     -> plugin.getMessageHandler().sendMessage(pl, MessageHandler.TwoFAMessages.COMMUNICATION_METHOD_NOT_CORRECT));
 
             if (fallbackCommunicationHandler != null) {

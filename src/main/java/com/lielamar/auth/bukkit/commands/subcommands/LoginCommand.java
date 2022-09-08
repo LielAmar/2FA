@@ -20,7 +20,7 @@ public class LoginCommand extends StandaloneCommand {
     private final SuperCommand parent;
 
     public LoginCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
-        super(Constants.loginCommand.getA(), Constants.loginCommand.getB());
+        super(Constants.LOGIN_COMMAND.getA(), Constants.LOGIN_COMMAND.getB());
 
         this.plugin = plugin;
         this.parent = parent;

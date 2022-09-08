@@ -6,7 +6,7 @@ import com.lielamar.auth.shared.handlers.MessageHandler;
 
 public interface TwoFactorAuthenticationPlugin {
 
-    void setupAuth();
+    AuthHandler setupAuth();
 
     MessageHandler getMessageHandler();
 

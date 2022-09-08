@@ -3,7 +3,6 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
 import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
@@ -31,7 +30,7 @@ public class ReportCommand extends StandaloneCommand {
     private final SuperCommand parent;
 
     public ReportCommand(@NotNull TwoFactorAuthentication plugin, @NotNull SuperCommand parent) {
-        super(Constants.reportCommand.getA(), Constants.reportCommand.getB());
+        super(Constants.REPORT_COMMAND.getA(), Constants.REPORT_COMMAND.getB());
 
         this.plugin = plugin;
         this.parent = parent;
