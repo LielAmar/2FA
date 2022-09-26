@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
     
-    implementation 'org.json:json:20220320'
+    implementation 'org.json:json:20220924'
     
     implementation 'com.lielamar:LielsUtils:1.6.31'
 
