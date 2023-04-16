@@ -1,5 +1,9 @@
 package com.lielamar.auth.bukkit.handlers;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
@@ -30,6 +34,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -173,9 +179,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         super.authCommunicationHandler.loadPlayerState(uuid, new LoadAuthCallback(uuid));
     }
 
-    public @Nullable
-    String getQRCodeURL(@NotNull String urlTemplate, @NotNull UUID uuid) {
-        String encodedPart = "%%label%%?secret=%%key%%&issuer=%%title%%";
+    private @Nullable String getTotpURL(@NotNull UUID uuid) {
+        String encodedPart = "otpauth://totp/%%label%%?secret=%%key%%&issuer=%%title%%";
 
         Player player = Bukkit.getPlayer(uuid);
 
@@ -189,11 +194,32 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         encodedPart = encodedPart.replaceAll("%%label%%", label).replaceAll("%%title%%", title).replaceAll("%%key%%", key);
 
-        try {
-            return urlTemplate + URLEncoder.encode(encodedPart, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException exception) {
-            return urlTemplate + encodedPart;
+        return encodedPart;
+    }
+
+
+    private @NotNull BufferedImage getQRCode(@NotNull String totpURL) throws WriterException {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(totpURL, BarcodeFormat.QR_CODE, 128, 128);
+        BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+        image.createGraphics();
+
+
+        Graphics2D graphics = (Graphics2D) image.getGraphics();
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(0, 0, 128, 128);
+        // Paint the image using the ByteMatrix
+        graphics.setColor(Color.BLACK);
+
+        for (int i = 0; i < 128; i++) {
+            for (int j = 0; j < 128; j++) {
+                if (bitMatrix.get(i, j)) {
+                    graphics.fillRect(i, j, 1, 1);
+                }
+            }
         }
+
+        return image;
     }
 
     /**
@@ -203,9 +229,9 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
     @SuppressWarnings("deprecation")
     public void giveQRCodeItem(@NotNull Player player) {
-        String url = this.getQRCodeURL(this.plugin.getConfigHandler().getQrCodeURL(), player.getUniqueId());
+        String totpURL = getTotpURL(player.getUniqueId());
 
-        if (url == null) {
+        if (totpURL == null) {
             return;
         }
 
@@ -216,8 +242,10 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             public void run() {
                 view.getRenderers().forEach(view::removeRenderer);
 
+
                 try {
-                    ImageRender renderer = new ImageRender(url);
+                    BufferedImage qrCode = getQRCode(totpURL);
+                    ImageRender renderer = new ImageRender(qrCode);
                     view.addRenderer(renderer);
 
                     ItemStack mapItem;
@@ -246,6 +274,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     // If the inventory is full we don't want to remove any of the player's items, but rather tell them to use the clickable message
                     // to authenticate
                     // otherwise, we want to add the map with the qr code to their first available hotbar slot and move the item in that slot.
+                    // TODO: Implement an alternative for the clickable message, as we no longer have a URL.
                     if (player.getInventory().firstEmpty() == -1) {
                         plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.INVENTORY_FULL_USE_CLICKABLE_MESSAGE);
                     } else {
@@ -272,8 +301,8 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                     // otherwise, we would want to completely void the player's key data, remove the QRItem and also send him a message about the issue.
                     if (getPendingKey(player.getUniqueId()) != null) {
                         if (!MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR.getMessage().isEmpty()) {
-                            plugin.getMessageHandler().sendClickableMessage(player, MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR,
-                                    url.replaceAll("128x128", "256x256"));
+//                            plugin.getMessageHandler().sendClickableMessage(player, MessageHandler.TwoFAMessages.CLICK_TO_OPEN_QR,
+//                                    url.replaceAll("128x128", "256x256"));
                         }
 
                         if (!MessageHandler.TwoFAMessages.USE_QR_CODE_TO_SETUP_2FA.getMessage().isEmpty()) {
@@ -285,7 +314,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         resetKey(player.getUniqueId());
                         plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
                     }
-                } catch (IOException | NumberFormatException exception) {
+                } catch (IOException | NumberFormatException | WriterException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
                 }
