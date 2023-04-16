@@ -8,7 +8,7 @@ version = '1.6.4'
 
 defaultTasks 'clean', 'shadowJar'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_16
 
 repositories {
     mavenCentral()
@@ -16,13 +16,15 @@ repositories {
     maven {
         url = 'https://api.lielamar.com/repository/maven-public/'
         content {
-            content {
-                includeGroup "net.byteflux"
-                includeGroup "com.lielamar"
-                includeGroup "com.lielamar.ConnectionsManager"
-            }
+//            content {
+//                includeGroup "net.byteflux"
+//                includeGroup "com.lielamar"
+//                includeGroup "com.lielamar.ConnectionsManager"
+//            }
         }
     }
+
+    maven { url = 'https://repo.alessiodp.com/releases' }
 
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
@@ -35,7 +37,9 @@ dependencies {
     
     implementation 'org.json:json:20220320'
     
-    implementation 'com.lielamar:LielsUtils:1.6.31'
+    //implementation 'com.lielamar:LielsUtils:1.6.31'
+    implementation fileTree("libs/")
+    implementation 'com.google.zxing:core:3.3.2'
 
     implementation 'net.byteflux:libby-core:1.1.5-v2'
     implementation 'net.byteflux:libby-bukkit:1.1.5'
