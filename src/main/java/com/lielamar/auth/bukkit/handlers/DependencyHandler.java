@@ -27,7 +27,7 @@ public class DependencyHandler {
         String hikariCpVersion = "4.0.3";
         String h2Version = "2.1.212";
         String mysqlVersion = "8.0.29";
-        String mariaDBVersion = "2.7.3";
+        String mariaDBVersion = "2.7.2";
         String postgresVersion = "42.3.6";
         String mongoDBVersion = "3.12.11";
         String slf4jVersion = "2.0.0-alpha7";
