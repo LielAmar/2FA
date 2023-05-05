@@ -13,16 +13,8 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 repositories {
     mavenCentral()
 
-    maven {
-        url = 'https://api.lielamar.com/repository/maven-public/'
-        content {
-            content {
-                includeGroup "net.byteflux"
-                includeGroup "com.lielamar"
-                includeGroup "com.lielamar.ConnectionsManager"
-            }
-        }
-    }
+    maven { url = 'https://repo.lielamar.com/repository/maven-releases'}
+    maven { url = 'https://repo.alessiodp.com/releases/' }
 
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
@@ -35,7 +27,7 @@ dependencies {
     
     implementation 'org.json:json:20220320'
     
-    implementation 'com.lielamar:LielsUtils:1.6.31'
+    implementation 'com.lielamar:lielsutils:1.6.31'
 
     implementation 'net.byteflux:libby-core:1.1.5-v2'
     implementation 'net.byteflux:libby-bukkit:1.1.5'
