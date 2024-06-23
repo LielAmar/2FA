@@ -1,6 +1,6 @@
-package com.lielamar.auth.storage.json;
+package com.lielamar.auth.core.storage.json;
 
-import com.lielamar.auth.storage.StorageHandler;
+import com.lielamar.auth.core.storage.StorageHandler;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class JSONStorage extends StorageHandler {
-
     private final File dir;
 
     public JSONStorage(String path) {

@@ -1,0 +1,166 @@
+# ===========================================================================================
+# Thank you for using the Two Factor Authentication plugin by Liel Amar.
+# Special thanks to Connor Linfoot for developing the original MC2FA plugin.
+# For support, you can contact me through my discord server: https://discord.gg/NzgBrqR.
+#
+# If you have any problems connecting to the database, whether it be MySQL or Mongo,
+# please delete this file, start up your server once again and re-set the values.
+#
+# Github: https://github.com/LielAmar/2FA
+# ===========================================================================================
+
+# Service to use when generating QR codes
+qr-code-service: "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/"
+
+# Whether to notify when there's an update available
+check-for-updates: true
+
+# Your server name. This will be the name of the service displayed in the authenticator app
+# Note that some authenticators don't support names with spaces.
+# If you use an authenticator other than Google Auth, consider removing spaces in the server name.
+server-name: "My Minecraft Server"
+
+# Whether to send a message advising to use 2FA if the player has permissions to use it
+advise-2fa: true
+
+# Amount of maps the plugin will reserve for it to display QR Codes
+reserved-maps: 20
+
+# DO NOT TOUCH THIS. This option saves the map IDs used by the plugin. Changing this may cause problems with maps!
+map-ids: []
+
+# The hash method to use for players' IP addresses
+# - SHA256
+# - SHA512
+# - NONE (no hash - not recommended!)
+ip-hash: SHA256
+
+# The player walk speed changes on joining
+change-walking-speed: true
+
+# How much delay should the plugin apply to loading players when the server reloads
+# This is useful when you have multiple databases with different latencies
+# You can use it to ensure your permissions plugin loads before the players are reloaded
+# * It's best to set the value to 0 if you use the same storage type AND storage (server/file), because you won't have latency differences anyways
+player-reload-delay: 0
+
+# Events to disable if a player is not authenticated yet
+# true - will block the event
+# false - will allow the event
+disabled-events:
+  move: true
+  block-break: true
+  block-place: true
+  chat: true
+  drop: true
+  pickup: true
+  get-damage: true
+  damage-others: true
+  click-inventory: true
+  change-slot: true
+  commands: true
+  move-item: true
+  interact-with-frames: true
+  death: true
+
+# If the "commands" event is disabled, you can whitelist specific commands with the below setting
+# These commands only will executed successfully. Anything else will be blocked.
+whitelisted-commands:
+  - "help"
+
+# If the "commands" event is not disabled, you can blacklist specific commands with the below setting
+# These commands only will be blacklisted. Anything else will be permitted
+blacklisted-commands:
+  - "op"
+  - "spawn"
+
+# When should the plugin require players to authenticate using their 2FA?
+# If your server uses a proxy, please include this plugin in your proxy /plugins/ folder
+# This way, authentications will be handled on the proxy level and will the state will be global across all servers
+require-when:
+  # When the player's IP address changes
+  ip-changes: true
+
+  # On every login
+  every-login: false
+
+# Should the plugin teleport players that need to authenticate to a designated location?
+tp-before-auth:
+  enable: false
+  location:
+    x: 0
+    y: 100
+    z: 0
+    yaw: 0
+    pitch: 0
+    world: "world"
+
+# Should the plugin teleport players to a designated location right after they authenticated OR if they don't have 2FA enabled?
+tp-after-auth:
+  enable: false
+  location:
+    x: 0
+    y: 100
+    z: 0
+    yaw: 0
+    pitch: 0
+    world: "world"
+
+# Possible methods for the plugin to communicate between servers
+#
+# - NONE (Only use NONE if you have a single server)
+# - PROXY
+# - REDIS (NOT SUPPORTED YET)
+# - RABBITMQ (NOT SUPPORTED YET)
+communication-method: NONE
+
+communication-data:
+  # How long (in ticks) should the plugin wait before timing out communication messages
+  # 1 second = 20 ticks
+  timeout: 30
+
+# Possible methods for the plugin to store data
+#
+# Local
+# - JSON
+#
+# Remote
+# - MYSQL
+# - MARIADB
+# - POSTGRESQL
+# - MONGODB
+#
+# If your server uses a proxy, it is recommended to use a Remote Storage Type!
+storage-method: JSON
+
+storage-data:
+  # The database host
+  host: "localhost"
+
+  # by default, -1 will use the default port. If you need to specific a different port, changes this
+  # for MONGODB use 27017
+  port: -1
+
+  # The name of the database to use when storing data
+  database: "auth"
+
+  # The credentials of the database
+  # Leave blank for no authentication
+  username: "root"
+  password: "password"
+
+  # The table & collection prefix for SQL & MongoDB respectively
+  table-prefix: "2fa_"
+  collection-prefix: "2fa_"
+
+  # Settings for SQL connection pool
+  pool-settings:
+    maximum-pool-size: 10
+    minimum-idle: 10
+    maximum-lifetime: 1800000
+    keep-alive-time: 0
+    connection-timeout: 5000
+
+  # If you want to use a URI to connect to MongoDB, set the uri here. This will cause the plugin to ignore every other setting
+  # Leave it empty if you don't want to use a URI.
+  mongodb-uri: ""

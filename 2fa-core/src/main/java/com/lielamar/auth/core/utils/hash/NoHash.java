@@ -1,6 +1,6 @@
-package com.lielamar.auth.utils.hash;
+package com.lielamar.auth.core.utils.hash;
 
-import com.lielamar.auth.utils.Hash;
+import com.lielamar.auth.core.utils.Hash;
 
 public class NoHash implements Hash {
 

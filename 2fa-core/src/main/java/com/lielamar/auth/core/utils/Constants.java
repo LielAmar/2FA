@@ -1,4 +1,4 @@
-package com.lielamar.auth.utils;
+package com.lielamar.auth.core.utils;
 
 import dev.sadghost.espresso.groups.Pair;
 

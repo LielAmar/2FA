@@ -1,4 +1,4 @@
-package com.lielamar.auth.storage;
+package com.lielamar.auth.core.storage;
 
 public enum StorageMethod {
     JSON,

@@ -15,3 +15,4 @@ rootProject.name = "2FA"
 include(":2fa-core")
 include(":2fa-api")
 include(":2fa-bukkit")
+include(":2fa-bungee")

@@ -15,7 +15,8 @@ dependencies {
     implementation("org.json:json:20240303")
 
     annotationProcessor("io.micronaut:micronaut-inject-java:4.5.3")
-    implementation("io.micronaut:micronaut-inject-java:4.5.3")
+    api("io.micronaut:micronaut-inject-java:4.5.3")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     compileOnly("commons-codec:commons-codec:1.17.0")
     implementation("com.zaxxer:HikariCP:5.1.0")
@@ -26,6 +27,7 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-sync:5.1.1")
 
     implementation(project(":2fa-api"))
+    implementation(project(":2fa-bungee"))
     implementation(project(":2fa-bukkit"))
 }
 

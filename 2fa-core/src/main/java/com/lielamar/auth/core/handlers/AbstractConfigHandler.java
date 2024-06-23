@@ -1,14 +1,14 @@
-package com.lielamar.auth.handlers;
+package com.lielamar.auth.core.handlers;
 
 
-import com.lielamar.auth.storage.StorageMethod;
+import com.lielamar.auth.core.storage.StorageMethod;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class IConfigHandler {
+public abstract class AbstractConfigHandler {
 
     protected final String configFileName = "config.yml";
 

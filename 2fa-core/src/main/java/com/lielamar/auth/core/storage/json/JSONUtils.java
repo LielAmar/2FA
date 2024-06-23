@@ -1,4 +1,4 @@
-package com.lielamar.auth.storage.json;
+package com.lielamar.auth.core.storage.json;
 
 import org.json.JSONObject;
 

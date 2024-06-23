@@ -3,7 +3,7 @@ package com.lielamar.auth.spigot;
 import com.lielamar.auth.api.ITwoFactorAuthPlugin;
 import com.lielamar.auth.spigot.utils.ConsoleFilter;
 import com.lielamar.auth.spigot.utils.Version;
-import com.lielamar.auth.storage.StorageHandler;
+import com.lielamar.auth.core.storage.StorageHandler;
 import io.micronaut.context.ApplicationContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Filter;

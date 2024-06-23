@@ -1,6 +1,6 @@
 package com.lielamar.auth.spigot.handlers;
 
-import com.lielamar.auth.handlers.IConfigHandler;
+import com.lielamar.auth.core.handlers.AbstractConfigHandler;
 import dev.sadghost.espresso.spigot.files.FileManager;
 import dev.sadghost.espresso.spigot.files.IConfig;
 import org.bukkit.Bukkit;
@@ -19,7 +19,7 @@ import org.bukkit.event.player.*;
 
 import java.util.Arrays;
 
-public final class ConfigHandler extends IConfigHandler {
+public final class ConfigHandler extends AbstractConfigHandler {
 
     private final IConfig config;
 

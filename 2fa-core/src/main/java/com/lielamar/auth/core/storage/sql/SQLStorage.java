@@ -1,6 +1,6 @@
-package com.lielamar.auth.storage.sql;
+package com.lielamar.auth.core.storage.sql;
 
-import com.lielamar.auth.storage.StorageHandler;
+import com.lielamar.auth.core.storage.StorageHandler;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
@@ -85,7 +85,7 @@ public class SQLStorage extends StorageHandler {
         properties.setProperty("port", port + "");
         properties.setProperty("databaseName", database);
         properties.setProperty("user", username);
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
             properties.setProperty("password", password);
         }
         hikari.setDataSourceProperties(properties);

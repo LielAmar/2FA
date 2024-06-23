@@ -1,55 +1,37 @@
-package com.lielamar.auth.storage;
+package com.lielamar.auth.core.storage;
 
-import com.lielamar.auth.handlers.IConfigHandler;
-import com.lielamar.auth.storage.json.JSONStorage;
-import com.lielamar.auth.storage.mongodb.MongoDBStorage;
-import com.lielamar.auth.storage.sql.SQLStorage;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.lielamar.auth.core.handlers.AbstractConfigHandler;
+import com.lielamar.auth.core.storage.json.JSONStorage;
+import com.lielamar.auth.core.storage.mongodb.MongoDBStorage;
+import com.lielamar.auth.core.storage.sql.SQLStorage;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public abstract class StorageHandler {
-
+    protected Cache<UUID, UserSession> cache;
     public static boolean isLoaded;
 
-    /**
-     * Sets the Key of the player whose UUID is uuid
-     *
-     * @param uuid UUID of the player to set the Key of
-     * @param secretKey Key to set
-     * @return The set Key
-     */
+    public StorageHandler() {
+
+        // todo: allow user to configure the cache's properties as well as query the cache's data (update, remove etc...)
+        cache = Caffeine.newBuilder()
+                .expireAfterWrite(30, TimeUnit.MINUTES)
+                .maximumSize(75)
+                .build();
+    }
+
     public abstract String setKey(UUID uuid, String secretKey);
 
-    /**
-     * Returns the Key of the player whose UUID is uuid
-     *
-     * @param uuid UUID of the player to get the Key of
-     * @return Key of the player
-     */
     public abstract String getKey(UUID uuid);
 
-    /**
-     * Checks whether a player whose UUID is uuid has a Key
-     *
-     * @param uuid UUID of the player to check the Key of
-     * @return Whether the player has a Key
-     */
     public abstract boolean hasKey(UUID uuid);
 
-    /**
-     * Removes the Key of the player who's UUID is uuid
-     *
-     * @param uuid UUID of the player to remove the Key of
-     */
     public abstract void removeKey(UUID uuid);
 
-    /**
-     * Sets the Last IP of the player whose UUID is uuid
-     *
-     * @param uuid UUID of the player to set the IP of
-     * @param lastIP IP to set
-     * @return The set IP
-     */
+
     public abstract String setIP(UUID uuid, String lastIP);
 
     /**
@@ -110,23 +92,23 @@ public abstract class StorageHandler {
      * @param absolutePath
      * @return Created Storage Handler
      */
-    public static StorageHandler loadStorageHandler(IConfigHandler configHandler, String absolutePath) {
+    public static StorageHandler loadStorageHandler(AbstractConfigHandler configHandler, String absolutePath) {
         try {
             isLoaded = true;
             return switch (configHandler.getStorageMethod()) {
-                case MYSQL -> new SQLStorage("com.mysql.cj.jdbc.MysqlDataSource",
+                case StorageMethod.MYSQL -> new SQLStorage("com.mysql.cj.jdbc.MysqlDataSource",
                         configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
                         configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
-                case H2 -> new SQLStorage("org.h2.jdbcx.JdbcDataSource",
+                case StorageMethod.H2 -> new SQLStorage("org.h2.jdbcx.JdbcDataSource",
                         configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
                         configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
-                case MARIADB -> new SQLStorage("org.mariadb.jdbc.MariaDbDataSource",
+                case StorageMethod.MARIADB -> new SQLStorage("org.mariadb.jdbc.MariaDbDataSource",
                         configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
                         configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
-                case POSTGRESQL -> new SQLStorage("org.postgresql.ds.PGSimpleDataSource",
+                case StorageMethod.POSTGRESQL -> new SQLStorage("org.postgresql.ds.PGSimpleDataSource",
                         configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
                         configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
-                case MONGODB ->
+                case StorageMethod.MONGODB ->
                         new MongoDBStorage(configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
                                 configHandler.getCollectionPrefix(), configHandler.getMongodbURI());
                 default -> // JSON
