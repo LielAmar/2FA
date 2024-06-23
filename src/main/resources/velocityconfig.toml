@@ -1,8 +1,0 @@
-[disabled.events]
-commands=true
-chat=true
-server-switch=true
-
-[commands]
-whitelisted = ["help"]
-blacklisted = ["server"]
