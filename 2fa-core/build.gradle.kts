@@ -17,6 +17,7 @@ dependencies {
     annotationProcessor("io.micronaut:micronaut-inject-java:4.5.3")
     api("io.micronaut:micronaut-inject-java:4.5.3")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("dev.samstevens.totp:totp:1.7.1")
 
     compileOnly("commons-codec:commons-codec:1.17.0")
     implementation("com.zaxxer:HikariCP:5.1.0")

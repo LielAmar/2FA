@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     compileOnly("org.jetbrains:annotations:24.1.0")
-    implementation("com.github.DirtyConcept:Espresso:763f2044f7")
+    implementation("com.github.DirtyConcept:Espresso:ed830513b6")
 }
 
 group = "com.lielamar"
