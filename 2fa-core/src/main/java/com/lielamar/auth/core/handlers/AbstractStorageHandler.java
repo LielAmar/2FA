@@ -1,8 +1,9 @@
-package com.lielamar.auth.core.storage;
+package com.lielamar.auth.core.handlers;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.lielamar.auth.core.handlers.AbstractConfigHandler;
+import com.lielamar.auth.core.storage.StorageMethod;
+import com.lielamar.auth.core.storage.UserSession;
 import com.lielamar.auth.core.storage.json.JSONStorage;
 import com.lielamar.auth.core.storage.mongodb.MongoDBStorage;
 import com.lielamar.auth.core.storage.sql.SQLStorage;
@@ -10,11 +11,11 @@ import com.lielamar.auth.core.storage.sql.SQLStorage;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public abstract class StorageHandler {
+public abstract class AbstractStorageHandler {
     protected Cache<UUID, UserSession> cache;
     public static boolean isLoaded;
 
-    public StorageHandler() {
+    public AbstractStorageHandler() {
 
         // todo: allow user to configure the cache's properties as well as query the cache's data (update, remove etc...)
         cache = Caffeine.newBuilder()
@@ -92,7 +93,7 @@ public abstract class StorageHandler {
      * @param absolutePath
      * @return Created Storage Handler
      */
-    public static StorageHandler loadStorageHandler(AbstractConfigHandler configHandler, String absolutePath) {
+    public static AbstractStorageHandler loadStorageHandler(AbstractConfigHandler configHandler, String absolutePath) {
         try {
             isLoaded = true;
             return switch (configHandler.getStorageMethod()) {

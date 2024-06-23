@@ -1,6 +1,6 @@
 package com.lielamar.auth.core.storage.mongodb;
 
-import com.lielamar.auth.core.storage.StorageHandler;
+import com.lielamar.auth.core.handlers.AbstractStorageHandler;
 import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 // todo: have reactivestreams and sync driver implementations of this.
-public final class MongoDBStorage extends StorageHandler {
+public final class MongoDBStorage extends AbstractStorageHandler {
     private MongoClient mongoClient;
     private MongoCollection<Document> mongoCollection;
 

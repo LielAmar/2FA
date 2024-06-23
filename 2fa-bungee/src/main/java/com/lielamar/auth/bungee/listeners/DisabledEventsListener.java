@@ -1,21 +1,22 @@
 package com.lielamar.auth.bungee.listeners;
 
 import com.lielamar.auth.bungee.TwoFactorAuthPlugin;
-import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.shared.utils.Constants;
+import com.lielamar.auth.bungee.handlers.BungeeAuthHandler;
+import jakarta.inject.Inject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
 
-public class DisabledEvents implements Listener {
+public class DisabledEventsListener implements Listener {
+    private final BungeeAuthHandler authHandler;
 
-    private final TwoFactorAuthPlugin plugin;
-
-    public DisabledEvents(@NotNull TwoFactorAuthPlugin plugin) {
-        this.plugin = plugin;
+    @Inject
+    public DisabledEventsListener(final @NotNull BungeeAuthHandler authHandler) {
+        this.authHandler = authHandler;
     }
 
     @EventHandler
@@ -25,7 +26,7 @@ public class DisabledEvents implements Listener {
         }
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
-        if (this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
+        if (authHandler.needsToAuthenticate(player.getUniqueId())) {
             String[] args = event.getMessage().substring(1).split("\\s+");
 
             if (this.plugin.getConfigHandler().isDisableCommands()) {
@@ -55,7 +56,7 @@ public class DisabledEvents implements Listener {
         }
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
-        if (this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
+        if (authHandler.needsToAuthenticate(player.getUniqueId())) {
             if (this.plugin.getConfigHandler().isDisableChat()) {
                 event.setCancelled(true);
             }
@@ -66,7 +67,19 @@ public class DisabledEvents implements Listener {
     public void onServerConnect(ServerConnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
 
-        if (this.plugin.getAuthHandler().needsToAuthenticate(player.getUniqueId())) {
+        if (authHandler.needsToAuthenticate(player.getUniqueId())) {
+            if (this.plugin.getConfigHandler().isDisableServerSwitch()) {
+                event.setCancelled(true);
+                this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onServerConnect(ServerSwitchEvent event) {
+        ProxiedPlayer player = event.getPlayer();
+
+        if (authHandler.needsToAuthenticate(player.getUniqueId())) {
             if (this.plugin.getConfigHandler().isDisableServerSwitch()) {
                 event.setCancelled(true);
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);

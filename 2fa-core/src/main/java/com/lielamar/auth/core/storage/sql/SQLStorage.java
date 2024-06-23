@@ -1,6 +1,6 @@
 package com.lielamar.auth.core.storage.sql;
 
-import com.lielamar.auth.core.storage.StorageHandler;
+import com.lielamar.auth.core.handlers.AbstractStorageHandler;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.UUID;
 
-public class SQLStorage extends StorageHandler {
+public class SQLStorage extends AbstractStorageHandler {
     protected HikariDataSource hikari;
 
     private final String driver;

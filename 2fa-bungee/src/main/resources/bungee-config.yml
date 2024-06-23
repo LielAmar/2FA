@@ -9,6 +9,22 @@
 # Github: https://github.com/LielAmar/2FA
 # ===========================================================================================
 
+# This option toggles if to force all servers to have 2FA or force specific servers.
+force-all-servers: true
+# This option tells if to force servers by their id (group) or by their name in the proxy.
+# You can force both servers and groups if you wish to.
+force-by-ids: false
+# In this list the bungeecord will decide in which servers it will enforce 2FA in.
+# for example if you put in an entry of hub it'll enforce on the hub server.
+forced-servers: []
+forced-ids: []
+
+# The hash method to use for players' IP addresses
+# - SHA256
+# - SHA512
+# - NONE (no hash - not recommended!)
+ip-hash: SHA256
+
 # Events to disable if a player is not authenticated yet
 # true - will block the event
 # false - will allow the event

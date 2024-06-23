@@ -1,18 +1,18 @@
 package com.lielamar.auth.bungee;
 
 import com.lielamar.auth.api.ITwoFactorAuthPlugin;
-import com.lielamar.auth.bungee.listeners.DisabledEvents;
+import com.lielamar.auth.bungee.listeners.IListenerRegisterer;
 import com.lielamar.auth.core.utils.AuthTracker;
 import io.micronaut.context.ApplicationContext;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.api.plugin.PluginManager;
+import org.yaml.snakeyaml.Yaml;
 
 public class TwoFactorAuthPlugin extends Plugin implements ITwoFactorAuthPlugin {
-    private ApplicationContext context;
+    private ApplicationContext applicationContext;
 
     @Override
     public void onLoad() {
-        context = ApplicationContext.builder()
+        applicationContext = ApplicationContext.builder()
                 .classLoader(getClass().getClassLoader())
                 .singletons(this, new AuthTracker())
                 .build();
@@ -20,28 +20,14 @@ public class TwoFactorAuthPlugin extends Plugin implements ITwoFactorAuthPlugin 
 
     @Override
     public void onEnable() {
-        this.setupAuth();
-        this.registerListeners();
+        applicationContext.start();
 
-        this.setupBStats();
+        final IListenerRegisterer listenerRegisterer = applicationContext.getBean(IListenerRegisterer.class);
+        listenerRegisterer.registerListeners();
     }
 
     @Override
     public void onDisable() {
-    }
-
-    @Override
-    public void setupAuth() {
-    }
-
-    public void registerListeners() {
-        PluginManager pm = getProxy().getPluginManager();
-        pm.registerListener(this, new OnPluginMessage(this));
-        pm.registerListener(this, new OnBungeePlayerConnections(this));
-        pm.registerListener(this, new DisabledEvents(this));
-        pm.registerListener(this, new OnAuthStateChange(this));
-
-        getProxy().registerChannel(PluginMessagingHandler.channelName);
     }
 
     @Override

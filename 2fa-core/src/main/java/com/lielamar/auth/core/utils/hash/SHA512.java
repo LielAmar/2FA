@@ -1,6 +1,5 @@
 package com.lielamar.auth.core.utils.hash;
 
-import com.lielamar.auth.core.utils.Hash;
 import org.apache.commons.codec.digest.DigestUtils;
 
 public class SHA512 implements Hash {

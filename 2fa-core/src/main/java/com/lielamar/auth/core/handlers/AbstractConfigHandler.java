@@ -2,6 +2,7 @@ package com.lielamar.auth.core.handlers;
 
 
 import com.lielamar.auth.core.storage.StorageMethod;
+import dev.samstevens.totp.code.HashingAlgorithm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractConfigHandler {
-
-    protected final String configFileName = "config.yml";
-
     protected Map<Class<?>, Boolean> disabledEvents = new HashMap<>();
     protected List<String> whitelistedCommands = new ArrayList<>();
     protected List<String> blacklistedCommands = new ArrayList<>();
@@ -24,6 +22,8 @@ public abstract class AbstractConfigHandler {
     protected String password = "password";
     protected String tablePrefix = "2fa_";
     protected String collectionPrefix = "2fa_";
+
+    protected HashingAlgorithm hashingAlgorithm = HashingAlgorithm.SHA256;
 
     protected int maximumPoolSize = 10;
     protected int minimumIdle = 10;

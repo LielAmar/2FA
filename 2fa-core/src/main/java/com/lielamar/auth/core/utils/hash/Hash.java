@@ -1,4 +1,4 @@
-package com.lielamar.auth.core.utils;
+package com.lielamar.auth.core.utils.hash;
 
 public interface Hash {
 

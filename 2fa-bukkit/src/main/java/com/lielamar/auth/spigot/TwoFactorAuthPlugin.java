@@ -3,7 +3,7 @@ package com.lielamar.auth.spigot;
 import com.lielamar.auth.api.ITwoFactorAuthPlugin;
 import com.lielamar.auth.spigot.utils.ConsoleFilter;
 import com.lielamar.auth.spigot.utils.Version;
-import com.lielamar.auth.core.storage.StorageHandler;
+import com.lielamar.auth.core.handlers.AbstractStorageHandler;
 import io.micronaut.context.ApplicationContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Filter;
@@ -46,7 +46,7 @@ public class TwoFactorAuthPlugin extends JavaPlugin implements ITwoFactorAuthPlu
     public void onDisable() {
         removeConsoleFilter();
 
-        StorageHandler storageHandler = context.getBean(StorageHandler.class);
+        AbstractStorageHandler storageHandler = context.getBean(AbstractStorageHandler.class);
         if (storageHandler != null) {
             storageHandler.unload();
         }
