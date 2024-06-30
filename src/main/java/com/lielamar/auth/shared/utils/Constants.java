@@ -1,6 +1,6 @@
 package com.lielamar.auth.shared.utils;
 
-import com.lielamar.lielsutils.groups.Pair;
+import com.lielamar.auth.shared.utils.groups.Pair;
 
 public class Constants {
 

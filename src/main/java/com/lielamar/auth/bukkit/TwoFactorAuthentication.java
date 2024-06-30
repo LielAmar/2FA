@@ -3,31 +3,28 @@ package com.lielamar.auth.bukkit;
 import com.lielamar.auth.bukkit.commands.TwoFactorAuthenticationCommand;
 import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
 import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
-import com.lielamar.auth.bukkit.listeners.OnMapDrop;
-import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
-import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
-import com.lielamar.auth.shared.communication.CommunicationMethod;
-import com.lielamar.auth.shared.utils.Constants;
-import com.lielamar.lielsutils.bukkit.updater.SpigotUpdateChecker;
-import com.lielamar.lielsutils.bukkit.bstats.BukkitMetrics;
-import com.lielamar.lielsutils.bukkit.files.FileManager;
-
 import com.lielamar.auth.bukkit.handlers.*;
 import com.lielamar.auth.bukkit.listeners.DisabledEvents;
 import com.lielamar.auth.bukkit.listeners.OnAuthStateChange;
+import com.lielamar.auth.bukkit.listeners.OnMapDrop;
 import com.lielamar.auth.bukkit.listeners.OnPlayerConnection;
+import com.lielamar.auth.bukkit.utils.bstats.BukkitMetrics;
+import com.lielamar.auth.bukkit.utils.file.FileManager;
+import com.lielamar.auth.bukkit.utils.update.SpigotUpdateChecker;
+import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
+import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
+import com.lielamar.auth.shared.communication.CommunicationMethod;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.AuthTracker;
-
+import com.lielamar.auth.shared.utils.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-
-import org.apache.logging.log4j.core.Logger;
 
 import java.util.Iterator;
 

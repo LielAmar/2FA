@@ -1,6 +1,6 @@
 package com.lielamar.auth.shared.handlers;
 
-import com.lielamar.lielsutils.groups.Pair;
+import com.lielamar.auth.shared.utils.groups.Pair;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class MessageHandler {
@@ -23,7 +23,7 @@ public abstract class MessageHandler {
         String raw = message.getMessage();
         String rawPrefix = TwoFAMessages.PREFIX.getMessage();
 
-        if (raw != null && raw.length() > 0) {
+        if (raw != null && !raw.isEmpty()) {
             for (Pair<?, ?> pair : args) {
                 raw = raw.replaceAll(pair.getA().toString(), pair.getB().toString());
             }
@@ -82,7 +82,7 @@ public abstract class MessageHandler {
         KEYWORD_REQUIRED("Required"),
         KEYWORD_NOT_REQUIRED("Not Required"),
         HELP_HEADER("&7----- &b2FA &7-----"),
-        HELP_COMMAND("&7\u2022 &b%command% &e%aliases%&7: %description%"),
+        HELP_COMMAND("&7• &b%command% &e%aliases%&7: %description%"),
         HELP_FOOTER("&7----- -------- -----"),
         DESCRIPTION_OF_DISABLE_COMMAND("Disables 2FA"),
         DESCRIPTION_OF_DISABLE_OTHERS_COMMAND("Disable 2FA for other users"),

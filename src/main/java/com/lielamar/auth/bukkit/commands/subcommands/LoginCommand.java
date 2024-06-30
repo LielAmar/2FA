@@ -2,10 +2,10 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.events.PlayerFailedAuthenticationEvent;
+import com.lielamar.auth.bukkit.utils.cmd.StandaloneCommand;
+import com.lielamar.auth.bukkit.utils.cmd.SuperCommand;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
-import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
-import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,7 +42,7 @@ public class LoginCommand extends StandaloneCommand {
         }
 
         try {
-            boolean isValid = this.plugin.getAuthHandler().validateKey(player.getUniqueId(), Integer.valueOf(code.toString()));
+            boolean isValid = this.plugin.getAuthHandler().validateKey(player.getUniqueId(), code.toString());
 
             if (isValid) {
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.SUCCESSFULLY_AUTHENTICATED);

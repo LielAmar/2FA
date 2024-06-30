@@ -15,4 +15,8 @@ public class AuthTracker {
     public void setAuthentications(int authentications) {
         this.authentications = authentications;
     }
+
+    public int incrementAuths() {
+        return ++authentications;
+    }
 }

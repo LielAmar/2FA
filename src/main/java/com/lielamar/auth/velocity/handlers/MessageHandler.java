@@ -1,11 +1,10 @@
 package com.lielamar.auth.velocity.handlers;
 
+import com.lielamar.auth.shared.utils.groups.Pair;
 import com.lielamar.auth.velocity.TwoFactorAuthentication;
-import com.lielamar.lielsutils.groups.Pair;
 import com.moandjiezana.toml.Toml;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.jetbrains.annotations.NotNull;
@@ -34,20 +33,20 @@ public class MessageHandler extends com.lielamar.auth.shared.handlers.MessageHan
     protected void sendRaw(final Object player, final String message, TextColor color) {
         if (player instanceof Player) {
             Audience.audience((Player) player).sendMessage(
-                    Component.text().content(message).color(color).build(),
-                    MessageType.CHAT);
+                    Component.text().content(message).color(color).build()
+            );
         }
     }
 
     public void sendMessage(Object sender, TwoFAMessages message) {
-        this.sendMessage(sender, (TwoFAMessages.PREFIX.getMessage().length() > 0), message);
+        this.sendMessage(sender, (!TwoFAMessages.PREFIX.getMessage().isEmpty()), message);
     }
 
     protected void sendMessage(Object sender, boolean prefix, TwoFAMessages message, Pair<?, ?>... args) {
         String raw = message.getMessage();
         String rawPrefix = TwoFAMessages.PREFIX.getMessage();
 
-        if (raw != null && raw.length() > 0) {
+        if (raw != null && !raw.isEmpty()) {
             for (Pair<?, ?> pair : args) {
                 raw = raw.replaceAll(pair.getA().toString(), pair.getB().toString());
             }

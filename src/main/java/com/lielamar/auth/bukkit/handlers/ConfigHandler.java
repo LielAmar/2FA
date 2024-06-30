@@ -1,8 +1,8 @@
 package com.lielamar.auth.bukkit.handlers;
 
+import com.lielamar.auth.bukkit.utils.file.FileManager;
 import com.lielamar.auth.shared.communication.CommunicationMethod;
 import com.lielamar.auth.shared.storage.StorageMethod;
-import com.lielamar.lielsutils.bukkit.files.FileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -39,7 +39,6 @@ public final class ConfigHandler extends com.lielamar.auth.shared.handlers.Confi
 
     protected long reloadDelay = 0;
 
-    protected String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/";
     protected String ipHashType = "SHA256";
 
     protected boolean requireOnIPChange = true;
@@ -75,10 +74,6 @@ public final class ConfigHandler extends com.lielamar.auth.shared.handlers.Confi
 
     public long getReloadDelay() {
         return this.reloadDelay;
-    }
-
-    public String getQrCodeURL() {
-        return this.qrCodeURL;
     }
 
     public String getIpHashType() {
@@ -283,13 +278,6 @@ public final class ConfigHandler extends com.lielamar.auth.shared.handlers.Confi
             });
         } else {
             super.blacklistedCommands = config.getStringList("blacklisted-commands");
-        }
-
-        if (!config.contains("qr-code-service")) {
-            config.set("qr-code-service", this.qrCodeURL);
-            config.addComment("qr-code-service", "# Service to use when generating QR codes");
-        } else {
-            this.qrCodeURL = config.getString("qr-code-service");
         }
 
         if (!config.contains("check-for-updates")) {

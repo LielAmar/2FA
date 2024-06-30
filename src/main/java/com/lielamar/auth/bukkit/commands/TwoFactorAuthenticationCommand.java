@@ -2,11 +2,11 @@ package com.lielamar.auth.bukkit.commands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.commands.subcommands.*;
+import com.lielamar.auth.bukkit.utils.cmd.Command;
+import com.lielamar.auth.bukkit.utils.cmd.SuperCommand;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
-import com.lielamar.lielsutils.bukkit.commands.Command;
-import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

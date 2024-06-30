@@ -1,10 +1,10 @@
 package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
+import com.lielamar.auth.bukkit.utils.cmd.StandaloneCommand;
+import com.lielamar.auth.bukkit.utils.cmd.SuperCommand;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
-import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
-import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

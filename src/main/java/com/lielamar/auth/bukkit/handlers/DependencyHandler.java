@@ -22,22 +22,23 @@ public class DependencyHandler {
 
         loader.addMavenCentral();
 
-        String googleAuthVersion = "1.5.0";
-        String commonsCodecVersion = "1.15";
-        String hikariCpVersion = "4.0.3";
-        String h2Version = "2.1.212";
-        String mysqlVersion = "8.0.29";
-        String mariaDBVersion = "2.7.3";
-        String postgresVersion = "42.3.6";
-        String mongoDBVersion = "3.12.11";
-        String slf4jVersion = "2.0.0-alpha7";
-        String log4jVersion = "2.18.0";
 
-        Bukkit.getServer().getLogger().info("Loading library Google Auth v" + googleAuthVersion);
+        String commonsCodecVersion = "1.17.0"; // Updated to match Gradle build file
+        String hikariCpVersion = "5.1.0"; // Updated to match Gradle build file
+        String h2Version = "2.2.224"; // Updated to match Gradle build file
+        String mysqlVersion = "8.4.0"; // Updated to match Gradle build file
+        String mariaDBVersion = "3.4.0"; // Updated to match Gradle build file
+        String postgresVersion = "42.7.3"; // Updated to match Gradle build file
+        String mongoDBVersion = "5.1.1"; // Updated to match Gradle build file
+        String slf4jVersion = "2.0.13"; // Updated to match Gradle build file
+        String log4jVersion = "2.23.1"; // Updated to match Gradle build file
+        String atlassianVersion = "2.1.1"; // Added Atlassian library
+
+        Bukkit.getServer().getLogger().info("Loading library Atlassian v" + atlassianVersion);
         Library library = Library.builder()
-                .groupId("com.warrenstrange")
-                .artifactId("googleauth")
-                .version(googleAuthVersion)
+                .groupId("com.atlassian")
+                .artifactId("onetime")
+                .version(atlassianVersion)
                 .build();
         loader.loadLibrary(library);
 
@@ -68,7 +69,7 @@ public class DependencyHandler {
         Bukkit.getServer().getLogger().info("Loading library MySQL v" + mysqlVersion);
         library = Library.builder()
                 .groupId("mysql")
-                .artifactId("mysql-connector-java")
+                .artifactId("mysql-connector-j")
                 .version(mysqlVersion)
                 .build();
         loader.loadLibrary(library);
@@ -92,7 +93,7 @@ public class DependencyHandler {
         Bukkit.getServer().getLogger().info("Loading library MongoDB v" + mongoDBVersion);
         library = Library.builder()
                 .groupId("org.mongodb")
-                .artifactId("mongo-java-driver")
+                .artifactId("mongodb-driver-sync")
                 .version(mongoDBVersion)
                 .build();
         loader.loadLibrary(library);
@@ -105,7 +106,7 @@ public class DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        Bukkit.getServer().getLogger().info("Loading library Log4j v" + slf4jVersion);
+        Bukkit.getServer().getLogger().info("Loading library Log4j v" + log4jVersion);
         library = Library.builder()
                 .groupId("org.apache.logging.log4j")
                 .artifactId("log4j-core")

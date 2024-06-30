@@ -1,12 +1,13 @@
 package com.lielamar.auth.bukkit.handlers;
 
-import com.lielamar.lielsutils.bukkit.color.ColorUtils;
-import com.lielamar.lielsutils.bukkit.files.FileManager;
+import com.lielamar.auth.shared.utils.color.ColorUtils;
+import com.lielamar.auth.bukkit.utils.file.FileManager;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -54,7 +55,7 @@ public final class MessageHandler extends com.lielamar.auth.shared.handlers.Mess
         String finalMessage = ColorUtils.translateAlternateColorCodes('&', rawPrefix + rawMessage);
 
         TextComponent component = new TextComponent(finalMessage);
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverAction).create()));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder(hoverAction).create())));
         player.spigot().sendMessage(component);
     }
 
