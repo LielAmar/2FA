@@ -23,8 +23,8 @@ public abstract class AuthHandler {
     protected AuthCommunicationHandler authCommunicationHandler, fallbackCommunicationHandler;
     protected HashMap<UUID, AuthState> authStates;
 
-    private final DefaultTOTPService totpService;
-    private final SecretProvider secretProvider;
+    protected final DefaultTOTPService totpService;
+    protected final SecretProvider secretProvider;
 
     public AuthHandler() {
         this(null, null);

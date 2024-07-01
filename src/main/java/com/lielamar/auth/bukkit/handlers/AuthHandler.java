@@ -1,5 +1,8 @@
 package com.lielamar.auth.bukkit.handlers;
 
+import com.atlassian.onetime.model.EmailAddress;
+import com.atlassian.onetime.model.Issuer;
+import com.atlassian.onetime.model.TOTPSecret;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
@@ -171,10 +174,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         super.authCommunicationHandler.loadPlayerState(uuid, new LoadAuthCallback(uuid));
     }
 
-    public @Nullable
-    String getQRCodeURL(@NotNull String urlTemplate, @NotNull UUID uuid) {
-        String encodedPart = "%%label%%?secret=%%key%%&issuer=%%title%%";
-
+    public @Nullable String getQRCodeURL(@NotNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
 
         String label = (player == null) ? "player" : player.getName();
@@ -185,13 +185,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return null;
         }
 
-        encodedPart = encodedPart.replaceAll("%%label%%", label).replaceAll("%%title%%", title).replaceAll("%%key%%", key);
-
-        try {
-            return urlTemplate + URLEncoder.encode(encodedPart, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException exception) {
-            return urlTemplate + encodedPart;
-        }
+        return totpService.generateTOTPUrl(TOTPSecret.Companion.fromBase32EncodedString(key), new EmailAddress(label), new Issuer(title)).toString();
     }
 
     /**
@@ -201,7 +195,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
     @SuppressWarnings("deprecation")
     public void giveQRCodeItem(@NotNull Player player) {
-        String url = this.getQRCodeURL(this.plugin.getConfigHandler().getQrCodeURL(), player.getUniqueId());
+        String url = this.getQRCodeURL(player.getUniqueId());
 
         if (url == null) {
             return;
