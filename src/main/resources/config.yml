@@ -9,9 +9,6 @@
 # Github: https://github.com/LielAmar/2FA
 # ===========================================================================================
 
-# Service to use when generating QR codes
-qr-code-service: "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/"
-
 # Whether to notify when there's an update available
 check-for-updates: true
 
