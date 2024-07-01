@@ -78,7 +78,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
 
     private void setupDependencies() {
         try {
-            Class.forName("com.warrenstrange.googleauth.GoogleAuthenticator");
+            Class.forName("com.atlassian.onetime.service.DefaultTOTPService");
         } catch (ClassNotFoundException exception) {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] The default spigot dependency loader either does not exist or failed to load dependencies. Falling back to a custom dependency loader");
             new DependencyHandler(this);
