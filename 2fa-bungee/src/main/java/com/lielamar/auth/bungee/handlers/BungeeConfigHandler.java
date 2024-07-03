@@ -1,7 +1,6 @@
 package com.lielamar.auth.bungee.handlers;
 
 import com.lielamar.auth.bungee.TwoFactorAuthPlugin;
-import com.lielamar.auth.bungee.TwoFactorAuthentication;
 import com.lielamar.auth.core.handlers.AbstractConfigHandler;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -36,10 +35,9 @@ public final class BungeeConfigHandler extends AbstractConfigHandler {
             this.plugin.getDataFolder().mkdir();
         }
 
-        File file = new File(this.plugin.getDataFolder(), super.configFileName);
-
+        File file = new File(this.plugin.getDataFolder(), "bungee-config.yml");
         if (!file.exists()) {
-            try ( InputStream in = this.plugin.getResourceAsStream("bungeeconfig.yml")) {
+            try (InputStream in = this.plugin.getResourceAsStream("bungee-config.yml")) {
                 Files.copy(in, file.toPath());
             } catch (IOException exception) {
                 exception.printStackTrace();

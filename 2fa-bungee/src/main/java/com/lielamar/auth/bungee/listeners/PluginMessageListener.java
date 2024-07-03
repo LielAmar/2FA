@@ -3,16 +3,21 @@ package com.lielamar.auth.bungee.listeners;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.lielamar.auth.api.ITwoFactorAuthPlugin;
 import com.lielamar.auth.bungee.TwoFactorAuthentication;
+import com.lielamar.auth.bungee.handlers.BungeeAuthHandler;
+import com.lielamar.auth.core.handlers.AbstractAuthHandler;
 import com.lielamar.auth.core.utils.Constants;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
+import jakarta.inject.Inject;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.UUID;
@@ -20,10 +25,14 @@ import java.util.UUID;
 @SuppressWarnings("UnstableApiUsage")
 public class PluginMessageListener implements Listener {
 
-    private final TwoFactorAuthentication plugin;
+    private final ITwoFactorAuthPlugin plugin;
+    private final AbstractAuthHandler authHandler;
 
-    public PluginMessageListener(TwoFactorAuthentication plugin) {
+    @Inject
+    public PluginMessageListener(final @NotNull ITwoFactorAuthPlugin plugin,
+                                 final @NotNull AbstractAuthHandler authHandler) {
         this.plugin = plugin;
+        this.authHandler = authHandler;
     }
 
     @EventHandler
@@ -54,7 +63,7 @@ public class PluginMessageListener implements Listener {
                 if (messageType == AuthCommunicationHandler.MessageType.SET_STATE) {
                     AuthHandler.AuthState state = AuthHandler.AuthState.valueOf(msgBodyData.readUTF());
 
-                    this.plugin.getAuthHandler().changeState(player.getUniqueId(), state);
+                    authHandler.changeState(player.getUniqueId(), state);
                 }
 
                 this.sendResponse(messageUUID, player, messageType);
@@ -65,7 +74,7 @@ public class PluginMessageListener implements Listener {
     }
 
     public void sendResponse(UUID messageUUID, ProxiedPlayer player, AuthCommunicationHandler.MessageType messageType) {
-        AuthHandler.AuthState authState = this.plugin.getAuthHandler().getAuthState(player.getUniqueId());
+        BungeeAuthHandler.AuthState authState = authHandler.getAuthState(player.getUniqueId());
 
         ByteArrayDataOutput response = ByteStreams.newDataOutput();
         response.writeUTF(Constants.PROXY_SUB_CHANNEL_NAME);

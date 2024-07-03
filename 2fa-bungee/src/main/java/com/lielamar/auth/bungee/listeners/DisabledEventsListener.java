@@ -2,6 +2,9 @@ package com.lielamar.auth.bungee.listeners;
 
 import com.lielamar.auth.bungee.TwoFactorAuthPlugin;
 import com.lielamar.auth.bungee.handlers.BungeeAuthHandler;
+import com.lielamar.auth.bungee.handlers.BungeeConfigHandler;
+import com.lielamar.auth.core.handlers.AbstractConfigHandler;
+import com.lielamar.auth.core.utils.Constants;
 import jakarta.inject.Inject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -13,11 +16,15 @@ import org.jetbrains.annotations.NotNull;
 
 public class DisabledEventsListener implements Listener {
     private final BungeeAuthHandler authHandler;
+    private final BungeeConfigHandler configHandler;
 
     @Inject
-    public DisabledEventsListener(final @NotNull BungeeAuthHandler authHandler) {
+    public DisabledEventsListener(final @NotNull BungeeAuthHandler authHandler,
+                                  final @NotNull BungeeConfigHandler configHandler) {
         this.authHandler = authHandler;
+        this.configHandler = configHandler;
     }
+
 
     @EventHandler
     public void onCommand(ChatEvent event) {
@@ -29,10 +36,10 @@ public class DisabledEventsListener implements Listener {
         if (authHandler.needsToAuthenticate(player.getUniqueId())) {
             String[] args = event.getMessage().substring(1).split("\\s+");
 
-            if (this.plugin.getConfigHandler().isDisableCommands()) {
+            if (configHandler.isDisableCommands()) {
                 if (args.length > 0) {
                     String command = args[0];
-                    if (!this.plugin.getConfigHandler().getWhitelistedCommands().contains(command) && !Constants.mainCommand.getA().equalsIgnoreCase(command)) {
+                    if (!configHandler.getWhitelistedCommands().contains(command) && !Constants.mainCommand.getA().equalsIgnoreCase(command)) {
                         event.setCancelled(true);
                         this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }
@@ -40,7 +47,7 @@ public class DisabledEventsListener implements Listener {
             } else {
                 if (args.length > 0) {
                     String command = args[0];
-                    if (this.plugin.getConfigHandler().getBlacklistedCommands().contains(command)) {
+                    if (configHandler.getBlacklistedCommands().contains(command)) {
                         event.setCancelled(true);
                         this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }
@@ -57,7 +64,7 @@ public class DisabledEventsListener implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
         if (authHandler.needsToAuthenticate(player.getUniqueId())) {
-            if (this.plugin.getConfigHandler().isDisableChat()) {
+            if (configHandler.isDisableChat()) {
                 event.setCancelled(true);
             }
         }
@@ -68,7 +75,7 @@ public class DisabledEventsListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
 
         if (authHandler.needsToAuthenticate(player.getUniqueId())) {
-            if (this.plugin.getConfigHandler().isDisableServerSwitch()) {
+            if (configHandler.isDisableServerSwitch()) {
                 event.setCancelled(true);
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
             }
@@ -80,7 +87,7 @@ public class DisabledEventsListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
 
         if (authHandler.needsToAuthenticate(player.getUniqueId())) {
-            if (this.plugin.getConfigHandler().isDisableServerSwitch()) {
+            if (configHandler.isDisableServerSwitch()) {
                 event.setCancelled(true);
                 this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
             }

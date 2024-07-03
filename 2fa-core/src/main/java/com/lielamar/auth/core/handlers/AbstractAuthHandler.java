@@ -1,13 +1,11 @@
 package com.lielamar.auth.core.handlers;
 
-import dev.samstevens.totp.code.CodeGenerator;
-import dev.samstevens.totp.code.DefaultCodeGenerator;
-import dev.samstevens.totp.code.DefaultCodeVerifier;
-import dev.samstevens.totp.code.HashingAlgorithm;
-import dev.samstevens.totp.secret.DefaultSecretGenerator;
-import dev.samstevens.totp.secret.SecretGenerator;
-import dev.samstevens.totp.time.SystemTimeProvider;
-import dev.samstevens.totp.time.TimeProvider;
+import com.atlassian.onetime.core.TOTP;
+import com.atlassian.onetime.model.TOTPSecret;
+import com.atlassian.onetime.service.DefaultTOTPService;
+import com.atlassian.onetime.service.RandomSecretProvider;
+import com.atlassian.onetime.service.SecretProvider;
+import com.atlassian.onetime.service.TOTPService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,24 +17,20 @@ public abstract class AbstractAuthHandler {
     private final Map<UUID, String> pendingKeys;
     private final Map<UUID, Integer> failedAttempts;
     protected Map<UUID, AuthState> authStates;
+    protected final TOTPService totpService;
+    protected final SecretProvider secretProvider;
 
-    private final SecretGenerator secretGenerator;
-    private final TimeProvider timeProvider;
-    private final CodeGenerator codeGenerator;
+    private final AbstractStorageHandler storageHandler;
 
-    public AbstractAuthHandler(final @NotNull AbstractConfigHandler configHandler) {
+    public AbstractAuthHandler(final @NotNull AbstractConfigHandler configHandler,
+                               final @NotNull AbstractStorageHandler storageHandler) {
+        this.storageHandler = storageHandler;
         this.pendingKeys = new HashMap<>();
         this.failedAttempts = new HashMap<>();
-        this.secretGenerator = new DefaultSecretGenerator(64);
-        this.codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.SHA512);
-
-        this.timeProvider = new SystemTimeProvider();
+        this.secretProvider = new RandomSecretProvider();
+        this.totpService = new DefaultTOTPService();
 
         this.authStates = new HashMap<>();
-    }
-
-    public @Nullable AbstractStorageHandler getStorageHandler() {
-        return this.storageHandler;
     }
 
     /**
@@ -46,15 +40,11 @@ public abstract class AbstractAuthHandler {
      * @return Player's key
      */
     protected @Nullable String getKey(@NotNull UUID uuid) {
-        if (this.getStorageHandler() == null) {
-            return null;
-        }
-
         if (!this.is2FAEnabled(uuid)) {
             return null;
         }
 
-        return this.getStorageHandler().getKey(uuid);
+        return storageHandler.getKey(uuid);
     }
 
     /**
@@ -118,11 +108,11 @@ public abstract class AbstractAuthHandler {
      * @return Created Key
      */
     public @NotNull String createKey(@NotNull UUID uuid) {
-        String key = secretGenerator.generate();
+        TOTPSecret key = secretProvider.generateSecret();
 
         this.changeState(uuid, AuthState.PENDING_SETUP);
-        this.pendingKeys.put(uuid, key);
-        return key;
+        this.pendingKeys.put(uuid, key.getBase32Encoded());
+        return key.getBase32Encoded();
     }
 
     /**
@@ -133,11 +123,10 @@ public abstract class AbstractAuthHandler {
      * @return Whether the code is valid
      */
     public boolean validateKey(@NotNull UUID uuid, @NotNull String code) {
-        String key = this.getKey(uuid);
+        String base32Key = this.getKey(uuid);
 
-
-        boolean successful = new DefaultCodeVerifier(codeGenerator, timeProvider).isValidCode(key, code);
-        if (key != null && successful && this.authStates.get(uuid).equals(AuthState.PENDING_LOGIN)) {
+        if (base32Key != null && totpService.verify(new TOTP(code), TOTPSecret.Companion.fromBase32EncodedString(base32Key)).isSuccess()
+                && this.authStates.get(uuid).equals(AuthState.PENDING_LOGIN)) {
             this.changeState(uuid, AuthState.AUTHENTICATED);
             return true;
         }
@@ -152,19 +141,15 @@ public abstract class AbstractAuthHandler {
      * @param code Inserted code
      * @return Whether the code is valid
      */
-    public boolean approveKey(@NotNull UUID uuid, @NotNull Integer code) {
-        if (this.getStorageHandler() == null) {
-            return false;
-        }
+    public boolean approveKey(@NotNull UUID uuid, @NotNull String code) {
+        String base32Key = this.getPendingKey(uuid);
 
-        String key = this.getPendingKey(uuid);
-
-        if (key != null && new GoogleAuthenticator().authorize(key, code)
+        if (base32Key != null && totpService.verify(new TOTP(code), TOTPSecret.Companion.fromBase32EncodedString(base32Key)).isSuccess()
                 && (this.authStates.get(uuid).equals(AuthState.PENDING_SETUP) || this.authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
             this.changeState(uuid, AuthState.AUTHENTICATED);
 
-            this.getStorageHandler().setKey(uuid, key);
-            this.getStorageHandler().setEnableDate(uuid, System.currentTimeMillis());
+            this.storageHandler.setKey(uuid, base32Key);
+            this.storageHandler.setEnableDate(uuid, System.currentTimeMillis());
             this.pendingKeys.remove(uuid);
 
             return true;
@@ -172,20 +157,17 @@ public abstract class AbstractAuthHandler {
         return false;
     }
 
+
     /**
      * Resets a player's key
      *
      * @param uuid UUID of the player to reset the key of
      */
     public void resetKey(@NotNull UUID uuid) {
-        if (this.getStorageHandler() == null) {
-            return;
-        }
-
         this.changeState(uuid, AuthState.DISABLED);
 
-        this.getStorageHandler().removeKey(uuid);
-        this.getStorageHandler().setEnableDate(uuid, -1);
+        storageHandler.removeKey(uuid);
+        storageHandler.setEnableDate(uuid, -1);
 
         this.pendingKeys.remove(uuid);
     }

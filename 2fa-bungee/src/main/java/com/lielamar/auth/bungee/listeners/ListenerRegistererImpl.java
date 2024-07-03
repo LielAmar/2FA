@@ -1,5 +1,6 @@
 package com.lielamar.auth.bungee.listeners;
 
+import com.lielamar.auth.core.listeners.IListenerRegisterer;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.md_5.bungee.api.plugin.Listener;

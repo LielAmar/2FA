@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BungeePlayerStateChangeEvent extends Event implements Cancellable {
-
     private final AbstractPlayerStateChangeEvent abstractEvent;
 
     public BungeePlayerStateChangeEvent(@NotNull ProxiedPlayer player, @Nullable AuthState oldAuthState, @NotNull AuthState newAuthState) {

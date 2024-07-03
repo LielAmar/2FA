@@ -4,7 +4,7 @@ import com.lielamar.auth.core.handlers.AbstractAuthHandler.AuthState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractPlayerStateChangeEvent {
+abstract class AbstractPlayerStateChangeEvent {
 
     private final Object player; // Use Object to generalize Player types
     private boolean cancelled = false;

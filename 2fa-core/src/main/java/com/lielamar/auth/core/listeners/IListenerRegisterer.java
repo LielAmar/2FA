@@ -1,4 +1,4 @@
-package com.lielamar.auth.bungee.listeners;
+package com.lielamar.auth.core.listeners;
 
 public interface IListenerRegisterer {
 

@@ -38,8 +38,6 @@ public final class ConfigHandler extends AbstractConfigHandler {
     protected int[] mapIDs = new int[reservedMaps];
 
     protected long reloadDelay = 0;
-
-    protected String qrCodeURL = "https://www.google.com/chart?chs=128x128&cht=qr&chl=otpauth://totp/";
     protected String ipHashType = "SHA256";
 
     protected boolean requireOnIPChange = true;
@@ -75,10 +73,6 @@ public final class ConfigHandler extends AbstractConfigHandler {
 
     public long getReloadDelay() {
         return this.reloadDelay;
-    }
-
-    public String getQrCodeURL() {
-        return this.qrCodeURL;
     }
 
     public String getIpHashType() {
