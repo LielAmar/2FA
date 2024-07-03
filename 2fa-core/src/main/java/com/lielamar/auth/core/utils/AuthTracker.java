@@ -16,7 +16,7 @@ public class AuthTracker {
         this.authentications = authentications;
     }
 
-    public void incrementAuths() {
+    public void increment() {
         this.authentications++;
     }
 }

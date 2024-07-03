@@ -6,16 +6,23 @@ import com.lielamar.auth.core.utils.AuthTracker;
 import io.micronaut.context.ApplicationContext;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.util.Map;
+
 public class TwoFactorAuthPlugin extends Plugin implements ITwoFactorAuthPlugin {
     private ApplicationContext applicationContext;
 
     @Override
     public void onLoad() {
         applicationContext = ApplicationContext.builder()
-                .classLoader(getClass().getClassLoader())
-                .singletons(this, new AuthTracker())
+                .classLoader(this.getClass().getClassLoader())
+                .singletons(this)
+                .properties(
+                        Map.ofEntries(
+                                Map.entry("datafolder", this.getDataFolder().getAbsoluteFile())
+                        ))
                 .build();
     }
+
 
     @Override
     public void onEnable() {
@@ -27,6 +34,7 @@ public class TwoFactorAuthPlugin extends Plugin implements ITwoFactorAuthPlugin 
 
     @Override
     public void onDisable() {
+        applicationContext.stop();
     }
 
     @Override

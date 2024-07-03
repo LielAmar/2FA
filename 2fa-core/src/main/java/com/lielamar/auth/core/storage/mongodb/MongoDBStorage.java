@@ -1,15 +1,18 @@
 package com.lielamar.auth.core.storage.mongodb;
 
-import com.lielamar.auth.core.handlers.AbstractStorageHandler;
+import com.lielamar.auth.core.storage.AbstractStorageHandler;
 import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.mongodb.client.model.Filters.eq;
 
 // todo: have reactivestreams and sync driver implementations of this.
 public final class MongoDBStorage extends AbstractStorageHandler {
@@ -143,8 +146,7 @@ public final class MongoDBStorage extends AbstractStorageHandler {
 
     @Override
     public String getIP(UUID uuid) {
-        Document query = new Document("uuid", uuid.toString());
-        Document playerDocument = this.mongoCollection.find(query).first();
+        Document playerDocument = this.mongoCollection.find(eq("uuid", uuid.toString())).first();
 
         if (playerDocument != null) {
             return playerDocument.getString("ip");
@@ -159,7 +161,7 @@ public final class MongoDBStorage extends AbstractStorageHandler {
 
     @Override
     public long setEnableDate(UUID uuid, long enableDate) {
-        Document query = new Document("uuid", uuid.toString());
+        Bson query = eq("uuid", uuid.toString());
         Document playerDocument = this.mongoCollection.find(query).first();
 
         if (playerDocument == null) {
@@ -178,8 +180,7 @@ public final class MongoDBStorage extends AbstractStorageHandler {
 
     @Override
     public long getEnableDate(UUID uuid) {
-        Document query = new Document("uuid", uuid.toString());
-        Document playerDocument = this.mongoCollection.find(query).first();
+        Document playerDocument = this.mongoCollection.find(eq("uuid", uuid.toString())).first();
 
         if (playerDocument != null) {
             return playerDocument.getLong("enable_date");

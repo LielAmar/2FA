@@ -1,7 +1,7 @@
 package com.lielamar.auth.bungee.listeners;
 
 import com.lielamar.auth.api.events.BungeePlayerStateChangeEvent;
-import com.lielamar.auth.core.handlers.AbstractAuthHandler;
+import com.lielamar.auth.core.auth.AbstractAuthHandler;
 import com.lielamar.auth.core.utils.AuthTracker;
 import jakarta.inject.Inject;
 import net.md_5.bungee.api.plugin.Listener;
@@ -19,7 +19,7 @@ public class AuthStateChangeListener implements Listener {
     @EventHandler
     public void onStateChange(final BungeePlayerStateChangeEvent event) {
         if (event.getNewAuthState().equals(AbstractAuthHandler.AuthState.AUTHENTICATED)) {
-            authTracker.incrementAuths();
+            authTracker.increment();
         }
     }
 }

@@ -12,6 +12,10 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":2fa-api"))
+    implementation(project(":2fa-bungee"))
+    implementation(project(":2fa-bukkit"))
+
     implementation("org.json:json:20240303")
 
     annotationProcessor("io.micronaut:micronaut-inject-java:4.5.3")
@@ -27,9 +31,6 @@ dependencies {
     implementation("org.mariadb.jdbc:mariadb-java-client:3.4.0")
     implementation("org.mongodb:mongodb-driver-sync:5.1.1")
 
-    implementation(project(":2fa-api"))
-    implementation(project(":2fa-bungee"))
-    implementation(project(":2fa-bukkit"))
 }
 
 description = "2fa-core"

@@ -1,14 +1,15 @@
-package com.lielamar.auth.core.handlers;
+package com.lielamar.auth.core.config;
 
 
 import com.lielamar.auth.core.storage.StorageMethod;
+import dev.sadghost.espresso.base.IReloadable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractConfigHandler {
+public abstract class AbstractConfigHandler implements IReloadable {
     protected Map<Class<?>, Boolean> disabledEvents = new HashMap<>();
     protected List<String> whitelistedCommands = new ArrayList<>();
     protected List<String> blacklistedCommands = new ArrayList<>();

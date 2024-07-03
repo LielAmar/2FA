@@ -1,6 +1,7 @@
 package com.lielamar.auth.api.events;
 
-import com.lielamar.auth.core.handlers.AbstractAuthHandler;
+import com.lielamar.auth.core.auth.AbstractAuthHandler;
+import com.lielamar.auth.core.auth.AuthState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -12,7 +13,7 @@ public class BukkitPlayerStateChangeEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
     private final AbstractPlayerStateChangeEvent abstractEvent;
 
-    public BukkitPlayerStateChangeEvent(@NotNull Player player, @Nullable AbstractAuthHandler.AuthState oldAuthState, @NotNull AbstractAuthHandler.AuthState newAuthState) {
+    public BukkitPlayerStateChangeEvent(@NotNull Player player, @Nullable AuthState oldAuthState, @NotNull AuthState newAuthState) {
         this.abstractEvent = new AbstractPlayerStateChangeEvent(player, oldAuthState, newAuthState) {
             @Override
             public boolean isPlatformCancelled() {
@@ -40,19 +41,19 @@ public class BukkitPlayerStateChangeEvent extends Event implements Cancellable {
         return (Player) abstractEvent.getPlayer();
     }
 
-    public @Nullable AbstractAuthHandler.AuthState getOldAuthState() {
+    public @Nullable AuthState getOldAuthState() {
         return abstractEvent.getOldAuthState();
     }
 
-    public void setOldAuthState(@Nullable AbstractAuthHandler.AuthState oldAuthState) {
+    public void setOldAuthState(@Nullable AuthState oldAuthState) {
         abstractEvent.setOldAuthState(oldAuthState);
     }
 
-    public @NotNull AbstractAuthHandler.AuthState getNewAuthState() {
+    public @NotNull AuthState getNewAuthState() {
         return abstractEvent.getNewAuthState();
     }
 
-    public void setNewAuthState(@NotNull AbstractAuthHandler.AuthState newAuthState) {
+    public void setNewAuthState(@NotNull AuthState newAuthState) {
         abstractEvent.setNewAuthState(newAuthState);
     }
 

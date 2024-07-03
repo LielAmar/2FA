@@ -1,9 +1,9 @@
 package com.lielamar.auth.bungee.handlers;
 
 import com.lielamar.auth.api.events.BungeePlayerStateChangeEvent;
-import com.lielamar.auth.core.handlers.AbstractAuthHandler;
-import com.lielamar.auth.core.handlers.AbstractConfigHandler;
-import com.lielamar.auth.core.handlers.AbstractStorageHandler;
+import com.lielamar.auth.core.auth.AuthState;
+import com.lielamar.auth.core.auth.AbstractAuthHandler;
+import com.lielamar.auth.core.storage.AbstractStorageHandler;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import net.md_5.bungee.api.ProxyServer;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class BungeeAuthHandler extends AbstractAuthHandler {
 
     @Inject
-    public BungeeAuthHandler(final @NotNull AbstractConfigHandler configHandler,
+    public BungeeAuthHandler(final @NotNull BungeeConfigHandler configHandler,
                              final @NotNull AbstractStorageHandler storageHandler) {
         super(configHandler, storageHandler);
     }

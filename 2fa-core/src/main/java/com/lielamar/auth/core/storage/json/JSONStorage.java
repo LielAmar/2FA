@@ -1,6 +1,6 @@
 package com.lielamar.auth.core.storage.json;
 
-import com.lielamar.auth.core.handlers.AbstractStorageHandler;
+import com.lielamar.auth.core.storage.AbstractStorageHandler;
 import org.json.JSONObject;
 
 import java.io.File;

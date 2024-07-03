@@ -130,7 +130,7 @@ communication-data:
 # If your server uses a proxy, it is recommended to use a Remote Storage Type!
 storage-method: JSON
 
-storage-data:
+database:
   # The database host
   host: "localhost"
 
@@ -158,6 +158,10 @@ storage-data:
     keep-alive-time: 0
     connection-timeout: 5000
 
-  # If you want to use a URI to connect to MongoDB, set the uri here. This will cause the plugin to ignore every other setting
-  # Leave it empty if you don't want to use a URI.
-  mongodb-uri: ""
+  mongodb-extras:
+    # This will make the server use a different driver from the sync driver, that will be
+    # based off non-block IO for the mongo. This will
+    use-async: false
+    # If you want to use a URI to connect to MongoDB, set the uri here. This will cause the plugin to ignore every other setting
+    # Leave it empty if you don't want to use a URI.
+    uri: ""

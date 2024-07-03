@@ -1,4 +1,4 @@
-package com.lielamar.auth.core.handlers;
+package com.lielamar.auth.core.auth;
 
 import com.atlassian.onetime.core.TOTP;
 import com.atlassian.onetime.model.TOTPSecret;
@@ -6,6 +6,8 @@ import com.atlassian.onetime.service.DefaultTOTPService;
 import com.atlassian.onetime.service.RandomSecretProvider;
 import com.atlassian.onetime.service.SecretProvider;
 import com.atlassian.onetime.service.TOTPService;
+import com.lielamar.auth.core.config.AbstractConfigHandler;
+import com.lielamar.auth.core.storage.AbstractStorageHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +42,10 @@ public abstract class AbstractAuthHandler {
      * @return Player's key
      */
     protected @Nullable String getKey(@NotNull UUID uuid) {
+        if (!storageHandler.isLoaded()) {
+            return null;
+        }
+
         if (!this.is2FAEnabled(uuid)) {
             return null;
         }
@@ -110,7 +116,7 @@ public abstract class AbstractAuthHandler {
     public @NotNull String createKey(@NotNull UUID uuid) {
         TOTPSecret key = secretProvider.generateSecret();
 
-        this.changeState(uuid, AuthState.PENDING_SETUP);
+        changeState(uuid, AuthState.PENDING_SETUP);
         this.pendingKeys.put(uuid, key.getBase32Encoded());
         return key.getBase32Encoded();
     }
@@ -142,6 +148,10 @@ public abstract class AbstractAuthHandler {
      * @return Whether the code is valid
      */
     public boolean approveKey(@NotNull UUID uuid, @NotNull String code) {
+        if (!storageHandler.isLoaded()) {
+            return false;
+        }
+
         String base32Key = this.getPendingKey(uuid);
 
         if (base32Key != null && totpService.verify(new TOTP(code), TOTPSecret.Companion.fromBase32EncodedString(base32Key)).isSuccess()
@@ -150,10 +160,9 @@ public abstract class AbstractAuthHandler {
 
             this.storageHandler.setKey(uuid, base32Key);
             this.storageHandler.setEnableDate(uuid, System.currentTimeMillis());
-            this.pendingKeys.remove(uuid);
-
             return true;
         }
+
         return false;
     }
 
@@ -164,6 +173,10 @@ public abstract class AbstractAuthHandler {
      * @param uuid UUID of the player to reset the key of
      */
     public void resetKey(@NotNull UUID uuid) {
+        if (!storageHandler.isLoaded()) {
+            return;
+        }
+
         this.changeState(uuid, AuthState.DISABLED);
 
         storageHandler.removeKey(uuid);
@@ -205,7 +218,7 @@ public abstract class AbstractAuthHandler {
     /**
      * Returns the amount of times a player has failed authentication
      *
-     * @param uuid UUID of the player to check
+     * @param uuid   UUID of the player to check
      * @param amount
      * @return Amount of fails
      */
@@ -228,8 +241,4 @@ public abstract class AbstractAuthHandler {
     }
 
     public abstract void changeState(@NotNull UUID uuid, @NotNull AuthState authState);
-
-    public enum AuthState {
-        NONE, DISABLED, PENDING_SETUP, DEMAND_SETUP, PENDING_LOGIN, AUTHENTICATED
-    }
 }

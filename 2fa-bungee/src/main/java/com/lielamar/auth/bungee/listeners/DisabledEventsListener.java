@@ -1,6 +1,5 @@
 package com.lielamar.auth.bungee.listeners;
 
-import com.lielamar.auth.bungee.TwoFactorAuthPlugin;
 import com.lielamar.auth.bungee.handlers.BungeeAuthHandler;
 import com.lielamar.auth.bungee.handlers.BungeeConfigHandler;
 import com.lielamar.auth.core.handlers.AbstractConfigHandler;
@@ -41,7 +40,9 @@ public class DisabledEventsListener implements Listener {
                     String command = args[0];
                     if (!configHandler.getWhitelistedCommands().contains(command) && !Constants.mainCommand.getA().equalsIgnoreCase(command)) {
                         event.setCancelled(true);
-                        this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                        // todo: Send message to user about his bungeecord command being blocked.
+                        // Block here only bungeecord commands
+                        // this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }
                 }
             } else {
@@ -49,7 +50,9 @@ public class DisabledEventsListener implements Listener {
                     String command = args[0];
                     if (configHandler.getBlacklistedCommands().contains(command)) {
                         event.setCancelled(true);
-                        this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
+                        // todo: Send message to user about his bungeecord command being blocked.
+                        // Block here only bungeecord commands
+                        // this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
                     }
                 }
             }
@@ -63,29 +66,14 @@ public class DisabledEventsListener implements Listener {
         }
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
-        if (authHandler.needsToAuthenticate(player.getUniqueId())) {
-            if (configHandler.isDisableChat()) {
-                event.setCancelled(true);
-            }
+        if (authHandler.needsToAuthenticate(player.getUniqueId()) && configHandler.isDisableChat()) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onServerConnect(ServerConnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-
-        if (authHandler.needsToAuthenticate(player.getUniqueId())) {
-            if (configHandler.isDisableServerSwitch()) {
-                event.setCancelled(true);
-                this.plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.VALIDATE_ACCOUNT);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onServerConnect(ServerSwitchEvent event) {
-        ProxiedPlayer player = event.getPlayer();
-
         if (authHandler.needsToAuthenticate(player.getUniqueId())) {
             if (configHandler.isDisableServerSwitch()) {
                 event.setCancelled(true);

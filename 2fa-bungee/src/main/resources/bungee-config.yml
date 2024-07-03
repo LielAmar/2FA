@@ -19,11 +19,12 @@ force-by-ids: false
 forced-servers: []
 forced-ids: []
 
-# The hash method to use for players' IP addresses
-# - SHA256
-# - SHA512
-# - NONE (no hash - not recommended!)
-ip-hash: SHA256
+# Each time a user joins and authenticates, the server will save in a cache for a set amount of time
+# his auth data, reducing calls for expensive operations.
+# this option will optimize the server's performance, but might have minimal side effects.
+session-cache:
+  enabled: true
+  max-ent
 
 # Events to disable if a player is not authenticated yet
 # true - will block the event
@@ -35,7 +36,7 @@ disabled-events:
   chat: true
   server-switch: true
 
-# If the "commands" event is disabled, you can whitelist specific commands with the below setting
+# If the "commands" event is disabled (set to true in disabled events), you can whitelist specific commands with the below setting
 # These commands will only be able to be executed. Anything else will be blocked.
 whitelisted-commands:
   - "help"

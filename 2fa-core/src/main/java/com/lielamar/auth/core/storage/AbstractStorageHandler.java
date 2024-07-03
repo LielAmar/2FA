@@ -1,15 +1,22 @@
-package com.lielamar.auth.core.handlers;
+package com.lielamar.auth.core.storage;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.lielamar.auth.core.storage.UserSession;
+import com.lielamar.auth.core.config.AbstractConfigHandler;
 import com.lielamar.auth.core.storage.json.JSONStorage;
 import com.lielamar.auth.core.storage.mongodb.MongoDBStorage;
 import com.lielamar.auth.core.storage.sql.SQLStorage;
+import io.micronaut.context.annotation.Bean;
+import io.micronaut.context.annotation.Factory;
+import io.micronaut.context.annotation.Value;
+import jakarta.inject.Singleton;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Factory
 public abstract class AbstractStorageHandler {
     protected Cache<UUID, UserSession> cache;
     public static boolean isLoaded;
@@ -85,18 +92,15 @@ public abstract class AbstractStorageHandler {
      */
     public abstract boolean isLoaded();
 
-    /**
-     * Sets up the Storage connection of the database
-     *
-     * @param configHandler Config the get the necessary data from
-     * @param absolutePath
-     * @return Created Storage Handler
-     */
-    public static AbstractStorageHandler loadStorageHandler(AbstractConfigHandler configHandler, String absolutePath) {
+
+    @Bean
+    @Singleton
+    public AbstractStorageHandler loadStorageHandler(final @NotNull AbstractConfigHandler configHandler,
+                                                     final @Value("datafolder") String absolutePath) {
         try {
             isLoaded = true;
             return switch (configHandler.getStorageMethod()) {
-                case MYSQL -> new SQLStorage("com.mysql.cj.jdbc.MysqlDataSourceww",
+                case MYSQL -> new SQLStorage("com.mysql.cj.jdbc.MysqlDataSource",
                         configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
                         configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
                 case H2 -> new SQLStorage("org.h2.jdbcx.JdbcDataSource",

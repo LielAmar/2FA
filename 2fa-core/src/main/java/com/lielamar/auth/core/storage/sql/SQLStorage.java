@@ -1,6 +1,6 @@
 package com.lielamar.auth.core.storage.sql;
 
-import com.lielamar.auth.core.handlers.AbstractStorageHandler;
+import com.lielamar.auth.core.storage.AbstractStorageHandler;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;

@@ -1,6 +1,6 @@
 package com.lielamar.auth.api.events;
 
-import com.lielamar.auth.core.handlers.AbstractAuthHandler.AuthState;
+import com.lielamar.auth.core.auth.AuthState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
