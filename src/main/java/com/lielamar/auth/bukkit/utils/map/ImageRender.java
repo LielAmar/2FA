@@ -43,19 +43,20 @@ public class ImageRender extends MapRenderer {
         int scale = 4;
         int border = 2;
 
-        int size = (qr.size + border * 2) * scale;
+        int qrSize = (qr.size + border * 2) * scale;  // Size of the QR code image before resizing
 
-        BufferedImage image;
+        BufferedImage qrImage;
         boolean originalUseCache = ImageIO.getUseCache();
         ImageIO.setUseCache(false);
 
         try {
-            image = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = image.createGraphics();
-            g.setColor(Color.WHITE);  // Fill the entire image with white
-            g.fillRect(0, 0, size, size);
+            // Create the original QR code image
+            qrImage = new BufferedImage(qrSize, qrSize, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = qrImage.createGraphics();
+            g.setColor(Color.WHITE);
+            g.fillRect(0, 0, qrSize, qrSize);
 
-            g.setColor(Color.BLACK);  // Draw the QR code in black
+            g.setColor(Color.BLACK);
             for (int y = 0; y < qr.size; y++) {
                 for (int x = 0; x < qr.size; x++) {
                     if (qr.getModule(x, y)) {
@@ -65,10 +66,16 @@ public class ImageRender extends MapRenderer {
             }
 
             g.dispose();
+
+            BufferedImage finalImage = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+            Graphics2D finalGraphics = finalImage.createGraphics();
+
+            finalGraphics.drawImage(qrImage, 0, 0, 128, 128, null);
+            finalGraphics.dispose();
+
+            return finalImage;
         } finally {
             ImageIO.setUseCache(originalUseCache);
         }
-
-        return image;
     }
 }
