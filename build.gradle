@@ -57,6 +57,6 @@ shadowJar {
     relocate 'com.google.gson', 'com.lielamar.auth.shade.gson'
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
