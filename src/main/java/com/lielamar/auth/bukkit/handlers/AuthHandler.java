@@ -33,6 +33,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -174,7 +176,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         super.authCommunicationHandler.loadPlayerState(uuid, new LoadAuthCallback(uuid));
     }
 
-    public @Nullable String getQRCodeURL(@NotNull UUID uuid) {
+    public @Nullable URI getQRCodeURL(@NotNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
 
         String label = (player == null) ? "player" : player.getName();
@@ -185,7 +187,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return null;
         }
 
-        return totpService.generateTOTPUrl(TOTPSecret.Companion.fromBase32EncodedString(key), new EmailAddress(label), new Issuer(title)).toString();
+        return totpService.generateTOTPUrl(TOTPSecret.Companion.fromBase32EncodedString(key), new EmailAddress(label), new Issuer(title));
     }
 
     /**
@@ -195,7 +197,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
     @SuppressWarnings("deprecation")
     public void giveQRCodeItem(@NotNull Player player) {
-        String url = this.getQRCodeURL(player.getUniqueId());
+        String url = this.getQRCodeURL(player.getUniqueId()).toString();
 
         if (url == null) {
             return;
@@ -276,7 +278,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         resetKey(player.getUniqueId());
                         plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
                     }
-                } catch (IOException | NumberFormatException exception) {
+                } catch (NumberFormatException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
                 }
