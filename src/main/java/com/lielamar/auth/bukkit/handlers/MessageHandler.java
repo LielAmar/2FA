@@ -55,7 +55,7 @@ public final class MessageHandler extends com.lielamar.auth.shared.handlers.Mess
         String finalMessage = ColorUtils.translateAlternateColorCodes('&', rawPrefix + rawMessage);
 
         TextComponent component = new TextComponent(finalMessage);
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder(hoverAction).create())));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverAction).create()));
         player.spigot().sendMessage(component);
     }
 
