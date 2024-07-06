@@ -2,12 +2,10 @@ package com.lielamar.auth.bukkit.commands.subcommands;
 
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
+import com.lielamar.auth.bukkit.utils.cmd.StandaloneCommand;
+import com.lielamar.auth.bukkit.utils.cmd.SuperCommand;
 import com.lielamar.auth.shared.handlers.MessageHandler;
-import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.Constants;
-import com.lielamar.lielsutils.bukkit.commands.StandaloneCommand;
-import com.lielamar.lielsutils.bukkit.commands.SuperCommand;
-import com.lielamar.lielsutils.bukkit.version.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -79,8 +77,7 @@ public class ReportCommand extends StandaloneCommand {
             writer.println("Server Jar, Versions and Information");
             writer.println("- Spigot Build version: " + Bukkit.getVersion());
             writer.println("- Server Version: " + Bukkit.getBukkitVersion());
-            writer.println("- Version Instance: " + Version.getInstance().getServerVersion().getVersionName());
-            writer.println("- NMSVersion Instance: " + Version.getInstance().getNMSVersion().getVersionName());
+            writer.println("- Version Instance: " + Bukkit.getServer().getBukkitVersion().split("-")[0].replaceAll("\\.", "_"));
             writer.println("- Max Memory: " + (Runtime.getRuntime().maxMemory() / 1000000) + " MB");
             writer.println("- Free Memory: " + (Runtime.getRuntime().freeMemory() / 1000000) + " MB");
             writer.println("- Total Memory: " + (Runtime.getRuntime().totalMemory() / 1000000) + " MB");

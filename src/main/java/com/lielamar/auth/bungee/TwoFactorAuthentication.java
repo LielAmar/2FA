@@ -1,16 +1,16 @@
 package com.lielamar.auth.bungee;
 
-import com.lielamar.auth.bungee.listeners.OnAuthStateChange;
-import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
-import com.lielamar.auth.shared.utils.AuthTracker;
 import com.lielamar.auth.bungee.handlers.AuthHandler;
 import com.lielamar.auth.bungee.handlers.ConfigHandler;
 import com.lielamar.auth.bungee.handlers.MessageHandler;
 import com.lielamar.auth.bungee.listeners.DisabledEvents;
+import com.lielamar.auth.bungee.listeners.OnAuthStateChange;
 import com.lielamar.auth.bungee.listeners.OnBungeePlayerConnections;
 import com.lielamar.auth.bungee.listeners.OnPluginMessage;
+import com.lielamar.auth.bungee.utils.BungeeMetrics;
+import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
-import com.lielamar.lielsutils.bukkit.bstats.BungeeMetrics;
+import com.lielamar.auth.shared.utils.AuthTracker;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 

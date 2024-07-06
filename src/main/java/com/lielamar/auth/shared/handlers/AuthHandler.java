@@ -1,9 +1,12 @@
 package com.lielamar.auth.shared.handlers;
 
+import com.atlassian.onetime.core.TOTP;
+import com.atlassian.onetime.model.TOTPSecret;
+import com.atlassian.onetime.service.DefaultTOTPService;
+import com.atlassian.onetime.service.RandomSecretProvider;
+import com.atlassian.onetime.service.SecretProvider;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
-import com.warrenstrange.googleauth.GoogleAuthenticator;
-import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +23,9 @@ public abstract class AuthHandler {
     protected AuthCommunicationHandler authCommunicationHandler, fallbackCommunicationHandler;
     protected HashMap<UUID, AuthState> authStates;
 
+    protected final DefaultTOTPService totpService;
+    protected final SecretProvider secretProvider;
+
     public AuthHandler() {
         this(null, null);
     }
@@ -32,6 +38,8 @@ public abstract class AuthHandler {
             @Nullable AuthCommunicationHandler fallbackCommunicationHandler) {
         this.pendingKeys = new HashMap<>();
         this.failedAttempts = new HashMap<>();
+        this.secretProvider = new RandomSecretProvider();
+        this.totpService = new DefaultTOTPService();
 
         this.storageHandler = storageHandler;
         this.authCommunicationHandler = authCommunicationHandler;
@@ -127,12 +135,11 @@ public abstract class AuthHandler {
      * @return Created Key
      */
     public @NotNull String createKey(@NotNull UUID uuid) {
-        GoogleAuthenticator authenticator = new GoogleAuthenticator();
-        GoogleAuthenticatorKey key = authenticator.createCredentials();
+        TOTPSecret key = secretProvider.generateSecret();
 
         this.changeState(uuid, AuthState.PENDING_SETUP);
-        this.pendingKeys.put(uuid, key.getKey());
-        return key.getKey();
+        this.pendingKeys.put(uuid, key.getBase32Encoded());
+        return key.getBase32Encoded();
     }
 
     /**
@@ -140,12 +147,13 @@ public abstract class AuthHandler {
      *
      * @param uuid UUID of the player to validate the key of
      * @param code Inserted code
-     * @return Whether or not the code is valid
+     * @return Whether the code is valid
      */
-    public boolean validateKey(@NotNull UUID uuid, @NotNull Integer code) {
-        String key = this.getKey(uuid);
+    public boolean validateKey(@NotNull UUID uuid, @NotNull String code) {
+        String base32Key = this.getKey(uuid);
 
-        if (key != null && new GoogleAuthenticator().authorize(key, code) && this.authStates.get(uuid).equals(AuthState.PENDING_LOGIN)) {
+        if (base32Key != null && totpService.verify(new TOTP(code), TOTPSecret.Companion.fromBase32EncodedString(base32Key)).isSuccess()
+                && this.authStates.get(uuid).equals(AuthState.PENDING_LOGIN)) {
             this.changeState(uuid, AuthState.AUTHENTICATED);
             return true;
         }
@@ -158,20 +166,20 @@ public abstract class AuthHandler {
      *
      * @param uuid UUID of the player to validate the key of
      * @param code Inserted code
-     * @return Whether or not the code is valid
+     * @return Whether the code is valid
      */
-    public boolean approveKey(@NotNull UUID uuid, @NotNull Integer code) {
+    public boolean approveKey(@NotNull UUID uuid, @NotNull String code) {
         if (this.getStorageHandler() == null) {
             return false;
         }
 
-        String key = this.getPendingKey(uuid);
+        String base32Key = this.getPendingKey(uuid);
 
-        if (key != null && new GoogleAuthenticator().authorize(key, code)
+        if (base32Key != null && totpService.verify(new TOTP(code), TOTPSecret.Companion.fromBase32EncodedString(base32Key)).isSuccess()
                 && (this.authStates.get(uuid).equals(AuthState.PENDING_SETUP) || this.authStates.get(uuid).equals(AuthState.DEMAND_SETUP))) {
             this.changeState(uuid, AuthState.AUTHENTICATED);
 
-            this.getStorageHandler().setKey(uuid, key);
+            this.getStorageHandler().setKey(uuid, base32Key);
             this.getStorageHandler().setEnableDate(uuid, System.currentTimeMillis());
             this.pendingKeys.remove(uuid);
 

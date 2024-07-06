@@ -18,7 +18,7 @@ public class OnAuthStateChange implements Listener {
     @EventHandler
     public void onStateChange(PlayerStateChangeEvent event) {
         if (event.getNewAuthState().equals(AuthHandler.AuthState.AUTHENTICATED)) {
-            this.plugin.getAuthTracker().setAuthentications(this.plugin.getAuthTracker().getAuthentications() + 1);
+            this.plugin.getAuthTracker().incrementAuths();
         }
     }
 }

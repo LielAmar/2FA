@@ -1,29 +1,20 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'com.lielamar.auth'
-version = '1.6.4'
+version = '1.7.0'
 
 defaultTasks 'clean', 'shadowJar'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
 
-    maven {
-        url = 'https://api.lielamar.com/repository/maven-public/'
-        content {
-            content {
-                includeGroup "net.byteflux"
-                includeGroup "com.lielamar"
-                includeGroup "com.lielamar.ConnectionsManager"
-            }
-        }
-    }
-
+    maven { url = "https://repo.alessiodp.com/releases/" }
+    maven { url = "https://repo.papermc.io/repository/maven-public/" }
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url = 'https://repo.velocitypowered.com/snapshots/' }
@@ -32,30 +23,27 @@ repositories {
 }
 
 dependencies {
-    
-    implementation 'org.json:json:20220320'
-    
-    implementation 'com.lielamar:LielsUtils:1.6.31'
+    implementation 'org.json:json:20240303'
 
-    implementation 'net.byteflux:libby-core:1.1.5-v2'
-    implementation 'net.byteflux:libby-bukkit:1.1.5'
+    implementation 'net.byteflux:libby-core:1.3.0'
+    implementation 'net.byteflux:libby-bukkit:1.3.0'
 
-    compileOnly 'org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT'
-    compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
-    compileOnly 'com.velocitypowered:velocity-api:3.1.0'
+    compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
+    compileOnly 'net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT'
+    compileOnly 'com.velocitypowered:velocity-api:3.3.0-SNAPSHOT'
 
-    compileOnly 'me.clip:placeholderapi:2.11.2'
+    compileOnly 'me.clip:placeholderapi:2.11.6'
 
-    compileOnly 'org.apache.logging.log4j:log4j-core:2.18.0'
-    compileOnly 'com.warrenstrange:googleauth:1.5.0'
-    compileOnly 'commons-codec:commons-codec:1.15'
-    compileOnly 'com.zaxxer:HikariCP:4.0.3'
-    compileOnly 'com.h2database:h2:2.1.214'
-    compileOnly 'mysql:mysql-connector-java:8.0.29'
-    compileOnly 'org.postgresql:postgresql:42.5.0'
-    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.0.7'
-    compileOnly 'org.mongodb:mongo-java-driver:3.12.11'
-    compileOnly 'org.slf4j:slf4j-api:2.0.0'
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.23.1'
+    compileOnly 'com.atlassian:onetime:2.1.1'
+    compileOnly 'commons-codec:commons-codec:1.17.0'
+    compileOnly 'com.zaxxer:HikariCP:5.1.0'
+    compileOnly 'com.h2database:h2:2.2.224'
+    compileOnly 'com.mysql:mysql-connector-j:8.4.0'
+    compileOnly 'org.postgresql:postgresql:42.7.3'
+    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.0'
+    compileOnly 'org.mongodb:mongodb-driver-sync:5.1.1'
+    compileOnly 'org.slf4j:slf4j-api:2.0.13'
 }
 
 jar {
@@ -64,13 +52,11 @@ jar {
 }
 
 shadowJar {
-    classifier = null
-
     relocate 'net.byteflux', 'com.lielamar.auth.shade'
     relocate 'org.json', 'com.lielamar.auth.shade.json'
     relocate 'com.google.gson', 'com.lielamar.auth.shade.gson'
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }

@@ -1,8 +1,15 @@
 package com.lielamar.auth.bukkit.handlers;
 
+import com.atlassian.onetime.model.EmailAddress;
+import com.atlassian.onetime.model.Issuer;
+import com.atlassian.onetime.model.TOTPSecret;
 import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
 import com.lielamar.auth.bukkit.events.PlayerStateChangeEvent;
+import com.lielamar.auth.shared.utils.color.ColorUtils;
+import com.lielamar.auth.bukkit.utils.map.ImageRender;
+import com.lielamar.auth.bukkit.utils.map.MapUtils;
+import com.lielamar.auth.bukkit.utils.version.Version;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
@@ -11,12 +18,6 @@ import com.lielamar.auth.shared.utils.hash.Hash;
 import com.lielamar.auth.shared.utils.hash.NoHash;
 import com.lielamar.auth.shared.utils.hash.SHA256;
 import com.lielamar.auth.shared.utils.hash.SHA512;
-import com.lielamar.lielsutils.bukkit.color.ColorUtils;
-
-import com.lielamar.lielsutils.bukkit.map.ImageRender;
-import com.lielamar.lielsutils.bukkit.map.MapUtils;
-
-import com.lielamar.lielsutils.bukkit.version.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -32,6 +33,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -99,7 +102,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     }
 
     @Override
-    public boolean validateKey(@NotNull UUID uuid, @NotNull Integer code) {
+    public boolean validateKey(@NotNull UUID uuid, @NotNull String code) {
         boolean valid = super.validateKey(uuid, code);
 
         Player player = Bukkit.getPlayer(uuid);
@@ -113,7 +116,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
     }
 
     @Override
-    public boolean approveKey(@NotNull UUID uuid, @NotNull Integer code) {
+    public boolean approveKey(@NotNull UUID uuid, @NotNull String code) {
         boolean approved = super.approveKey(uuid, code);
 
         if (approved) {
@@ -173,10 +176,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
         super.authCommunicationHandler.loadPlayerState(uuid, new LoadAuthCallback(uuid));
     }
 
-    public @Nullable
-    String getQRCodeURL(@NotNull String urlTemplate, @NotNull UUID uuid) {
-        String encodedPart = "%%label%%?secret=%%key%%&issuer=%%title%%";
-
+    public @Nullable URI getQRCodeURL(@NotNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
 
         String label = (player == null) ? "player" : player.getName();
@@ -187,13 +187,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             return null;
         }
 
-        encodedPart = encodedPart.replaceAll("%%label%%", label).replaceAll("%%title%%", title).replaceAll("%%key%%", key);
-
-        try {
-            return urlTemplate + URLEncoder.encode(encodedPart, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException exception) {
-            return urlTemplate + encodedPart;
-        }
+        return totpService.generateTOTPUrl(TOTPSecret.Companion.fromBase32EncodedString(key), new EmailAddress(label), new Issuer(title));
     }
 
     /**
@@ -203,7 +197,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
      */
     @SuppressWarnings("deprecation")
     public void giveQRCodeItem(@NotNull Player player) {
-        String url = this.getQRCodeURL(this.plugin.getConfigHandler().getQrCodeURL(), player.getUniqueId());
+        String url = this.getQRCodeURL(player.getUniqueId()).toString();
 
         if (url == null) {
             return;
@@ -227,7 +221,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
                         if (mapItem.getItemMeta() instanceof MapMeta) {
                             MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
-
                             if (mapMeta != null) {
                                 mapMeta.setMapId(view.getId());
                                 mapItem.setItemMeta(mapMeta);
@@ -285,7 +278,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
                         resetKey(player.getUniqueId());
                         plugin.getMessageHandler().sendMessage(player, MessageHandler.TwoFAMessages.NULL_KEY);
                     }
-                } catch (IOException | NumberFormatException exception) {
+                } catch (NumberFormatException exception) {
                     exception.printStackTrace();
                     player.sendMessage(ChatColor.RED + "An error occurred! Is the URL correct?");
                 }

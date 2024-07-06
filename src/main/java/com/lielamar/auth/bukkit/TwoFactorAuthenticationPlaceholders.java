@@ -1,11 +1,11 @@
 package com.lielamar.auth.bukkit;
 
-import com.lielamar.auth.shared.utils.Constants;
-import com.lielamar.lielsutils.time.TimeUtils;
-
+import com.lielamar.auth.bukkit.utils.TimeUtils;
 import com.lielamar.auth.shared.handlers.MessageHandler;
+import com.lielamar.auth.shared.utils.Constants;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class TwoFactorAuthenticationPlaceholders extends PlaceholderExpansion {
 
@@ -16,43 +16,38 @@ public class TwoFactorAuthenticationPlaceholders extends PlaceholderExpansion {
     }
 
     @Override
-    public String getIdentifier() {
+    public @NotNull String getIdentifier() {
         return "2FA";
     }
 
     @Override
-    public String getAuthor() {
+    public @NotNull String getAuthor() {
         return plugin.getDescription().getAuthors().get(0);
     }
 
     @Override
-    public String getVersion() {
+    public @NotNull String getVersion() {
         return plugin.getDescription().getVersion();
     }
 
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        switch (identifier.toLowerCase()) {
-            case "is_enabled":
-                return plugin.getAuthHandler().is2FAEnabled(player.getUniqueId())
-                        ? MessageHandler.TwoFAMessages.KEYWORD_ENABLED.getMessage()
-                        : MessageHandler.TwoFAMessages.KEYWORD_DISABLED.getMessage();
-                
-            case "time_since_enabled":
+        return switch (identifier.toLowerCase()) {
+            case "is_enabled" -> plugin.getAuthHandler().is2FAEnabled(player.getUniqueId())
+                    ? MessageHandler.TwoFAMessages.KEYWORD_ENABLED.getMessage()
+                    : MessageHandler.TwoFAMessages.KEYWORD_DISABLED.getMessage();
+            case "time_since_enabled" -> {
                 long enableDate = plugin.getAuthHandler().getStorageHandler().getEnableDate(player.getUniqueId());
-                return enableDate == -1 ? "Not Enabled"
+                yield enableDate == -1 ? "Not Enabled"
                         : TimeUtils.parseTime(System.currentTimeMillis() - enableDate);
-                
-            case "key":
-                return plugin.getAuthHandler().getStorageHandler()
-                        .getKey(player.getUniqueId());
-                
-            case "is_required":
-                return player.hasPermission(Constants.demandPermission)
-                        ? MessageHandler.TwoFAMessages.KEYWORD_REQUIRED.getMessage()
-                        : MessageHandler.TwoFAMessages.KEYWORD_NOT_REQUIRED.getMessage();
-        }
+            }
+            case "key" -> plugin.getAuthHandler().getStorageHandler()
+                    .getKey(player.getUniqueId());
+            case "is_required" -> player.hasPermission(Constants.demandPermission)
+                    ? MessageHandler.TwoFAMessages.KEYWORD_REQUIRED.getMessage()
+                    : MessageHandler.TwoFAMessages.KEYWORD_NOT_REQUIRED.getMessage();
+            default -> null;
+        };
 
-        return null;
     }
 }

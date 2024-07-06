@@ -46,7 +46,7 @@ public class OnAuthStateChange implements Listener {
             this.plugin.getStorageHandler().setIP(event.getPlayer().getUniqueId(),
                     this.hash.hash(event.getPlayer().getAddress().getAddress().getHostAddress()));
 
-            this.plugin.getAuthTracker().setAuthentications(this.plugin.getAuthTracker().getAuthentications() + 1);
+            this.plugin.getAuthTracker().incrementAuths();
         }
     }
 

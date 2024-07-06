@@ -2,10 +2,13 @@ package com.lielamar.auth.shared.storage.mongodb;
 
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.mongodb.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import java.util.List;
 import java.util.UUID;
 
 public final class MongoDBStorage extends StorageHandler {
@@ -55,15 +58,23 @@ public final class MongoDBStorage extends StorageHandler {
             throw new IllegalStateException("A MongoDB instance already exists for the following database: " + this.database);
         }
 
-        if (this.uri.length() > 0) {
-            MongoClientURI uri = new MongoClientURI(this.uri);
-            this.mongoClient = new MongoClient(uri);
+        if (!this.uri.isEmpty()) {
+            this.mongoClient = MongoClients.create(uri);
         } else {
-            if (this.username.length() > 0 && this.password.length() > 0) {
+            if (!this.username.isEmpty() && !this.password.isEmpty()) {
                 MongoCredential credential = MongoCredential.createCredential(this.username, this.database, this.password.toCharArray());
-                this.mongoClient = new MongoClient(new ServerAddress(this.host, this.port), credential, MongoClientOptions.builder().build());
+                this.mongoClient = MongoClients.create(
+                        MongoClientSettings.builder()
+                                .credential(credential)
+                                .applyToClusterSettings(builder -> builder.hosts(List.of(new ServerAddress(this.host, this.port))))
+                                .build()
+                );
             } else {
-                this.mongoClient = new MongoClient(new ServerAddress(this.host, this.port));
+                this.mongoClient = MongoClients.create(
+                        MongoClientSettings.builder()
+                                .applyToClusterSettings(builder -> builder.hosts(List.of(new ServerAddress(this.host, this.port))))
+                                .build()
+                );
             }
         }
 

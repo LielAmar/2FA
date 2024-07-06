@@ -54,8 +54,7 @@ public abstract class AuthCommunicationHandler {
         }
     }
 
-    protected @NotNull
-    UUID registerCallback(@Nullable AuthCommunicationCallback callback) {
+    protected @NotNull UUID registerCallback(@Nullable AuthCommunicationCallback callback) {
         UUID randomUUID = UUID.randomUUID();
 
         if (callback != null) {

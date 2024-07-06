@@ -4,7 +4,8 @@ import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.handlers.MessageHandler;
 import com.lielamar.auth.shared.handlers.AuthHandler;
 import com.lielamar.auth.shared.utils.Constants;
-import com.lielamar.lielsutils.numbers.NumbersUtils;
+import com.lielamar.auth.shared.utils.NumbersUtils;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -101,12 +103,13 @@ public class DisabledEvents implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onItemPickup(PlayerPickupItemEvent event) {
-        if (!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) {
+    public void onItemPickup(EntityPickupItemEvent event) {
+        if (!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)
+                || !event.getEntityType().equals(EntityType.PLAYER)) {
             return;
         }
 
-        if (this.plugin.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
+        if (this.plugin.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) {
             event.setCancelled(true);
         } else if (this.plugin.getAuthHandler().isQRCodeItem(event.getItem().getItemStack())) {
             event.getItem().remove();
