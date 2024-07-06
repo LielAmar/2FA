@@ -1,9 +1,10 @@
 package com.lielamar.auth.core.storage;
 
 public class UserSession {
-    private long enableDate;
     private String key;
     private String ip;
+    private long enableDate;
+    private long lastAuthDate;
 
     public String getKey() {
         return key;
@@ -11,6 +12,14 @@ public class UserSession {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public long getEnableDate() {
@@ -21,11 +30,11 @@ public class UserSession {
         this.enableDate = enableDate;
     }
 
-    public String getIp() {
-        return ip;
+    public long getLastAuthDate() {
+        return lastAuthDate;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setLastAuthDate(long lastAuthDate) {
+        this.lastAuthDate = lastAuthDate;
     }
 }

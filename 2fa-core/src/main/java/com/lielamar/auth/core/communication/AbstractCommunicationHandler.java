@@ -1,7 +1,7 @@
 package com.lielamar.auth.core.communication;
 
-import com.lielamar.auth.core.auth.AuthState;
-
+import com.lielamar.auth.api.auth.AuthState;
+import com.lielamar.auth.api.communication.MessageType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,26 +21,25 @@ public abstract class AbstractCommunicationHandler {
         this.connected = false;
     }
 
+    public abstract void loadPlayerState(@NotNull UUID uuid, @Nullable CommunicationCallback callback);
+
     public void loadPlayerState(@NotNull UUID uuid) {
         this.loadPlayerState(uuid, null);
     }
+
+    public abstract void setPlayerState(@NotNull UUID uuid, @NotNull AuthState authState, @Nullable CommunicationCallback callback);
 
     public void setPlayerState(@NotNull UUID uuid, @NotNull AuthState authState) {
         this.setPlayerState(uuid, authState, null);
     }
 
+    public abstract void checkCommunication(@NotNull UUID uuid, @Nullable CommunicationCallback callback);
+
     public void checkCommunication(@NotNull UUID uuid) {
         this.checkCommunication(uuid, null);
     }
 
-    public abstract void loadPlayerState(@NotNull UUID uuid, @Nullable CommunicationCallback callback);
-
-    public abstract void setPlayerState(@NotNull UUID uuid, @NotNull AuthState authState, @Nullable CommunicationCallback callback);
-
-    public abstract void checkCommunication(@NotNull UUID uuid, @Nullable CommunicationCallback callback);
-
-    public void onResponse(@NotNull UUID playerUUID, @NotNull UUID messageUUID, @NotNull MessageType messageType,
-            @NotNull AuthState authState) {
+    public void onResponse(@NotNull UUID playerUUID, @NotNull UUID messageUUID, @NotNull MessageType messageType, @NotNull AuthState authState) {
         CommunicationCallback callback = this.callbacks.get(messageUUID);
 
         if (callback != null) {
@@ -49,9 +48,10 @@ public abstract class AbstractCommunicationHandler {
 
         this.callbacks.remove(messageUUID);
 
-        if (messageType == MessageType.CHECK_COMMUNICATION) {
+        // TODO: send a syn
+/*        if (messageType == MessageType.PROXY_SYNACK) {
             this.connected = true;
-        }
+        }*/
     }
 
     protected @NotNull UUID registerCallback(@Nullable CommunicationCallback callback) {
@@ -62,12 +62,5 @@ public abstract class AbstractCommunicationHandler {
         }
 
         return randomUUID;
-    }
-
-
-    public enum MessageType {
-        LOAD_STATE,
-        SET_STATE,
-        CHECK_COMMUNICATION
     }
 }

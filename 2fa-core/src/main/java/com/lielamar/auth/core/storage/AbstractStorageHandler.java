@@ -2,7 +2,6 @@ package com.lielamar.auth.core.storage;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.lielamar.auth.core.storage.UserSession;
 import com.lielamar.auth.core.config.AbstractConfigHandler;
 import com.lielamar.auth.core.storage.json.JSONStorage;
 import com.lielamar.auth.core.storage.mongodb.MongoDBStorage;
@@ -91,7 +90,6 @@ public abstract class AbstractStorageHandler {
      * Check if external storage was loaded
      */
     public abstract boolean isLoaded();
-
 
     @Bean
     @Singleton

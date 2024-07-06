@@ -1,7 +1,6 @@
 package com.lielamar.auth.api.events;
 
-import com.lielamar.auth.core.auth.AbstractAuthHandler;
-import com.lielamar.auth.core.auth.AuthState;
+import com.lielamar.auth.api.auth.AuthState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

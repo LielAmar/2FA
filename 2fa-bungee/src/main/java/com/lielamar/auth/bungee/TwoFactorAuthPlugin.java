@@ -2,7 +2,6 @@ package com.lielamar.auth.bungee;
 
 import com.lielamar.auth.api.ITwoFactorAuthPlugin;
 import com.lielamar.auth.core.listeners.IListenerRegisterer;
-import com.lielamar.auth.core.utils.AuthTracker;
 import io.micronaut.context.ApplicationContext;
 import net.md_5.bungee.api.plugin.Plugin;
 

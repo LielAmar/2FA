@@ -1,6 +1,6 @@
 package com.lielamar.auth.core.communication;
 
-import com.lielamar.auth.core.auth.AuthState;
+import com.lielamar.auth.api.auth.AuthState;
 
 import java.util.UUID;
 

@@ -6,6 +6,7 @@ import com.atlassian.onetime.service.DefaultTOTPService;
 import com.atlassian.onetime.service.RandomSecretProvider;
 import com.atlassian.onetime.service.SecretProvider;
 import com.atlassian.onetime.service.TOTPService;
+import com.lielamar.auth.api.auth.AuthState;
 import com.lielamar.auth.core.config.AbstractConfigHandler;
 import com.lielamar.auth.core.storage.AbstractStorageHandler;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +18,10 @@ import java.util.UUID;
 
 public abstract class AbstractAuthHandler {
     private final Map<UUID, String> pendingKeys;
-    private final Map<UUID, Integer> failedAttempts;
     protected Map<UUID, AuthState> authStates;
+
+    private final Map<UUID, Integer> failedAttempts;
+
     protected final TOTPService totpService;
     protected final SecretProvider secretProvider;
 

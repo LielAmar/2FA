@@ -14,8 +14,6 @@ plugins {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT")
-
-    compileOnly(project(":2fa-core"))
 }
 
 description = "2fa-api"

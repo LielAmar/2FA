@@ -13,23 +13,20 @@ plugins {
 
 dependencies {
     implementation(project(":2fa-api"))
-    implementation(project(":2fa-bungee"))
-    implementation(project(":2fa-bukkit"))
 
     implementation("org.json:json:20240303")
-
     annotationProcessor("io.micronaut:micronaut-inject-java:4.5.3")
     api("io.micronaut:micronaut-inject-java:4.5.3")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
-    implementation("com.atlassian:onetime:2.1.1")
 
+    compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    compileOnly("com.atlassian:onetime:2.1.1")
     compileOnly("commons-codec:commons-codec:1.17.0")
-    implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("com.h2database:h2:2.2.224")
-    implementation("com.mysql:mysql-connector-j:8.4.0")
-    implementation("org.postgresql:postgresql:42.7.3")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.4.0")
-    implementation("org.mongodb:mongodb-driver-sync:5.1.1")
+    compileOnly("com.zaxxer:HikariCP:5.1.0")
+    compileOnly("com.h2database:h2:2.2.224")
+    compileOnly("com.mysql:mysql-connector-j:8.4.0")
+    compileOnly("org.postgresql:postgresql:42.7.3")
+    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.4.0")
+    compileOnly("org.mongodb:mongodb-driver-sync:5.1.1")
 
 }
 

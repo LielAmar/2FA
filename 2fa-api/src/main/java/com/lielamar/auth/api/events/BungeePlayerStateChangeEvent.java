@@ -1,6 +1,6 @@
 package com.lielamar.auth.api.events;
 
-import com.lielamar.auth.core.auth.AuthState;
+import com.lielamar.auth.api.auth.AuthState;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Cancellable;
 import net.md_5.bungee.api.plugin.Event;
