@@ -39,7 +39,7 @@ dependencies {
     compileOnly 'commons-codec:commons-codec:1.17.0'
     compileOnly 'com.zaxxer:HikariCP:5.1.0'
     compileOnly 'com.h2database:h2:2.2.224'
-    compileOnly 'com.mysql:mysql-connector-j:8.4.0'
+    compileOnly 'com.mysql:mysql-connector-j:9.0.0'
     compileOnly 'org.postgresql:postgresql:42.7.3'
     compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.0'
     compileOnly 'org.mongodb:mongodb-driver-sync:5.1.1'
