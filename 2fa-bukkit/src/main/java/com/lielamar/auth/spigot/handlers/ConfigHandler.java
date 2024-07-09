@@ -1,5 +1,6 @@
 package com.lielamar.auth.spigot.handlers;
 
+import com.lielamar.auth.api.communication.CommunicationMethod;
 import com.lielamar.auth.core.config.AbstractConfigHandler;
 import dev.sadghost.espresso.files.FileManager;
 import dev.sadghost.espresso.files.IConfig;

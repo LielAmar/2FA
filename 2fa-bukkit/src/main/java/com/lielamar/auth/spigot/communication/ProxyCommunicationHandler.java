@@ -1,31 +1,32 @@
 package com.lielamar.auth.spigot.communication;
 
 import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.lielamar.auth.api.communication.MessageType;
 import com.lielamar.auth.core.utils.Constants;
 import jakarta.inject.Inject;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.io.*;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class ProxyCommunicationHandler implements PluginMessageListener {
     private final Server server;
+    private final Plugin plugin;
 
     private boolean connected;
 
     @Inject
-    public ProxyCommunicationHandler(final @NotNull Server server) {
+    public ProxyCommunicationHandler(final @NotNull Server server,
+                                     final @NotNull Plugin plugin) {
         this.server = server;
+        this.plugin = plugin;
     }
 
     @Override
@@ -74,7 +75,7 @@ public class ProxyCommunicationHandler implements PluginMessageListener {
     private void acknowledgeProxy() {
         if (!connected) {
             connected = true;
-            server.sendPluginMessage();
+
             // Optionally, log successful acknowledgement
             //getLogger().info("Proxy acknowledged successfully.");
         } else {
@@ -83,7 +84,17 @@ public class ProxyCommunicationHandler implements PluginMessageListener {
         }
     }
 
-    public void sendMessage(MessageType messageType, List<?> message) {
-        // Implement sending messages to the proxy
+    public void sendMessage(final @NotNull MessageType messageType,
+                            final @NotNull Consumer<ByteArrayDataOutput> outputConsumer) {
+        for (Player player : server.getOnlinePlayers()) {
+            ByteArrayDataOutput msg = ByteStreams.newDataOutput();
+            outputConsumer.accept(msg);
+            player.sendPluginMessage(plugin, Constants.PROXY_CHANNEL_NAME, msg.toByteArray());
+            break;
+        }
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 }
