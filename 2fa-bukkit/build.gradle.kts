@@ -13,7 +13,7 @@ plugins {
 dependencies {
     compileOnly("org.json:json:20240303")
 
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
     compileOnly("io.micronaut:micronaut-inject-java:4.5.3")
 
     compileOnly("me.clip:placeholderapi:2.11.6")

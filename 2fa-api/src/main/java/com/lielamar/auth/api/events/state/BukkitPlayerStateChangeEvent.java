@@ -1,25 +1,27 @@
-package com.lielamar.auth.api.events;
+package com.lielamar.auth.api.events.state;
 
 import com.lielamar.auth.api.auth.AuthState;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Cancellable;
-import net.md_5.bungee.api.plugin.Event;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BungeePlayerStateChangeEvent extends Event implements Cancellable {
+public class BukkitPlayerStateChangeEvent extends Event implements Cancellable {
+    private static final HandlerList HANDLERS = new HandlerList();
     private final AbstractPlayerStateChangeEvent abstractEvent;
 
-    public BungeePlayerStateChangeEvent(@NotNull ProxiedPlayer player, @Nullable AuthState oldAuthState, @NotNull AuthState newAuthState) {
+    public BukkitPlayerStateChangeEvent(@NotNull Player player, @Nullable AuthState oldAuthState, @NotNull AuthState newAuthState) {
         this.abstractEvent = new AbstractPlayerStateChangeEvent(player, oldAuthState, newAuthState) {
             @Override
             public boolean isPlatformCancelled() {
-                return BungeePlayerStateChangeEvent.this.isCancelled();
+                return BukkitPlayerStateChangeEvent.this.isCancelled();
             }
 
             @Override
             public void setPlatformCancelled(boolean cancelled) {
-                BungeePlayerStateChangeEvent.this.setCancelled(cancelled);
+                BukkitPlayerStateChangeEvent.this.setCancelled(cancelled);
             }
         };
     }
@@ -34,15 +36,15 @@ public class BungeePlayerStateChangeEvent extends Event implements Cancellable {
         abstractEvent.setCancelled(cancelled);
     }
 
-    public ProxiedPlayer getPlayer() {
-        return (ProxiedPlayer) abstractEvent.getPlayer();
+    public @NotNull Player getPlayer() {
+        return (Player) abstractEvent.getPlayer();
     }
 
     public @Nullable AuthState getOldAuthState() {
         return abstractEvent.getOldAuthState();
     }
 
-    public void setOldAuthState(@NotNull AuthState oldAuthState) {
+    public void setOldAuthState(@Nullable AuthState oldAuthState) {
         abstractEvent.setOldAuthState(oldAuthState);
     }
 
@@ -52,5 +54,14 @@ public class BungeePlayerStateChangeEvent extends Event implements Cancellable {
 
     public void setNewAuthState(@NotNull AuthState newAuthState) {
         abstractEvent.setNewAuthState(newAuthState);
+    }
+
+    @Override
+    public @NotNull HandlerList getHandlers() {
+        return HANDLERS;
+    }
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 }

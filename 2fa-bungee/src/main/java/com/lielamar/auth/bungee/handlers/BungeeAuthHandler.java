@@ -1,6 +1,6 @@
 package com.lielamar.auth.bungee.handlers;
 
-import com.lielamar.auth.api.events.BungeePlayerStateChangeEvent;
+import com.lielamar.auth.api.events.state.BungeePlayerStateChangeEvent;
 import com.lielamar.auth.api.auth.AuthState;
 import com.lielamar.auth.core.auth.AbstractAuthHandler;
 import com.lielamar.auth.core.storage.AbstractStorageHandler;

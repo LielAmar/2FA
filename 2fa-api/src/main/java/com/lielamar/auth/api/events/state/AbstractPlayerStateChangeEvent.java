@@ -1,4 +1,4 @@
-package com.lielamar.auth.api.events;
+package com.lielamar.auth.api.events.state;
 
 import com.lielamar.auth.api.auth.AuthState;
 import org.jetbrains.annotations.NotNull;

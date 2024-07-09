@@ -1,6 +1,6 @@
 package com.lielamar.auth.bungee.listeners;
 
-import com.lielamar.auth.api.events.BungeePlayerStateChangeEvent;
+import com.lielamar.auth.api.events.state.BungeePlayerStateChangeEvent;
 import com.lielamar.auth.api.auth.AuthState;
 import com.lielamar.auth.api.stats.StatsTracker;
 import jakarta.inject.Inject;

@@ -5,6 +5,6 @@ public enum MessageType {
         PROXY_SYNACK,
         SPIGOT_ACK,
 
-        GET_STATE,
-        SET_STATE;
+        AUTH_STATE,
+        PROXY_AUTHENTICATE;
 }
