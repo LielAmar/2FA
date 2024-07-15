@@ -76,7 +76,7 @@ public class DependencyHandler {
 
         Bukkit.getServer().getLogger().info("Loading library MySQL v" + mysqlVersion);
         library = Library.builder()
-                .groupId("mysql")
+                .groupId("com.mysql")
                 .artifactId("mysql-connector-j")
                 .version(mysqlVersion)
                 .build();
