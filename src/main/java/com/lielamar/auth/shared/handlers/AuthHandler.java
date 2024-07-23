@@ -5,6 +5,7 @@ import com.atlassian.onetime.model.TOTPSecret;
 import com.atlassian.onetime.service.DefaultTOTPService;
 import com.atlassian.onetime.service.RandomSecretProvider;
 import com.atlassian.onetime.service.SecretProvider;
+import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import org.jetbrains.annotations.NotNull;
@@ -259,6 +260,9 @@ public abstract class AuthHandler {
     public void playerQuit(@NotNull UUID uuid) {
         pendingKeys.remove(uuid);
         authStates.remove(uuid);
+        if (authCommunicationHandler instanceof BasicAuthCommunication authCommunication) {
+            authCommunication.handleQuit(uuid);
+        }
     }
 
     public abstract void changeState(@NotNull UUID uuid, @NotNull AuthState authState);

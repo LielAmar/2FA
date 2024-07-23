@@ -23,6 +23,11 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
             public void changeState(@NotNull UUID uuid, @NotNull AuthState authState) {
                 super.authStates.put(uuid, authState);
             }
+
+            @Override
+            public void playerQuit(@NotNull UUID uuid) {
+                super.playerQuit(uuid);
+            }
         };
 
         long timeout = this.plugin.getConfigHandler().getCommunicationTimeout();
@@ -64,5 +69,9 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
         UUID callbackUUID = registerCallback(callback);
 
         super.onResponse(uuid, callbackUUID, MessageType.CHECK_COMMUNICATION, AuthHandler.AuthState.NONE);
+    }
+
+    public void handleQuit(UUID uuid) {
+        this.authHandler.playerQuit(uuid);
     }
 }
