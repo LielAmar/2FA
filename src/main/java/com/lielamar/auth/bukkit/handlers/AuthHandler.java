@@ -78,13 +78,6 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
         for(Player pl : Bukkit.getOnlinePlayers())
             removeQRItem(pl);
-
-        // we pass the auth handler to the communication handler, so we'd have them both synchronized.
-        // Terrible practice the way I do it because I think sometimes it sets the auth state multiple times
-        // but this serves as a quick fix for the issue now that I figured it out.
-        if (authCommunicationHandler instanceof BasicAuthCommunication basicAuth) {
-            basicAuth.loadTimeoutAndHandler(this);
-        }
     }
 
     public void reloadOnlinePlayers() {

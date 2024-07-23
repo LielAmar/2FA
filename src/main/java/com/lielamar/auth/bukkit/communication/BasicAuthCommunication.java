@@ -13,14 +13,17 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
 
     private final TwoFactorAuthentication plugin;
 
-    private AuthHandler authHandler;
+    private final AuthHandler authHandler;
 
     public BasicAuthCommunication(TwoFactorAuthentication plugin) {
         this.plugin = plugin;
-    }
 
-    public void loadTimeoutAndHandler(AuthHandler authHandler) {
-        this.authHandler = authHandler;
+        this.authHandler = new AuthHandler() {
+            @Override
+            public void changeState(@NotNull UUID uuid, @NotNull AuthState authState) {
+                super.authStates.put(uuid, authState);
+            }
+        };
 
         long timeout = this.plugin.getConfigHandler().getCommunicationTimeout();
 
