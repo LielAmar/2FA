@@ -26,10 +26,10 @@ public class DependencyHandler {
         String commonsCodecVersion = "1.17.0"; // Updated to match Gradle build file
         String hikariCpVersion = "5.1.0"; // Updated to match Gradle build file
         String h2Version = "2.2.224"; // Updated to match Gradle build file
-        String mysqlVersion = "8.4.0"; // Updated to match Gradle build file
+        String mysqlVersion = "9.0.0"; // Updated to match Gradle build file
         String mariaDBVersion = "3.4.0"; // Updated to match Gradle build file
         String postgresVersion = "42.7.3"; // Updated to match Gradle build file
-        String mongoDBVersion = "5.1.1"; // Updated to match Gradle build file
+        String mongoDBVersion = "5.1.2"; // Updated to match Gradle build file
         String slf4jVersion = "2.0.13"; // Updated to match Gradle build file
         String log4jVersion = "2.23.1"; // Updated to match Gradle build file
         String atlassianVersion = "2.1.1"; // Added Atlassian library
@@ -76,7 +76,7 @@ public class DependencyHandler {
 
         Bukkit.getServer().getLogger().info("Loading library MySQL v" + mysqlVersion);
         library = Library.builder()
-                .groupId("mysql")
+                .groupId("com.mysql")
                 .artifactId("mysql-connector-j")
                 .version(mysqlVersion)
                 .build();

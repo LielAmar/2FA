@@ -65,4 +65,8 @@ public class BasicAuthCommunication extends AuthCommunicationHandler {
 
         super.onResponse(uuid, callbackUUID, MessageType.CHECK_COMMUNICATION, AuthHandler.AuthState.NONE);
     }
+
+    public void handleQuit(UUID uuid) {
+        this.authHandler.playerQuit(uuid);
+    }
 }

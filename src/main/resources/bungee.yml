@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.7.0"
+version: "1.7.1"
 author: "LielAmar"
 authors: ["LielAmar", "SadGhost", "Wolfity"]
 main: com.lielamar.auth.bungee.TwoFactorAuthentication
