@@ -12,6 +12,7 @@ import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
 import com.lielamar.auth.shared.handlers.DependencyHandler;
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.shared.utils.AuthTracker;
+import net.byteflux.libby.BungeeLibraryManager;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 
@@ -24,7 +25,7 @@ public class TwoFactorAuthentication extends Plugin implements TwoFactorAuthenti
 
     @Override
     public void onEnable() {
-        new DependencyHandler(this); // Setup dependencies
+        new DependencyHandler(new BungeeLibraryManager(this)); // Setup dependencies
 
         this.setupAuth();
         this.registerListeners();

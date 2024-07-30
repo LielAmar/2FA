@@ -3,10 +3,7 @@ package com.lielamar.auth.bukkit;
 import com.lielamar.auth.bukkit.commands.TwoFactorAuthenticationCommand;
 import com.lielamar.auth.bukkit.communication.BasicAuthCommunication;
 import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
-import com.lielamar.auth.bukkit.handlers.AuthHandler;
-import com.lielamar.auth.bukkit.handlers.ConfigHandler;
-import com.lielamar.auth.bukkit.handlers.ConsoleFilter;
-import com.lielamar.auth.bukkit.handlers.MessageHandler;
+import com.lielamar.auth.bukkit.handlers.*;
 import com.lielamar.auth.bukkit.listeners.DisabledEvents;
 import com.lielamar.auth.bukkit.listeners.OnAuthStateChange;
 import com.lielamar.auth.bukkit.listeners.OnMapDrop;
@@ -17,7 +14,6 @@ import com.lielamar.auth.bukkit.utils.update.SpigotUpdateChecker;
 import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
 import com.lielamar.auth.shared.communication.AuthCommunicationHandler;
 import com.lielamar.auth.shared.communication.CommunicationMethod;
-import com.lielamar.auth.shared.handlers.DependencyHandler;
 import com.lielamar.auth.shared.storage.StorageHandler;
 import com.lielamar.auth.shared.utils.AuthTracker;
 import com.lielamar.auth.shared.utils.Constants;
@@ -85,7 +81,7 @@ public class TwoFactorAuthentication extends JavaPlugin implements TwoFactorAuth
             Class.forName("com.atlassian.onetime.service.DefaultTOTPService");
         } catch (ClassNotFoundException exception) {
             Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "[2FA] The default spigot dependency loader either does not exist or failed to load dependencies. Falling back to a custom dependency loader");
-            new DependencyHandler(this);
+            new BukkitDependencyHandler(this);
         }
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {

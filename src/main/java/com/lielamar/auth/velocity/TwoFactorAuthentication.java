@@ -17,6 +17,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import net.byteflux.libby.VelocityLibraryManager;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -41,7 +42,7 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         this.logger = logger;
         this.dataDirectory = dataDirectory;
 
-        new DependencyHandler(this);
+        new DependencyHandler(new VelocityLibraryManager<>(logger, dataDirectory, proxy.getPluginManager(), this));
         this.setupAuth();
     }
 
@@ -101,4 +102,5 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
     public AuthHandler getAuthHandler() {
         return this.authHandler;
     }
+
 }
