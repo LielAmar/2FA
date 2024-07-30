@@ -2,6 +2,7 @@ package com.lielamar.auth.velocity;
 
 import com.google.inject.Inject;
 import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
+import com.lielamar.auth.shared.handlers.DependencyHandler;
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.velocity.handlers.AuthHandler;
 import com.lielamar.auth.velocity.handlers.ConfigHandler;
@@ -40,6 +41,7 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         this.logger = logger;
         this.dataDirectory = dataDirectory;
 
+        new DependencyHandler(this);
         this.setupAuth();
     }
 
@@ -71,6 +73,10 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
 
     public Path getDataDirectory() {
         return this.dataDirectory;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     public MinecraftChannelIdentifier getINCOMING() {
