@@ -22,7 +22,6 @@ public class DependencyHandler {
 
         loader.addMavenCentral();
 
-        String kotlinStdLibVersion = "2.0.0"; // Added STDLib to allow atlassian library to run properly.
         String commonsCodecVersion = "1.17.0"; // Updated to match Gradle build file
         String hikariCpVersion = "5.1.0"; // Updated to match Gradle build file
         String h2Version = "2.2.224"; // Updated to match Gradle build file
@@ -32,26 +31,9 @@ public class DependencyHandler {
         String mongoDBVersion = "5.1.2"; // Updated to match Gradle build file
         String slf4jVersion = "2.0.13"; // Updated to match Gradle build file
         String log4jVersion = "2.23.1"; // Updated to match Gradle build file
-        String atlassianVersion = "2.1.1"; // Added Atlassian library
-
-        Bukkit.getServer().getLogger().info("Loading library Kotlin-StandardLib v" + atlassianVersion);
-        Library library = Library.builder()
-                .groupId("org.jetbrains.kotlin")
-                .artifactId("kotlin-stdlib")
-                .version(kotlinStdLibVersion)
-                .build();
-        loader.loadLibrary(library);
-
-        Bukkit.getServer().getLogger().info("Loading library OneTime v" + atlassianVersion);
-        library = Library.builder()
-                .groupId("com.atlassian")
-                .artifactId("onetime")
-                .version(atlassianVersion)
-                .build();
-        loader.loadLibrary(library);
 
         Bukkit.getServer().getLogger().info("Loading library Commons-Codec v" + commonsCodecVersion);
-        library = Library.builder()
+        Library library = Library.builder()
                 .groupId("commons-codec")
                 .artifactId("commons-codec")
                 .version(commonsCodecVersion)

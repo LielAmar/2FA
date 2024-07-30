@@ -1,5 +1,5 @@
 name: 2FA
-version: "1.7.1"
+version: "1.7.2"
 api-version: 1.13
 authors: [LielAmar, SadGhost, Wolfity]
 main: com.lielamar.auth.bukkit.TwoFactorAuthentication
@@ -7,7 +7,6 @@ description: Add another layer of protection to your server
 softdepend: [PlaceholderAPI]
 
 libraries:
-  - org.jetbrains.kotlin:kotlin-stdlib:2.0.0
   - commons-codec:commons-codec:1.17.0
   - com.zaxxer:HikariCP:5.1.0
   - com.h2database:h2:2.2.224
@@ -17,7 +16,6 @@ libraries:
   - org.mongodb:mongodb-driver-sync:5.1.2
   - org.slf4j:slf4j-api:2.0.13
   - org.apache.logging.log4j:log4j-core:2.23.1
-  - com.atlassian:onetime:2.1.1
 
 commands:
   2fa:
