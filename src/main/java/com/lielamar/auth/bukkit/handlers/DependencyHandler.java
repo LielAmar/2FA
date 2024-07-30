@@ -22,11 +22,11 @@ public class DependencyHandler {
 
         loader.addMavenCentral();
 
-        String commonsCodecVersion = "1.17.0"; // Updated to match Gradle build file
+        String commonsCodecVersion = "1.17.1"; // Updated to match Gradle build file
         String hikariCpVersion = "5.1.0"; // Updated to match Gradle build file
-        String h2Version = "2.2.224"; // Updated to match Gradle build file
+        String h2Version = "2.3.230"; // Updated to match Gradle build file
         String mysqlVersion = "9.0.0"; // Updated to match Gradle build file
-        String mariaDBVersion = "3.4.0"; // Updated to match Gradle build file
+        String mariaDBVersion = "3.4.1"; // Updated to match Gradle build file
         String postgresVersion = "42.7.3"; // Updated to match Gradle build file
         String mongoDBVersion = "5.1.2"; // Updated to match Gradle build file
         String slf4jVersion = "2.0.13"; // Updated to match Gradle build file

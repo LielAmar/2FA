@@ -37,12 +37,12 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.11.6'
 
     compileOnly 'org.apache.logging.log4j:log4j-core:2.23.1'
-    compileOnly 'commons-codec:commons-codec:1.17.0'
+    compileOnly 'commons-codec:commons-codec:1.17.1'
     compileOnly 'com.zaxxer:HikariCP:5.1.0'
-    compileOnly 'com.h2database:h2:2.2.224'
+    compileOnly 'com.h2database:h2:2.3.230'
     compileOnly 'com.mysql:mysql-connector-j:9.0.0'
     compileOnly 'org.postgresql:postgresql:42.7.3'
-    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.0'
+    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
     compileOnly 'org.mongodb:mongodb-driver-sync:5.1.2'
     compileOnly 'org.slf4j:slf4j-api:2.0.13'
 }
