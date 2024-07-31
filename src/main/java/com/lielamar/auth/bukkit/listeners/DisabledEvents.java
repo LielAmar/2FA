@@ -103,13 +103,12 @@ public class DisabledEvents implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onItemPickup(EntityPickupItemEvent event) {
-        if (!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)
-                || !event.getEntityType().equals(EntityType.PLAYER)) {
+    public void onItemPickup(PlayerPickupItemEvent event) {
+        if (!this.plugin.getConfigHandler().getDisabledEvents().getOrDefault(event.getClass(), true)) {
             return;
         }
 
-        if (this.plugin.getAuthHandler().needsToAuthenticate(event.getEntity().getUniqueId())) {
+        if (this.plugin.getAuthHandler().needsToAuthenticate(event.getPlayer().getUniqueId())) {
             event.setCancelled(true);
         } else if (this.plugin.getAuthHandler().isQRCodeItem(event.getItem().getItemStack())) {
             event.getItem().remove();
