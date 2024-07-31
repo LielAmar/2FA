@@ -9,6 +9,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
 
     public BukkitDependencyHandler(TwoFactorAuthentication plugin) {
         super(new BukkitLibraryManager(plugin));
+        loadBukkitDependencies();
     }
 
     private void loadBukkitDependencies() {
