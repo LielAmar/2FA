@@ -1,7 +1,7 @@
 {
   "id": "twofa",
   "name": "2FA",
-  "version": "1.7.0",
+  "version": "1.7.2",
   "description": "Add another layer of protection to your server",
   "authors": [
     "Liel Amar",

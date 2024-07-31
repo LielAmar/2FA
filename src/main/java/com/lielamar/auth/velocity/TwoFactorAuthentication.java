@@ -2,6 +2,7 @@ package com.lielamar.auth.velocity;
 
 import com.google.inject.Inject;
 import com.lielamar.auth.shared.TwoFactorAuthenticationPlugin;
+import com.lielamar.auth.shared.handlers.DependencyHandler;
 import com.lielamar.auth.shared.handlers.PluginMessagingHandler;
 import com.lielamar.auth.velocity.handlers.AuthHandler;
 import com.lielamar.auth.velocity.handlers.ConfigHandler;
@@ -16,11 +17,12 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import net.byteflux.libby.VelocityLibraryManager;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
 
-@Plugin(id = "twofa", name = "2FA", version = "1.7.1", description = "Add another layer of protection to your server", authors = {"Liel Amar", "SadGhost", "Wolfity"})
+@Plugin(id = "twofa", name = "2FA", version = "1.7.2", description = "Add another layer of protection to your server", authors = {"Liel Amar", "SadGhost", "Wolfity"})
 public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
 
     private final ProxyServer proxy;
@@ -40,6 +42,7 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         this.logger = logger;
         this.dataDirectory = dataDirectory;
 
+        new DependencyHandler(new VelocityLibraryManager<>(logger, dataDirectory, proxy.getPluginManager(), this));
         this.setupAuth();
     }
 
@@ -73,6 +76,10 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         return this.dataDirectory;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     public MinecraftChannelIdentifier getINCOMING() {
         return this.INCOMING;
     }
@@ -95,4 +102,5 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
     public AuthHandler getAuthHandler() {
         return this.authHandler;
     }
+
 }

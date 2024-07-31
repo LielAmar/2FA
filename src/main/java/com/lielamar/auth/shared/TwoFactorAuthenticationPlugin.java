@@ -13,4 +13,5 @@ public interface TwoFactorAuthenticationPlugin {
     ConfigHandler getConfigHandler();
 
     AuthHandler getAuthHandler();
+
 }

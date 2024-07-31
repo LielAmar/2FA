@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.lielamar.auth'
-version = '1.7.1'
+version = '1.7.2'
 
 defaultTasks 'clean', 'shadowJar'
 
@@ -27,6 +27,8 @@ dependencies {
 
     implementation 'net.byteflux:libby-core:1.3.1'
     implementation 'net.byteflux:libby-bukkit:1.3.1'
+    implementation 'net.byteflux:libby-bungee:1.3.1'
+    implementation 'net.byteflux:libby-velocity:1.3.1'
 
     compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
     compileOnly 'net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT'
@@ -34,14 +36,15 @@ dependencies {
 
     compileOnly 'me.clip:placeholderapi:2.11.6'
 
-    compileOnly 'org.apache.logging.log4j:log4j-core:2.23.1'
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.0.0'
     compileOnly 'com.atlassian:onetime:2.1.1'
-    compileOnly 'commons-codec:commons-codec:1.17.0'
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.23.1'
+    compileOnly 'commons-codec:commons-codec:1.17.1'
     compileOnly 'com.zaxxer:HikariCP:5.1.0'
-    compileOnly 'com.h2database:h2:2.2.224'
+    compileOnly 'com.h2database:h2:2.3.230'
     compileOnly 'com.mysql:mysql-connector-j:9.0.0'
     compileOnly 'org.postgresql:postgresql:42.7.3'
-    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.0'
+    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
     compileOnly 'org.mongodb:mongodb-driver-sync:5.1.2'
     compileOnly 'org.slf4j:slf4j-api:2.0.13'
 }
