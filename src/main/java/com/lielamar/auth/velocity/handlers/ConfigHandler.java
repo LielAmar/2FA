@@ -19,6 +19,8 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
 
     public ConfigHandler(@NotNull TwoFactorAuthentication plugin) {
         this.plugin = plugin;
+
+        this.reload();
     }
 
     @Override
@@ -26,7 +28,7 @@ public class ConfigHandler extends com.lielamar.auth.shared.handlers.ConfigHandl
         if(!this.plugin.getDataDirectory().toFile().exists())
             this.plugin.getDataDirectory().toFile().mkdir();
 
-        File file = new File(this.plugin.getDataDirectory().toFile(), super.configFileName);
+        File file = new File(this.plugin.getDataDirectory().toFile(), "config.toml");
 
         if(!file.getParentFile().exists())
             file.getParentFile().mkdirs();

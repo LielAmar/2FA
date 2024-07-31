@@ -51,12 +51,11 @@ public final class MessageHandler extends com.lielamar.auth.shared.handlers.Mess
         try {
             this.config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(this.file);
 
-            for (TwoFAMessages message : TwoFAMessages.values()) {
-                if (!this.config.contains(message.name())) {
-                    this.config.set(message.name(), message.getMessage());
-                } else {
-                    message.setMessage(this.config.getString(message.name()));
-                }
+            TwoFAMessages message = TwoFAMessages.VALIDATE_ACCOUNT; // We only need this message in the messages.yml file in bungeecord.
+            if (!this.config.contains(message.name())) {
+                this.config.set(message.name(), message.getMessage());
+            } else {
+                message.setMessage(this.config.getString(message.name()));
             }
         } catch (IOException exception) {
             exception.printStackTrace();
