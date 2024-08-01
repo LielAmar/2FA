@@ -3,6 +3,7 @@ package com.lielamar.auth.shared.handlers;
 import net.byteflux.libby.Library;
 import net.byteflux.libby.LibraryManager;
 
+import java.lang.reflect.InaccessibleObjectException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,8 +16,12 @@ public class DependencyHandler {
         this.loader = loader;
         try {
             this.loadDependencies();
+        } catch (InaccessibleObjectException exception) {
+            logger.severe("2FA detected that you might be using Java 16 without the --add-opens java.base/java.lang=ALL-UNNAMED or the --add-opens java.base/java.net=ALL-UNNAMED flags!");
+            logger.severe("If you want the plugin to support all features, most significantly Remote Databases, please add this flag to your startup script");
+            logger.severe("In case that the issue persists please contact the developers via Discord or Github Issues using '/2fa report' file.");
         } catch (Exception exception) {
-            logger.severe("An error has occurred while attempting to load the dependencies");
+            logger.severe("An error has occurred while loading the dependencies.");
             logger.log(Level.SEVERE, "Error caused by: ", exception);
         }
     }

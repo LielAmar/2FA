@@ -11,6 +11,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
         super(new BukkitLibraryManager(plugin));
     }
 
+    @Override
     protected void loadDependencies() {
         super.loadDependencies();
         Library library;
