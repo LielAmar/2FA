@@ -260,7 +260,8 @@ public abstract class AuthHandler {
     public void playerQuit(@NotNull UUID uuid) {
         pendingKeys.remove(uuid);
         authStates.remove(uuid);
-        if (authCommunicationHandler instanceof BasicAuthCommunication authCommunication) {
+        if (authCommunicationHandler instanceof BasicAuthCommunication) {
+            BasicAuthCommunication authCommunication = (BasicAuthCommunication)authCommunicationHandler;
             authCommunication.handleQuit(uuid);
         }
     }

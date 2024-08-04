@@ -11,10 +11,11 @@ public class BukkitDependencyHandler extends DependencyHandler {
         super(new BukkitLibraryManager(plugin));
     }
 
-    private void loadBukkitDependencies() {
+    @Override
+    protected void loadDependencies() {
+        super.loadDependencies();
         Library library;
 
-        String commonsCodecVersion = "1.17.1"; // Updated to match Gradle build file
         String hikariCpVersion = "5.1.0"; // Updated to match Gradle build file
         String h2Version = "2.3.230"; // Updated to match Gradle build file
         String mysqlVersion = "9.0.0"; // Updated to match Gradle build file
@@ -24,15 +25,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
         String slf4jVersion = "2.0.13"; // Updated to match Gradle build file
         String log4jVersion = "2.23.1"; // Updated to match Gradle build file
 
-        logger.info("Loading library Commons-Codec v{}", commonsCodecVersion);
-        library = Library.builder()
-                .groupId("commons-codec")
-                .artifactId("commons-codec")
-                .version(commonsCodecVersion)
-                .build();
-        loader.loadLibrary(library);
-
-        logger.info("Loading library HikariCP v{}", hikariCpVersion);
+        logger.info("Loading library HikariCP v" + hikariCpVersion);
         library = Library.builder()
                 .groupId("com.zaxxer")
                 .artifactId("HikariCP")
@@ -40,7 +33,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        logger.info("Loading library H2 v{}", h2Version);
+        logger.info("Loading library H2 v" + h2Version);
         library = Library.builder()
                 .groupId("com.h2database")
                 .artifactId("h2")
@@ -48,7 +41,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        logger.info("Loading library MySQL v{}", mysqlVersion);
+        logger.info("Loading library MySQL v" + mysqlVersion);
         library = Library.builder()
                 .groupId("com.mysql")
                 .artifactId("mysql-connector-j")
@@ -56,7 +49,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        logger.info("Loading library MariaDB v{}", mariaDBVersion);
+        logger.info("Loading library MariaDB v" + mariaDBVersion);
         library = Library.builder()
                 .groupId("org.mariadb.jdbc")
                 .artifactId("mariadb-java-client")
@@ -64,7 +57,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        logger.info("Loading library PostgreSQL v{}", postgresVersion);
+        logger.info("Loading library PostgreSQL v" + postgresVersion);
         library = Library.builder()
                 .groupId("org.postgresql")
                 .artifactId("postgresql")
@@ -72,7 +65,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        logger.info("Loading library MongoDB v{}", mongoDBVersion);
+        logger.info("Loading library MongoDB v" + mongoDBVersion);
         library = Library.builder()
                 .groupId("org.mongodb")
                 .artifactId("mongodb-driver-sync")
@@ -80,7 +73,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        logger.info("Loading library Slf4j v{}", slf4jVersion);
+        logger.info("Loading library Slf4j v" + slf4jVersion);
         library = Library.builder()
                 .groupId("org.slf4j")
                 .artifactId("slf4j-api")
@@ -88,7 +81,7 @@ public class BukkitDependencyHandler extends DependencyHandler {
                 .build();
         loader.loadLibrary(library);
 
-        logger.info("Loading library Log4j v{}", log4jVersion);
+        logger.info("Loading library Log4j v" + log4jVersion);
         library = Library.builder()
                 .groupId("org.apache.logging.log4j")
                 .artifactId("log4j-core")

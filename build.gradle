@@ -8,7 +8,7 @@ version = '1.7.2'
 
 defaultTasks 'clean', 'shadowJar'
 
-sourceCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
@@ -32,7 +32,7 @@ dependencies {
 
     compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
     compileOnly 'net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT'
-    compileOnly 'com.velocitypowered:velocity-api:3.3.0-SNAPSHOT'
+    compileOnly 'com.velocitypowered:velocity-api:3.1.1-SNAPSHOT'
 
     compileOnly 'me.clip:placeholderapi:2.11.6'
 

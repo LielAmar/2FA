@@ -31,12 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -216,7 +211,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
 
                     ItemStack mapItem;
 
-                    if (version.above(Version.ServerVersion.v1_13_0)) {
+                    if (version.above(Version.ServerVersion.v1_13)) {
                         mapItem = new ItemStack(Material.FILLED_MAP);
 
                         if (mapItem.getItemMeta() instanceof MapMeta) {
@@ -336,7 +331,7 @@ public class AuthHandler extends com.lielamar.auth.shared.handlers.AuthHandler {
             }
         });
 
-        if (version.above(Version.ServerVersion.v1_9_0)) {
+        if (version.above(Version.ServerVersion.v1_9)) {
             if (isQRCodeItem(player.getInventory().getItemInOffHand())) {
                 player.getInventory().setItemInOffHand(null);
             }

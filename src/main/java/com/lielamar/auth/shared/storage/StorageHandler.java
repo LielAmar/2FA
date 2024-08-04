@@ -114,25 +114,30 @@ public abstract class StorageHandler {
     public static StorageHandler loadStorageHandler(ConfigHandler configHandler, String absolutePath) {
         try {
             isLoaded = true;
-            return switch (configHandler.getStorageMethod()) {
-                case MYSQL -> new SQLStorage("com.mysql.cj.jdbc.MysqlDataSource",
-                        configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
-                        configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
-                case H2 -> new SQLStorage("org.h2.jdbcx.JdbcDataSource",
-                        configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
-                        configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
-                case MARIADB -> new SQLStorage("org.mariadb.jdbc.MariaDbDataSource",
-                        configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
-                        configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
-                case POSTGRESQL -> new SQLStorage("org.postgresql.ds.PGSimpleDataSource",
-                        configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
-                        configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
-                case MONGODB ->
-                        new MongoDBStorage(configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
-                                configHandler.getCollectionPrefix(), configHandler.getMongodbURI());
-                default -> // JSON
-                        new JSONStorage(absolutePath);
-            };
+            // JSON
+            switch (configHandler.getStorageMethod()) {
+                case MYSQL:
+                    return new SQLStorage("com.mysql.cj.jdbc.MysqlDataSource",
+                            configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
+                            configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
+                case H2:
+                    return new SQLStorage("org.h2.jdbcx.JdbcDataSource",
+                            configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
+                            configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
+                case MARIADB:
+                    return new SQLStorage("org.mariadb.jdbc.MariaDbDataSource",
+                            configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
+                            configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
+                case POSTGRESQL:
+                    return new SQLStorage("org.postgresql.ds.PGSimpleDataSource",
+                            configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
+                            configHandler.getTablePrefix(), configHandler.getMaximumPoolSize(), configHandler.getMinimumIdle(), configHandler.getMaximumLifetime(), configHandler.getKeepAliveTime(), configHandler.getConnectionTimeout());
+                case MONGODB:
+                    return new MongoDBStorage(configHandler.getHost(), configHandler.getDatabase(), configHandler.getUsername(), configHandler.getPassword(), configHandler.getPort(),
+                            configHandler.getCollectionPrefix(), configHandler.getMongodbURI());
+                default:
+                    return new JSONStorage(absolutePath);
+            }
         } catch (Exception exception) {
             isLoaded = false;
             exception.printStackTrace();

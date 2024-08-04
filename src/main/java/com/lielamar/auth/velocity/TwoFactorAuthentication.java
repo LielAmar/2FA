@@ -41,13 +41,12 @@ public class TwoFactorAuthentication implements TwoFactorAuthenticationPlugin {
         this.proxy = proxy;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
-
-        new DependencyHandler(new VelocityLibraryManager<>(logger, dataDirectory, proxy.getPluginManager(), this));
-        this.setupAuth();
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        new DependencyHandler(new VelocityLibraryManager<>(logger, dataDirectory, proxy.getPluginManager(), this));
+        this.setupAuth();
         this.registerListeners();
     }
 

@@ -32,22 +32,24 @@ public class TwoFactorAuthenticationPlaceholders extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        return switch (identifier.toLowerCase()) {
-            case "is_enabled" -> plugin.getAuthHandler().is2FAEnabled(player.getUniqueId())
-                    ? MessageHandler.TwoFAMessages.KEYWORD_ENABLED.getMessage()
-                    : MessageHandler.TwoFAMessages.KEYWORD_DISABLED.getMessage();
-            case "time_since_enabled" -> {
+        switch (identifier.toLowerCase()) {
+            case "is_enabled":
+                return plugin.getAuthHandler().is2FAEnabled(player.getUniqueId())
+                        ? MessageHandler.TwoFAMessages.KEYWORD_ENABLED.getMessage()
+                        : MessageHandler.TwoFAMessages.KEYWORD_DISABLED.getMessage();
+            case "time_since_enabled":
                 long enableDate = plugin.getAuthHandler().getStorageHandler().getEnableDate(player.getUniqueId());
-                yield enableDate == -1 ? "Not Enabled"
+                return enableDate == -1 ? "Not Enabled"
                         : TimeUtils.parseTime(System.currentTimeMillis() - enableDate);
-            }
-            case "key" -> plugin.getAuthHandler().getStorageHandler()
-                    .getKey(player.getUniqueId());
-            case "is_required" -> player.hasPermission(Constants.demandPermission)
-                    ? MessageHandler.TwoFAMessages.KEYWORD_REQUIRED.getMessage()
-                    : MessageHandler.TwoFAMessages.KEYWORD_NOT_REQUIRED.getMessage();
-            default -> null;
-        };
-
+            case "key":
+                return plugin.getAuthHandler().getStorageHandler()
+                        .getKey(player.getUniqueId());
+            case "is_required":
+                return player.hasPermission(Constants.demandPermission)
+                        ? MessageHandler.TwoFAMessages.KEYWORD_REQUIRED.getMessage()
+                        : MessageHandler.TwoFAMessages.KEYWORD_NOT_REQUIRED.getMessage();
+            default:
+                return null;
+        }
     }
 }
