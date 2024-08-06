@@ -36,7 +36,7 @@ dependencies {
 
     compileOnly 'me.clip:placeholderapi:2.11.6'
 
-    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.0.0'
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.0.10'
     compileOnly 'com.atlassian:onetime:2.1.1'
     compileOnly 'org.apache.logging.log4j:log4j-core:2.23.1'
     compileOnly 'commons-codec:commons-codec:1.17.1'
