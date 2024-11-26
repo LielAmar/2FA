@@ -4,6 +4,7 @@ import com.lielamar.auth.bukkit.TwoFactorAuthentication;
 import com.lielamar.auth.bukkit.communication.ProxyAuthCommunication;
 import com.lielamar.auth.bukkit.utils.cmd.StandaloneCommand;
 import com.lielamar.auth.bukkit.utils.cmd.SuperCommand;
+import com.lielamar.auth.bukkit.utils.version.Version;
 import com.lielamar.auth.shared.handlers.MessageHandler;
 import com.lielamar.auth.shared.utils.Constants;
 import org.bukkit.Bukkit;
@@ -16,6 +17,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +43,7 @@ public class ReportCommand extends StandaloneCommand {
         Date now = new Date();
 
         commandSender.sendMessage(ChatColor.GREEN + "Creating a Bug Report file...");
-
+        PrintWriter writer;
         try {
             File dataFolder = this.plugin.getDataFolder();
             if (!dataFolder.exists()) {
@@ -58,7 +61,7 @@ public class ReportCommand extends StandaloneCommand {
             }
 
             FileWriter fileWriter = new FileWriter(file, true);
-            PrintWriter writer = new PrintWriter(fileWriter);
+            writer = new PrintWriter(fileWriter);
 
             writer.println("Server Java and OS");
             writer.println("- Java Runtime Version: " + System.getProperty("java.runtime.version"));
@@ -85,7 +88,7 @@ public class ReportCommand extends StandaloneCommand {
             writer.println("");
 
             writer.println("Communication Method & Proxies: ");
-            writer.println("- Using Bungeecord: " + Class.forName("org.spigotmc.SpigotConfig").getField("bungee").getBoolean(null));
+            writer.println("- Proxy Software: " + getProxy());
             writer.println("- Is Proxy Loaded: " + (this.plugin.getAuthHandler().getAuthCommunicationHandler() instanceof ProxyAuthCommunication));
             writer.println("- Communication Method in config: " + this.plugin.getConfigHandler().getCommunicationMethod().name());
             writer.println("- Communication Timeout in config: " + this.plugin.getConfigHandler().getCommunicationTimeout() + " ticks");
@@ -107,7 +110,6 @@ public class ReportCommand extends StandaloneCommand {
             commandSender.sendMessage(ChatColor.GREEN + "Created a Bug Report file, Use this for your Bug Report! :)");
         } catch (IOException | ClassNotFoundException | NoSuchFieldException | IllegalAccessException exception) {
             exception.printStackTrace();
-
             commandSender.sendMessage(ChatColor.RED + "Failed to create a Bug Report file!");
         }
         return false;
@@ -131,5 +133,56 @@ public class ReportCommand extends StandaloneCommand {
     @Override
     public String[] getAliases() {
         return new String[]{"print", "info", "report"};
+    }
+
+    private String getProxy() throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException {
+        if (isUsingBungee()) {
+            return "BUNGEE";
+        } else if (isUsingVelocity()) {
+            return "VELOCITY";
+        } else {
+            return "NONE";
+        }
+    }
+
+    private boolean isUsingBungee() throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        return Class.forName("org.spigotmc.SpigotConfig").getField("bungee").getBoolean(null);
+    }
+
+    // This should detect if using velocity above and from paper version 1.13.1 build 377
+    // commit https://github.com/PaperMC/paper/commit/7141632abfd3ede89a1e3749c4e40ef6d0be8574
+    private boolean isUsingVelocity() {
+        if (Version.getInstance().getServerVersion().above(Version.ServerVersion.v1_19)) {
+            try {
+                Class<?> globalConfigClass = Class.forName("io.papermc.paper.configuration.GlobalConfiguration"); // Replace with the actual package name
+                Object globalConfigInstance = globalConfigClass.getMethod("get").invoke(null);
+
+                Field proxiesField = globalConfigClass.getDeclaredField("proxies");
+                proxiesField.setAccessible(true);
+                Object proxiesInstance = proxiesField.get(globalConfigInstance);
+
+                Field velocityField = proxiesInstance.getClass().getDeclaredField("velocity");
+                velocityField.setAccessible(true);
+                Object velocityInstance = velocityField.get(proxiesInstance);
+
+                Field enabledField = velocityInstance.getClass().getDeclaredField("enabled");
+                enabledField.setAccessible(true);
+                return enabledField.getBoolean(velocityInstance);
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | NoSuchFieldException | InvocationTargetException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            try {
+                Class<?> paperConfigClass = Class.forName("com.destroystokyo.paper.PaperConfig");
+                Field velocitySupportField = paperConfigClass.getDeclaredField("velocitySupport");
+                velocitySupportField.setAccessible(true);
+
+                return velocitySupportField.getBoolean(null);
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
     }
 }

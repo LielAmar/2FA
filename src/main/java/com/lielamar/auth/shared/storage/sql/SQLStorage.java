@@ -87,10 +87,10 @@ public class SQLStorage extends StorageHandler {
 
         Properties properties = new Properties();
         properties.setProperty("serverName", host);
-        properties.setProperty("port", port + "");
+        properties.setProperty("portNumber", port + "");
         properties.setProperty("databaseName", database);
         properties.setProperty("user", username);
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
             properties.setProperty("password", password);
         }
         hikari.setDataSourceProperties(properties);
