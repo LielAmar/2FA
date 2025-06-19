@@ -7,19 +7,17 @@
 plugins {
     id("java")
 
-    id("com.lielamar.java-conventions")
+    id("regular-libs")
 }
 
-dependencies {
-    compileOnly("org.json:json:20240303")
+val minecraftVersion: String by project
+val micronautVersion: String by project
 
-    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
-    compileOnly("io.micronaut:micronaut-inject-java:4.5.3")
+dependencies {
+    compileOnly("org.spigotmc:spigot-api:$minecraftVersion")
+    compileOnly("io.micronaut:micronaut-inject-java:$micronautVersion")
 
     compileOnly("me.clip:placeholderapi:2.11.6")
-
-    compileOnly("org.slf4j:slf4j-api:2.0.12")
-    compileOnly("org.apache.logging.log4j:log4j-core:2.23.1")
 
     compileOnly(project(":2fa-api"))
     compileOnly(project(":2fa-core"))

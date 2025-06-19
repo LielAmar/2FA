@@ -7,16 +7,15 @@
 plugins {
     id("java")
 
-    id("com.lielamar.java-conventions")
+    id("regular-libs")
 }
 
+val bungeeVersion: String by project
+val micronautVersion: String by project
+
 dependencies {
-    compileOnly("org.json:json:20240303")
-
-    compileOnly("net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT")
-
-    compileOnly("org.slf4j:slf4j-api:2.0.12")
-    compileOnly("org.apache.logging.log4j:log4j-core:2.23.1")
+    compileOnly("net.md-5:bungeecord-api:$bungeeVersion")
+    compileOnly("io.micronaut:micronaut-inject-java:$micronautVersion")
 
     compileOnly(project(":2fa-api"))
     compileOnly(project(":2fa-core"))

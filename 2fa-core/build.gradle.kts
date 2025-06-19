@@ -7,26 +7,26 @@
 plugins {
     java
 
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("com.lielamar.java-conventions")
+    id("com.gradleup.shadow") version "8.3.6"
+    id("database-libs")
 }
+
+val jsonVersion: String by project
+val micronautVersion: String by project
+val caffeineVersion: String by project
+val atlassianOnetimeVersion: String by project
+val commonsCodecVersion: String by project
 
 dependencies {
     implementation(project(":2fa-api"))
 
-    implementation("org.json:json:20240303")
-    annotationProcessor("io.micronaut:micronaut-inject-java:4.5.3")
-    api("io.micronaut:micronaut-inject-java:4.5.3")
+    implementation("org.json:json:$jsonVersion")
+    annotationProcessor("io.micronaut:micronaut-inject-java:$micronautVersion")
+    api("io.micronaut:micronaut-inject-java:$micronautVersion")
 
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.1.8")
-    compileOnly("com.atlassian:onetime:2.1.1")
-    compileOnly("commons-codec:commons-codec:1.17.0")
-    compileOnly("com.zaxxer:HikariCP:5.1.0")
-    compileOnly("com.h2database:h2:2.2.224")
-    compileOnly("com.mysql:mysql-connector-j:8.4.0")
-    compileOnly("org.postgresql:postgresql:42.7.3")
-    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.4.0")
-    compileOnly("org.mongodb:mongodb-driver-sync:5.1.1")
+    compileOnly("com.github.ben-manes.caffeine:caffeine:${caffeineVersion}")
+    compileOnly("com.atlassian:onetime:${atlassianOnetimeVersion}")
+    compileOnly("commons-codec:commons-codec:${commonsCodecVersion}")
 
 }
 

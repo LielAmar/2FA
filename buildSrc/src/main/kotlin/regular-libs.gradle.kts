@@ -18,9 +18,21 @@ repositories {
     maven("https://jitpack.io")
 }
 
+val jetbrainsVersion: String by project
+val jsonVersion: String by project
+val slf4jVersion: String by project
+val log4jVersion: String by project
+val espressoVersion: String by project
+
 dependencies {
-    compileOnly("org.jetbrains:annotations:24.1.0")
-    implementation("com.github.DirtyConcept:Espresso:ed830513b6")
+    compileOnly("org.jetbrains:annotations:$jetbrainsVersion")
+
+    compileOnly("org.json:json:$jsonVersion")
+
+    compileOnly("org.slf4j:slf4j-api:$slf4jVersion")
+    compileOnly("org.apache.logging.log4j:log4j-core:$log4jVersion")
+
+    implementation("com.github.DirtyConcept:Espresso:$espressoVersion")
 }
 
 group = "com.lielamar"
